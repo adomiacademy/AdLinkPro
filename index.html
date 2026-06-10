@@ -87,5 +87,33 @@
 
     </div>
 
+<script type="module">
+    import { auth, provider, signInWithPopup, db, doc, setDoc } from './firebase-config.js';
+
+    const googleBtn = document.querySelector('.google-login-btn') || document.querySelector('button:has(img[src*="google"])');
+
+    if (googleBtn) {
+        googleBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+
+                // ইউজারের ডাটাবেস প্রোফাইল তৈরি
+                await setDoc(doc(db, "users", user.uid), {
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    email: user.email,
+                    lastLogin: new Date()
+                }, { merge: true });
+
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                alert("লগইন ফেইল: " + error.message);
+            }
+        });
+    }
+</script>
+
 </body>
 </html>
