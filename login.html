@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdLinkX - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #080915; color: white; font-family: 'Inter', sans-serif; }
+        .login-card { background-color: #111223; border: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen px-4">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <div class="lg:col-span-6 space-y-6 hidden lg:block">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-link text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">AdLinkX</h1>
+                    <p class="text-xs text-gray-500">Traffic Exchange Network</p>
+                </div>
+            </div>
+            
+            <h2 class="text-4xl font-black tracking-tight leading-tight">
+                Exchange Traffic.<br><span class="text-purple-500">Grow Together.</span>
+            </h2>
+            <p class="text-gray-400 text-sm max-w-md">
+                Share your links, earn credits, and get real traffic from active members of our community.
+            </p>
+
+            <div class="space-y-4 pt-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center border border-gray-800">
+                        <i class="fas fa-users text-purple-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold">Real People</h4>
+                        <p class="text-xs text-gray-500">Get traffic from real active members</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center border border-gray-800">
+                        <i class="fas fa-bolt text-purple-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold">Fast & Simple</h4>
+                        <p class="text-xs text-gray-500">10 seconds timer, visit and earn</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-6 flex justify-center w-full">
+            <div class="login-card p-8 sm:p-10 rounded-3xl max-w-md w-full shadow-2xl">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-white">Welcome Back!</h3>
+                    <p class="text-xs text-gray-400 mt-1">Login to your account and continue</p>
+                </div>
+
+                <form id="login-form" class="space-y-5">
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Email Address</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-3.5 text-gray-600 text-sm"></i>
+                            <input type="email" id="login-email" required placeholder="Enter your email" 
+                                class="w-full bg-[#16172a] border border-gray-800 rounded-xl pt-3 pb-3 pl-12 pr-4 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-2">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-3.5 text-gray-600 text-sm"></i>
+                            <input type="password" id="login-password" required placeholder="Enter your password" 
+                                class="w-full bg-[#16172a] border border-gray-800 rounded-xl pt-3 pb-3 pl-12 pr-10 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 transition">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs pt-1">
+                        <label class="flex items-center text-gray-400 cursor-pointer">
+                            <input type="checkbox" class="rounded bg-gray-900 border-gray-800 text-purple-600 mr-2 focus:ring-0"> Remember me
+                        </label>
+                        <a href="#" class="text-purple-400 hover:underline font-medium">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition transform active:scale-[0.98] shadow-lg shadow-purple-600/20 mt-2">
+                        Login <i class="fas fa-chevron-right text-xs ml-1"></i>
+                    </button>
+                </form>
+
+                <div class="relative flex py-5 items-center">
+                    <div class="flex-grow border-t border-gray-800/60"></div>
+                    <span class="flex-shrink mx-4 text-[10px] text-gray-600 font-bold uppercase tracking-wider">Or Continue With</span>
+                    <div class="flex-grow border-t border-gray-800/60"></div>
+                </div>
+
+                <button id="google-login-btn" class="w-full bg-[#16172a] hover:bg-[#1c1e36] border border-gray-800/80 text-white font-medium py-3 px-4 rounded-xl text-sm transition flex items-center justify-center space-x-2">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-4 h-4">
+                    <span>Continue with Google</span>
+                </button>
+
+                <p class="text-center text-xs text-gray-500 mt-8">
+                    Don't have an account? <a href="signup.html" class="text-purple-400 hover:underline font-medium ml-1">Sign Up</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+<script type="module">
+    import { db, auth } from './firebase-config.js';
+    import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // ১. ইমেইল ও পাসওয়ার্ড দিয়ে লগইন
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            window.location.href = "index.html"; // সফল হলে হোমে যাবে
+        } catch (error) {
+            console.error(error);
+            alert("লগইন ব্যর্থ হয়েছে! ইমেইল অথবা পাসওয়ার্ড চেক করুন।");
+        }
+    });
+
+    // ২. গুগল দিয়ে লগইন ও ফায়ারস্টোরে নতুন ইউজার ডাটা ইনিশিয়ালাইজেশন (The Science)
+    document.getElementById('google-login-btn').addEventListener('click', async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            // ডাটাবেসে এই ইউজার আগে থেকে আছে কি না চেক করা
+            const userDocRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(userDocRef);
+
+            if (!docSnap.exists()) {
+                // নতুন ইউজার হলে ফায়ারস্টোরে ২৫টি খালি লিংকের ডেমো অ্যারে এবং টাস্ক ডাটা সেট করা
+                await setDoc(userDocRef, {
+                    displayName: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    points: 10,          // নতুন সাইন-আপ বোনাস ১০ পয়েন্ট!
+                    total_clicks: 0,
+                    referrals_count: 0,
+                    links: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""] // ২৫টি খালি ঘর
+                });
+            }
+
+            window.location.href = "index.html"; // হোমে রিডাইরেক্ট
+        } catch (error) {
+            console.error("Google Login Error:", error);
+            alert("গুগল লগইন করতে সমস্যা হয়েছে।");
+        }
+    });
+</script>
+
+</body>
+</html>
