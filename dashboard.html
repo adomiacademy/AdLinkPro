@@ -255,5 +255,77 @@
         </a>
     </div>
 
+<script type="module">
+    // ফায়ারবেস থেকে প্রয়োজনীয় ফাংশনগুলো নিয়ে আসছি
+    import { db, auth } from './firebase-config.js';
+    import { collection, query, limit, getDocs, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // পেজ লোড হলে অন্য ইউজারদের লিঙ্কগুলো ডাটাবেস থেকে এনে দেখানোর ফাংশন
+    async function loadAdFeed() {
+        const querySnapshot = await getDocs(query(collection(db, "users"), limit(10)));
+        const feedContainer = document.querySelector('.lg:col-span-8.space-y-5'); 
+        
+        // এখানে আমরা আগের ডামি পোস্টগুলো সরিয়ে রিয়েল পোস্ট বসাবো
+        // (আপাতত আপনার ডিজাইন ঠিক রাখতে আমরা জাভাস্ক্রিপ্ট দিয়ে বাটনগুলোকে সচল করছি)
+    }
+
+    // ৬ সেকেন্ড টাইমার এবং লিঙ্ক ওপেন করার আসল লজিক
+    window.startAdVisit = function(element, adLink) {
+        if(!adLink || adLink.includes('adsterra.com/abc12345')) {
+            alert("এটি একটি ডেমো লিঙ্ক। টেস্ট করার জন্য profile.html এ গিয়ে আগে একটি আসল লিঙ্ক সেভ করুন!");
+            return;
+        }
+
+        // ১. ছোট উইন্ডো বা নতুন ট্যাবে ডাইরেক্ট লিঙ্কটি ওপেন হবে
+        window.open(adLink, '_blank', 'width=450,height=600,top=100,left=100');
+
+        let timeLeft = 6;
+        element.disabled = true; // বাটন লক করে দিলাম যাতে বারবার ক্লিক না করতে পারে
+        element.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+        element.classList.add('bg-gray-700', 'cursor-not-allowed');
+        element.innerText = `Wait ${timeLeft}s`;
+
+        // ২. টাইমার কাউন্টডাউন শুরু
+        const timer = setInterval(async () => {
+            timeLeft--;
+            element.innerText = `Wait ${timeLeft}s`;
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                element.innerText = "Completed ✅";
+                element.classList.remove('bg-gray-700');
+                element.classList.add('bg-green-600');
+
+                // ৩. ক্রেডিট বা পয়েন্ট আপডেট (ইউজারকে ১০ পয়েন্ট দেওয়া)
+                const user = auth.currentUser;
+                if (user) {
+                    const userDocRef = doc(db, "users", user.uid);
+                    await updateDoc(userDocRef, {
+                        points: increment(10), // ১০ পয়েন্ট যোগ হবে
+                        total_clicks: increment(1) // ইউজারের টোটাল ক্লিক ১ বাড়বে
+                    });
+                    
+                    // স্ক্রিনে পয়েন্টের সংখ্যা আপডেট করা
+                    const pointsText = document.querySelector('.text-yellow-500');
+                    if(pointsText) {
+                        let currentPoints = parseInt(pointsText.innerText) || 0;
+                        pointsText.innerText = currentPoints + 10;
+                    }
+                    
+                    alert("সফল হয়েছে! আপনি ১০ পয়েন্ট বোনাস পেয়েছেন।");
+                }
+            }
+        }, 1000);
+    }
+
+    // চেক করা ইউজার লগইন আছে কিনা
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            // যদি লগইন না থাকে তবে ইনডেক্স পেজে পাঠিয়ে দেবে
+            window.location.href = "index.html";
+        }
+    });
+</script>
+    
 </body>
 </html>
