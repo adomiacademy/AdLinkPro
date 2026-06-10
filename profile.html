@@ -17,7 +17,6 @@
 </head>
 <body class="flex min-h-screen">
 
-    <!-- Sidebar -->
     <aside class="w-64 sidebar h-screen fixed hidden lg:block border-r border-gray-800">
         <div class="p-6 flex items-center">
             <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-2">
@@ -29,22 +28,17 @@
             <a href="dashboard.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
                 <i class="fas fa-home mr-3 w-5 text-center"></i> Home
             </a>
-            <a href="#" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
+            <a href="dashboard.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
                 <i class="fas fa-th-large mr-3 w-5 text-center"></i> Dashboard
             </a>
             <a href="profile.html" class="flex items-center p-3 active-tab rounded-lg transition">
                 <i class="fas fa-user mr-3 w-5 text-center"></i> My Profile
             </a>
-            <a href="#" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
-                <i class="fas fa-history mr-3 w-5 text-center"></i> History
-            </a>
         </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="lg:ml-64 w-full flex flex-col min-h-screen">
         
-        <!-- Header -->
         <header class="card h-16 flex items-center justify-between px-8 sticky top-0 z-50">
             <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">User Profile</h2>
             <div class="flex items-center space-x-4">
@@ -57,39 +51,34 @@
 
         <div class="p-4 lg:p-8 space-y-8">
             
-            <!-- User Info Card -->
             <div class="card p-8 rounded-3xl relative overflow-hidden">
                 <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
                     <div class="relative">
                         <img id="profile-img" src="" class="w-32 h-32 rounded-2xl border-4 border-purple-500/20 object-cover">
-                        <div class="absolute -bottom-2 -right-2 bg-purple-600 p-2 rounded-lg cursor-pointer">
-                            <i class="fas fa-camera text-xs"></i>
-                        </div>
                     </div>
                     <div class="flex-1 text-center md:text-left">
-                        <div class="flex flex-col md:flex-row md:items-center gap-2">
+                        <div class="flex flex-col md:flex-row md:items-center gap-2 justify-center md:justify-start">
                             <h1 id="profile-name" class="text-3xl font-bold">Loading...</h1>
                             <i class="fas fa-check-circle text-blue-500 text-lg"></i>
                         </div>
-                        <p class="text-gray-400 text-sm mt-1">@<span id="profile-handle">username</span> • Joined June 2026</p>
+                        <p class="text-gray-400 text-sm mt-1">@<span id="profile-handle">username</span> • Joined 2026</p>
                         <p class="text-gray-500 text-sm mt-3 max-w-xl">Passive income lover. Earning through Adsterra & Monetag direct links. Let's grow together!</p>
                         
                         <div class="flex gap-3 mt-6 justify-center md:justify-start">
-                            <button class="bg-gray-800 hover:bg-gray-700 px-6 py-2 rounded-xl text-sm font-bold transition">Edit Profile</button>
-                            <button class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl text-sm font-bold transition">Share</button>
+                            <button id="edit-profile-btn" class="bg-gray-800 hover:bg-gray-700 px-6 py-2 rounded-xl text-sm font-bold transition">Edit Profile</button>
+                            <button id="share-profile-btn" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl text-sm font-bold transition"><i class="fas fa-share-alt mr-1"></i> Share</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Stats Row -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
                     <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
                         <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Followers</p>
-                        <p class="text-xl font-bold text-gray-200 mt-1">1.2k</p>
+                        <p id="stat-followers" class="text-xl font-bold text-gray-200 mt-1">0</p>
                     </div>
                     <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
                         <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Following</p>
-                        <p class="text-xl font-bold text-gray-200 mt-1">340</p>
+                        <p id="stat-following" class="text-xl font-bold text-gray-200 mt-1">0</p>
                     </div>
                     <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
                         <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Clicks</p>
@@ -97,15 +86,13 @@
                     </div>
                     <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
                         <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Return Clicks</p>
-                        <p class="text-xl font-bold text-green-400 mt-1">4,120</p>
+                        <p id="stat-return-clicks" class="text-xl font-bold text-green-400 mt-1">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Management Section -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <!-- Links Column -->
                 <div class="lg:col-span-7 space-y-6">
                     <div class="flex justify-between items-center">
                         <h3 class="font-bold flex items-center">
@@ -115,37 +102,10 @@
                     </div>
 
                     <div id="links-container" class="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                        <!-- Inputs generated by JS -->
-                    </div>
+                        </div>
                 </div>
 
-                <!-- Sidebar Analytics -->
                 <div class="lg:col-span-5 space-y-6">
-                    <div class="card p-6 rounded-3xl">
-                        <h4 class="font-bold text-sm mb-6">Daily Earning History</h4>
-                        <div class="space-y-6">
-                            <div>
-                                <div class="flex justify-between text-xs mb-2">
-                                    <span class="text-gray-400 uppercase font-bold">Today's Clicks</span>
-                                    <span class="text-purple-400 font-bold">142 <i class="fas fa-caret-up ml-1"></i></span>
-                                </div>
-                                <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden">
-                                    <div class="bg-purple-600 h-full w-[70%]"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-xs mb-2">
-                                    <span class="text-gray-400 uppercase font-bold">Yesterday's Clicks</span>
-                                    <span class="text-gray-300 font-bold">128</span>
-                                </div>
-                                <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden">
-                                    <div class="bg-gray-700 h-full w-[60%]"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Safety Card -->
                     <div class="bg-purple-900/10 border border-purple-500/20 p-6 rounded-3xl">
                         <div class="flex items-start gap-4">
                             <div class="bg-purple-600/20 p-3 rounded-xl">
@@ -166,6 +126,7 @@
 <script type="module">
     import { db, auth } from './firebase-config.js';
     import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const linksContainer = document.getElementById('links-container');
     const saveBtn = document.getElementById('save-all-btn');
@@ -177,31 +138,33 @@
                 <span class="text-[10px] text-gray-600 font-bold w-4">${String(i).padStart(2, '0')}</span>
                 <input type="url" id="link-${i}" placeholder="Paste Adsterra/Monetag Link ${i}" 
                     class="flex-1 input-box rounded-xl px-4 py-3 text-xs text-gray-300 placeholder:text-gray-700 transition">
-                <i class="fas fa-check-circle text-gray-800 text-sm"></i>
             </div>
         `;
         linksContainer.insertAdjacentHTML('beforeend', row);
     }
 
-    // ডাটা লোড করা
+    // ফায়ারবেস থেকে লাইভ ডাটা লোড
     auth.onAuthStateChanged(async (user) => {
         if (!user) { window.location.href = "index.html"; return; }
 
-        // প্রোফাইল ডাটা সেট করা
-        document.getElementById('profile-name').innerText = user.displayName;
-        document.getElementById('profile-handle').innerText = user.displayName.toLowerCase().replace(/\s+/g, '_');
-        document.getElementById('profile-img').src = user.photoURL;
-        document.getElementById('user-avatar-top').src = user.photoURL;
+        document.getElementById('profile-name').innerText = user.displayName || "User";
+        document.getElementById('profile-handle').innerText = (user.displayName || "user").toLowerCase().replace(/\s+/g, '_');
+        document.getElementById('profile-img').src = user.photoURL || "https://i.pravatar.cc/100";
+        document.getElementById('user-avatar-top').src = user.photoURL || "https://i.pravatar.cc/100";
 
         const userDocRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(userDocRef);
 
         if (docSnap.exists()) {
             const data = docSnap.data();
+            
+            // রিয়েল ডাটা সেট (ডাটা না থাকলে বাই ডিফল্ট ০ দেখাবে)
             document.getElementById('user-points').innerText = data.points || 0;
             document.getElementById('total-clicks').innerText = data.total_clicks || 0;
+            document.getElementById('stat-followers').innerText = data.followers_count || 0;
+            document.getElementById('stat-following').innerText = data.following_count || 0;
+            document.getElementById('stat-return-clicks').innerText = data.return_clicks || 0;
             
-            // যদি আগে থেকে লিঙ্ক সেভ করা থাকে তবে ইনপুটে বসানো
             if (data.links && data.links.length > 0) {
                 data.links.forEach((link, index) => {
                     if(index < 25) {
@@ -213,7 +176,7 @@
         }
     });
 
-    // সব লিঙ্ক সেভ করা
+    // ১. সেভ বাটন লজিক
     saveBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -221,7 +184,7 @@
         const linksArray = [];
         for (let i = 1; i <= 25; i++) {
             const val = document.getElementById(`link-${i}`).value.trim();
-            linksArray.push(val); // খালি থাকলেও পুশ হবে যাতে ইনডেক্স ঠিক থাকে
+            linksArray.push(val);
         }
 
         saveBtn.innerText = "Saving...";
@@ -229,9 +192,7 @@
 
         try {
             const userDocRef = doc(db, "users", user.uid);
-            await updateDoc(userDocRef, {
-                links: linksArray
-            });
+            await updateDoc(userDocRef, { links: linksArray });
             alert("All links updated successfully! 🚀");
         } catch (err) {
             console.error(err);
@@ -240,6 +201,47 @@
             saveBtn.innerText = "Save All";
             saveBtn.disabled = false;
         }
+    });
+
+    // ২. প্রোফাইল এডিট বাটন সচল করা
+    document.getElementById('edit-profile-btn').addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const newName = prompt("আপনার নতুন নাম লিখুন:", user.displayName);
+        if (newName && newName.trim() !== "") {
+            try {
+                // Auth Profile আপডেট
+                await updateProfile(user, { displayName: newName.trim() });
+                
+                // Firestore Database আপডেট
+                const userDocRef = doc(db, "users", user.uid);
+                await updateDoc(userDocRef, { displayName: newName.trim() });
+                
+                // স্ক্রিন রিফ্রেশ না করেই নাম পরিবর্তন
+                document.getElementById('profile-name').innerText = newName;
+                document.getElementById('profile-handle').innerText = newName.toLowerCase().replace(/\s+/g, '_');
+                alert("প্রোফাইল নাম সফলভাবে আপডেট হয়েছে! 🎉");
+            } catch (error) {
+                console.error("Error updating profile:", error);
+                alert("নাম আপডেট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+            }
+        }
+    });
+
+    // ৩. শেয়ার বাটন সচল করা (প্রোফাইল লিঙ্ক ক্লিপবোর্ডে কপি হবে)
+    document.getElementById('share-profile-btn').addEventListener('click', () => {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        // ইউজারের ইউনিক আইডি দিয়ে প্রোফাইল ইউআরএল তৈরি
+        const profileUrl = `${window.location.origin}/profile.html?uid=${user.uid}`;
+        
+        navigator.clipboard.writeText(profileUrl).then(() => {
+            alert("আপনার প্রোফাইল লিঙ্ক কপি করা হয়েছে! এখন এটি বন্ধুদের সাথে শেয়ার করতে পারেন। 🔗\n" + profileUrl);
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+        });
     });
 </script>
 
