@@ -203,5 +203,37 @@
         </a>
     </div>
 
+<script type="module">
+    import { db, auth, doc, setDoc } from './firebase-config.js';
+
+    // 'Save All' বাটনটি ধরছি
+    const saveBtn = document.querySelector('.text-green-400'); 
+
+    saveBtn.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("আগে লগইন করুন!");
+            return;
+        }
+
+        // ২৫টি ইনপুট ফিল্ড থেকে লিঙ্কগুলো সংগ্রহ করছি
+        const linkInputs = document.querySelectorAll('.link-input');
+        const linksArray = Array.from(linkInputs).map(input => input.value);
+
+        try {
+            // ডাটাবেসে ইউজারের ID অনুযায়ী ২৫টি লিঙ্ক সেভ হচ্ছে
+            await setDoc(doc(db, "users", user.uid), {
+                links: linksArray,
+                userId: user.uid,
+                lastUpdated: new Date()
+            }, { merge: true });
+            
+            alert("সবগুলো লিঙ্ক সেভ হয়েছে!");
+        } catch (error) {
+            alert("সেভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+        }
+    });
+</script>
+    
 </body>
 </html>
