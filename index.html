@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdLinkX - Dashboard</title>
+    <title>AdLink Pro - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -27,7 +27,7 @@
             <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
                 <i class="fas fa-link text-white text-xs"></i>
             </div>
-            <span class="text-xl font-bold tracking-tight text-white">AdLinkX</span>
+            <span class="text-xl font-bold tracking-tight text-white">AdLink Pro</span>
         </div>
         <nav class="flex-1 px-4 space-y-1">
             <a href="#" class="flex items-center p-3 active-nav rounded-lg">
@@ -41,7 +41,7 @@
             </a>
         </nav>
         <div class="p-6 text-[10px] text-gray-600 border-t border-gray-800">
-            © 2026 AdLinkX<br>All rights reserved.
+            © 2026 AdLink Pro<br>All rights reserved.
         </div>
     </aside>
 
@@ -88,18 +88,7 @@
                     <h3 class="text-sm font-bold mb-4 flex items-center text-gray-300">
                         <i class="fas fa-layer-group text-purple-500 mr-2"></i> Digital Post Tasks
                     </h3>
-                    <div id="tasks-container" class="space-y-3">
-                        </div>
-                </div>
-
-                <div id="ad-screen-container" class="card p-4 hidden">
-                    <div class="flex justify-between items-center mb-2 px-2">
-                        <span id="ad-timer" class="text-xs text-yellow-500 font-bold"><i class="fas fa-spinner fa-spin mr-1"></i> Waiting for click...</span>
-                        <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20">Live Mini Display</span>
-                    </div>
-                    <div class="w-full h-72 bg-black rounded-xl overflow-hidden border border-gray-800 relative">
-                        <iframe id="ad-frame" src="" class="w-full h-full border-none"></iframe>
-                    </div>
+                    <div id="tasks-container" class="space-y-3"></div>
                 </div>
 
             </div>
@@ -148,7 +137,31 @@
         <div class="bg-[#111223] border border-purple-500/20 p-8 rounded-3xl text-center max-w-sm w-full mx-4 shadow-2xl">
             <div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <h3 class="text-lg font-bold text-white mb-1">অ্যাড লোড করা হচ্ছে...</h3>
-            <p class="text-xs text-gray-400">দয়া করে একটু অপেক্ষা করুন, নতুন লিংক সাজানো হচ্ছে।</p>
+            <p class="text-xs text-gray-400">দয়া করে একটু অপেক্ষা করুন, নতুন লিংক সাজানো হচ্ছে।</p>
+        </div>
+    </div>
+
+    <div id="ad-task-popup" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-[#111223] border border-purple-500/20 p-6 md:p-8 rounded-3xl text-center max-w-md w-full shadow-2xl relative">
+            
+            <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-3">
+                <span class="text-[10px] bg-purple-500/10 text-purple-400 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Live Task Tracker</span>
+                <div id="popup-timer-badge" class="text-xs text-yellow-500 font-bold bg-yellow-500/10 px-3 py-1 rounded-full">
+                    <i class="fas fa-clock fa-spin mr-1"></i> <span id="popup-countdown">10</span>s Left
+                </div>
+            </div>
+
+            <div class="w-16 h-16 bg-purple-600/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-purple-400 text-xl animate-pulse">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h3 class="text-base font-bold text-white mb-2">ডিজিটাল অ্যাড পোস্ট ভেরিফিকেশন</h3>
+            <p class="text-xs text-gray-400 leading-relaxed mb-6">নিচের বাটনে ক্লিক করে অ্যাডটি ওপেন করুন এবং পয়েন্ট দাবি করার জন্য এই পপ-আপ স্ক্রিনে ১০ সেকেন্ড অপেক্ষা করুন।</p>
+            
+            <button id="popup-action-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-3 rounded-xl text-xs font-bold transition-all transform hover:scale-[1.01] shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2">
+                <i class="fas fa-external-link-alt"></i> Open Live Advertisement
+            </button>
+
+            <p class="text-[10px] text-gray-600 mt-4"><i class="fas fa-info-circle mr-1"></i> ১০ সেকেন্ড পূর্ণ হলে এই উইন্ডোটি স্বয়ংক্রিয়ভাবে বন্ধ হয়ে যাবে।</p>
         </div>
     </div>
 
@@ -160,7 +173,7 @@
     let fetchedLinks = [];       
     let completedCount = 0;
 
-    // 🤫 হাসান ভাইয়ের গোপন ২৫টি ইনকাম লিঙ্ক (ফিল্টার করে ডুপ্লিকেট সরানো হয়েছে)
+    // 🤫 গোপন ২৫টি ইনকাম লিঙ্ক 
     const adminSecretLinks = [
         "https://www.effectivecpmnetwork.com/cf568zcm6?key=5fbc3663d60d6c660694d8b44b458a3b",
         "https://www.effectivecpmnetwork.com/dpq18ax9?key=191558e19a42195ab896384fd3d16343",
@@ -202,7 +215,7 @@
                 document.getElementById('stat-referrals').innerText = data.referrals_count || 0;
             }
 
-            // ৩. অন্যান্য রিয়েল মেম্বারদের সিরিয়ালি লাইভ স্ক্রিনে আনা
+            // ৩. অন্যান্য রিয়েল মেম্বারদের সিরিয়ালি লাইভ স্ক্রিনে আনা
             loadLiveMembersList(user.uid);
 
             // ৪. ট্রাফিক বাটন মিক্সিং এবং জেনারেট করা
@@ -212,7 +225,7 @@
         }
     });
 
-    // ফায়ারবেস থেকে রিয়েল জিমেইল মেম্বারদের লিস্ট তৈরি করার লজিক
+    // ফায়ারবেস থেকে রিয়েল জিমেইল মেম্বারদের লিস্ট তৈরি করার লজিক
     async function loadLiveMembersList(currentUid) {
         const container = document.getElementById('users-list-container');
         container.innerHTML = `<p class="text-xs text-gray-600 text-center py-2">Searching members...</p>`;
@@ -226,7 +239,7 @@
                 if (uDoc.id !== currentUid) { 
                     userCount++;
                     const userData = uDoc.data();
-                    const name = userData.displayName || "AdLinkX Member";
+                    const name = userData.displayName || "AdLink Pro Member";
                     const photo = userData.photoURL || `https://i.pravatar.cc/100?u=${uDoc.id}`;
                     const handle = name.toLowerCase().replace(/\s+/g, '_');
                     const pts = userData.points || 0;
@@ -257,7 +270,7 @@
         }
     }
 
-    // ট্রাফিক লিংক ব্যালেন্সিং ও মিক্সিং মেকানিজম (The Pure Science)
+    // ট্রাফিক লিংক ব্যালেন্সিং ও মিক্সিং মেকানিজম
     async function loadTrafficExchangeLinks(currentUid) {
         const container = document.getElementById('tasks-container');
         container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Digital ad posts loading...</p>`;
@@ -270,7 +283,7 @@
         document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-6 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed";
 
         try {
-            // ১. ডাটাবেস থেকে মেম্বারদের ৫টি রিয়েল একটিভ লিঙ্ক নেওয়া হচ্ছে (সাইট রিয়েল রাখার জন্য)
+            // ১. ডাটাবেস থেকে মেম্বারদের ৫টি রিয়েল একটিভ লিঙ্ক নেওয়া হচ্ছে
             const q = query(collection(db, "users"), where("points", ">", 0), limit(10));
             const querySnapshot = await getDocs(q);
             
@@ -287,7 +300,7 @@
                 }
             });
 
-            // ২. বাকি সব ফাঁকা টাস্ক এবং সিস্টেমের ব্যাকআপ হাসান ভাইয়ের লিঙ্ক দিয়ে লোড করা হচ্ছে
+            // ২. বাকি সব ফাঁকা টাস্ক ব্যাকআপ অ্যাডমিন লিঙ্ক দিয়ে লোড করা হচ্ছে
             while (fetchedLinks.length < 10) {
                 const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
                 fetchedLinks.push({
@@ -296,13 +309,12 @@
                 });
             }
 
-            // লিঙ্কগুলো ওলটপালট (Shuffle) করা হচ্ছে যাতে কেউ টের না পায়
+            // লিঙ্কগুলো ওলটপালট (Shuffle) করা হচ্ছে
             fetchedLinks.sort(() => Math.random() - 0.5);
 
             renderTaskButtons();
         } catch (err) {
             console.error("Error fetching links:", err);
-            // ডাটাবেস ক্যাচ এরর হ্যান্ডেল করে সবসময় আপনার লিঙ্কগুলো একটিভ রাখবে
             while (fetchedLinks.length < 10) {
                 const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
                 fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
@@ -342,48 +354,55 @@
         });
     }
 
-    // চেইন টাইমার অ্যাকশন ফাংশন (১০ সেকেন্ড কাউন্টডাউন)
+    // নতুন পপ-আপ ও অটো-ডিসমিস চেইন টাইমার অ্যাকশন ফাংশন
     async function handleTaskClick(index) {
         if (index !== currentActiveIndex) return;
 
         const currentBtn = document.getElementById(`task-btn-${index}`);
         const nextBtn = document.getElementById(`task-btn-${index + 1}`);
-        const screenContainer = document.getElementById('ad-screen-container');
-        const frame = document.getElementById('ad-frame');
-        const timerText = document.getElementById('ad-timer');
+        
+        const taskPopup = document.getElementById('ad-task-popup');
+        const popupCountdown = document.getElementById('popup-countdown');
+        const popupActionBtn = document.getElementById('popup-action-btn');
 
-        screenContainer.classList.remove('hidden');
-        frame.src = fetchedLinks[index].url;
-
+        // ১. পপ-আপ স্ক্রিন ওপেন করা
+        taskPopup.classList.remove('hidden');
+        let timeLeft = 10;
+        popupCountdown.innerText = timeLeft;
+        
         currentBtn.disabled = true;
         currentBtn.className = "px-5 py-2 rounded-xl text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20";
-        
-        let timeLeft = 10;
-        timerText.innerHTML = `<i class="fas fa-clock fa-spin mr-1 text-yellow-500"></i> ${timeLeft}s Remaining...`;
-        currentBtn.innerHTML = `<i class="fas fa-hourglass-start animate-spin mr-1"></i> ${timeLeft}s`;
+        currentBtn.innerHTML = `<i class="fas fa-hourglass-start animate-spin mr-1"></i> Processing...`;
 
+        // ২. নতুন ট্যাবে অ্যাড ওপেন করার লজিক
+        popupActionBtn.onclick = function() {
+            window.open(fetchedLinks[index].url, '_blank');
+        };
+
+        // ৩. ১০ সেকেন্ডের মূল কাউন্টডাউন ইন্টারভাল শুরু
         const interval = setInterval(async () => {
             timeLeft--;
-            timerText.innerHTML = `<i class="fas fa-clock fa-spin mr-1 text-yellow-500"></i> ${timeLeft}s Remaining...`;
-            currentBtn.innerHTML = `<i class="fas fa-hourglass-start animate-spin mr-1"></i> ${timeLeft}s`;
+            popupCountdown.innerText = timeLeft;
 
             if (timeLeft <= 0) {
                 clearInterval(interval);
                 
+                // ৪. পপ-আপ অটোমেটিক হাইড/সরে যাবে
+                taskPopup.classList.add('hidden');
+                
+                // ৫. ড্যাশবোর্ডের বাটন কমপ্লিট স্টেট করা
                 currentBtn.className = "px-5 py-2 rounded-xl text-[11px] font-bold link-btn-completed";
                 currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Completed`;
-                timerText.innerHTML = `<span class="text-green-400 font-bold"><i class="fas fa-check-circle"></i> View verified! +1 Point</span>`;
 
+                // ফায়ারবেস ডাটাবেসে পয়েন্ট আপডেট
                 const user = auth.currentUser;
                 if (user) {
-                    // পয়েন্ট এডিশন লজিক
                     const viewerRef = doc(db, "users", user.uid);
                     await updateDoc(viewerRef, {
                         points: increment(1),
                         total_clicks: increment(1)
                     });
 
-                    // পয়েন্ট ডিডাকশন লজিক (আপনার লিঙ্কের ক্ষেত্রে পয়েন্ট কাটবে না)
                     const ownerUid = fetchedLinks[index].ownerUid;
                     if (ownerUid !== "system_admin" && ownerUid !== user.uid) {
                         const ownerRef = doc(db, "users", ownerUid);
@@ -397,10 +416,25 @@
                 completedCount++;
                 document.getElementById('progress-text').innerText = `Visits Progress: ${completedCount}/10`;
 
+                // ৬. চেইন সিস্টেম: পরের আইটেমটি ১০ সেকেন্ড পর এক্টিভ হওয়ার মেকানিজম
                 currentActiveIndex++;
                 if (index < 9 && nextBtn) {
-                    nextBtn.className = "px-5 py-2 rounded-xl text-[11px] font-bold link-btn-active";
-                    nextBtn.innerHTML = `<i class="fas fa-play mr-2 text-[10px]"></i> Visit Post #${index + 2}`;
+                    let unlockTimeLeft = 10;
+                    nextBtn.disabled = true;
+                    nextBtn.className = "px-5 py-2 rounded-xl text-[11px] font-bold bg-gray-900 text-gray-500 border border-gray-800 cursor-not-allowed";
+                    nextBtn.innerHTML = `<i class="fas fa-hourglass-half animate-pulse text-yellow-500 mr-2"></i> Unlocking in ${unlockTimeLeft}s...`;
+                    
+                    const unlockInterval = setInterval(() => {
+                        unlockTimeLeft--;
+                        if (unlockTimeLeft > 0) {
+                            nextBtn.innerHTML = `<i class="fas fa-hourglass-half animate-pulse text-yellow-500 mr-2"></i> Unlocking in ${unlockTimeLeft}s...`;
+                        } else {
+                            clearInterval(unlockInterval);
+                            nextBtn.disabled = false;
+                            nextBtn.className = "px-5 py-2 rounded-xl text-[11px] font-bold link-btn-active";
+                            nextBtn.innerHTML = `<i class="fas fa-play mr-2 text-[10px]"></i> Visit Post #${index + 2}`;
+                        }
+                    }, 1000);
                 }
 
                 // ১০টি কাজ শেষ হলে বোনাস ১০ পয়েন্ট প্রদান
@@ -431,7 +465,6 @@
 
         setTimeout(() => {
             popup.classList.add('hidden');
-            document.getElementById('ad-screen-container').classList.add('hidden');
             loadTrafficExchangeLinks(auth.currentUser.uid);
         }, 3000);
     });
