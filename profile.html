@@ -7,113 +7,136 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #080915; color: white; font-family: sans-serif; }
-        .sidebar { background-color: #0d0e1b; }
-        .card { background-color: #111223; border: 1px solid rgba(255,255,255,0.05); }
-        .input-box { background-color: #080915; border: 1px solid #1f2937; }
-        .input-box:focus { border-color: #a855f7; outline: none; }
+        body { background-color: #080915; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .sidebar { background-color: #0d0e1b; border-right: 1px solid #1f2937; }
+        .card { background-color: #111223; border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; }
+        .input-box { background-color: #080915; border: 1px solid #1f2937; transition: all 0.3s ease; }
+        .input-box:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 10px rgba(168, 85, 247, 0.15); }
         .active-tab { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-left: 4px solid #a855f7; }
+        
+        /* কাস্টম স্ক্রলবার স্টাইল */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #080915; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a855f7/50; }
     </style>
 </head>
 <body class="flex min-h-screen">
 
-    <aside class="w-64 sidebar h-screen fixed hidden lg:block border-r border-gray-800">
-        <div class="p-6 flex items-center">
-            <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-2">
-                <i class="fas fa-link text-white text-sm"></i>
+    <!-- Sidebar (বাম পাশের মেনু) - index.html এর সাথে হুবহু মিল রাখা হয়েছে -->
+    <aside class="w-64 sidebar h-screen fixed hidden lg:flex flex-col">
+        <div class="p-6 flex items-center mb-4">
+            <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
+                <i class="fas fa-link text-white text-xs"></i>
             </div>
-            <span class="text-xl font-bold tracking-wide">AdLinkX</span>
+            <span class="text-xl font-bold tracking-tight text-white">AdLinkX</span>
         </div>
-        <nav class="mt-4 px-4 space-y-2">
-            <a href="dashboard.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="index.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
                 <i class="fas fa-home mr-3 w-5 text-center"></i> Home
             </a>
-            <a href="dashboard.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
+            <a href="index.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
                 <i class="fas fa-th-large mr-3 w-5 text-center"></i> Dashboard
             </a>
             <a href="profile.html" class="flex items-center p-3 active-tab rounded-lg transition">
                 <i class="fas fa-user mr-3 w-5 text-center"></i> My Profile
             </a>
         </nav>
+        <div class="p-6 text-[10px] text-gray-600 border-t border-gray-800">
+            © 2026 AdLinkX<br>All rights reserved.
+        </div>
     </aside>
 
+    <!-- Main Content এরিয়া -->
     <main class="lg:ml-64 w-full flex flex-col min-h-screen">
         
-        <header class="card h-16 flex items-center justify-between px-8 sticky top-0 z-50">
-            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">User Profile</h2>
+        <!-- Top Navigation Bar -->
+        <header class="h-16 flex items-center justify-between px-8 bg-[#080915]/80 backdrop-blur-md sticky top-0 z-50 border-b border-b-gray-800/30">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">User Profile Workspace</h2>
             <div class="flex items-center space-x-4">
-                <div class="bg-gray-900 px-3 py-1.5 rounded-full flex items-center border border-yellow-500/20 text-sm">
-                    <span class="mr-1.5">💰</span> <span id="user-points" class="font-bold text-yellow-500">0</span>
+                <div class="bg-gray-900 px-3 py-1.5 rounded-full flex items-center border border-yellow-500/10 text-xs">
+                    <span class="mr-2">💰</span> <span id="user-points" class="font-bold text-yellow-500">0</span>
                 </div>
-                <img id="user-avatar-top" src="" class="w-8 h-8 rounded-full border border-purple-500">
+                <div class="flex items-center space-x-2 bg-gray-900/50 pr-4 pl-1 py-1 rounded-full border border-gray-800">
+                    <img id="user-avatar-top" src="https://via.placeholder.com/32" class="w-8 h-8 rounded-full border border-purple-500">
+                    <span id="header-name" class="text-[11px] font-bold uppercase tracking-wider">Loading...</span>
+                </div>
             </div>
         </header>
 
-        <div class="p-4 lg:p-8 space-y-8">
+        <!-- মূল কন্টেন্ট গ্রিড -->
+        <div class="p-6 lg:p-10 space-y-8">
             
-            <div class="card p-8 rounded-3xl relative overflow-hidden">
+            <!-- মেম্বার ব্যানার এবং মেইন প্রোফাইল কার্ড -->
+            <div class="card p-8 bg-gradient-to-br from-[#111223] to-[#0d0e1b] relative overflow-hidden">
                 <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
                     <div class="relative">
-                        <img id="profile-img" src="" class="w-32 h-32 rounded-2xl border-4 border-purple-500/20 object-cover">
+                        <img id="profile-img" src="https://via.placeholder.com/128" class="w-32 h-32 rounded-2xl border-4 border-purple-500/20 object-cover shadow-xl shadow-purple-500/5">
+                        <div class="absolute -bottom-2 -right-2 bg-green-500 text-black text-[9px] font-bold px-2 py-0.5 rounded-full border-2 border-[#111223]">ONLINE</div>
                     </div>
                     <div class="flex-1 text-center md:text-left">
                         <div class="flex flex-col md:flex-row md:items-center gap-2 justify-center md:justify-start">
-                            <h1 id="profile-name" class="text-3xl font-bold">Loading...</h1>
-                            <i class="fas fa-check-circle text-blue-500 text-lg"></i>
+                            <h1 id="profile-name" class="text-2xl font-bold tracking-wide uppercase">Loading...</h1>
+                            <i class="fas fa-check-circle text-purple-500 text-base shadow-sm"></i>
                         </div>
-                        <p class="text-gray-400 text-sm mt-1">@<span id="profile-handle">username</span> • Joined 2026</p>
-                        <p class="text-gray-500 text-sm mt-3 max-w-xl">Passive income lover. Earning through Adsterra & Monetag direct links. Let's grow together!</p>
+                        <p class="text-gray-400 text-xs mt-1">@<span id="profile-handle">username</span> • Active Member</p>
+                        <p class="text-gray-500 text-xs mt-3 max-w-xl leading-relaxed">Passive income lover. Earning through Adsterra & Monetag direct links. Let's grow together!</p>
                         
                         <div class="flex gap-3 mt-6 justify-center md:justify-start">
-                            <button id="edit-profile-btn" class="bg-gray-800 hover:bg-gray-700 px-6 py-2 rounded-xl text-sm font-bold transition">Edit Profile</button>
-                            <button id="share-profile-btn" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl text-sm font-bold transition"><i class="fas fa-share-alt mr-1"></i> Share</button>
+                            <button id="edit-profile-btn" class="bg-gray-800/80 hover:bg-gray-700 border border-gray-700/30 px-6 py-2 rounded-xl text-xs font-bold transition">Edit Profile Name</button>
+                            <button id="share-profile-btn" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-purple-500/10"><i class="fas fa-share-alt mr-11.5"></i> Share Profile</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
-                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Followers</p>
-                        <p id="stat-followers" class="text-xl font-bold text-gray-200 mt-1">0</p>
+                <!-- ইউজার লাইভ মেট্রিকেস কাউন্টার -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10 border-t border-gray-800/50 pt-6">
+                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/40">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Followers</p>
+                        <p id="stat-followers" class="text-lg font-bold text-gray-200 mt-1">0</p>
                     </div>
-                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
-                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Following</p>
-                        <p id="stat-following" class="text-xl font-bold text-gray-200 mt-1">0</p>
+                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/40">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Following</p>
+                        <p id="stat-following" class="text-lg font-bold text-gray-200 mt-1">0</p>
                     </div>
-                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
-                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Clicks</p>
-                        <p id="total-clicks" class="text-xl font-bold text-blue-400 mt-1">0</p>
+                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/40">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">My Link Clicks</p>
+                        <p id="total-clicks" class="text-lg font-bold text-purple-400 mt-1">0</p>
                     </div>
-                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
-                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Return Clicks</p>
-                        <p id="stat-return-clicks" class="text-xl font-bold text-green-400 mt-1">0</p>
+                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/40">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Return Clicks</p>
+                        <p id="stat-return-clicks" class="text-lg font-bold text-green-400 mt-1">0</p>
                     </div>
                 </div>
             </div>
 
+            <!-- লিঙ্ক ম্যানেজমেন্ট সেকশন গ্রিড -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold flex items-center">
-                            <i class="fas fa-link text-purple-500 mr-2"></i> Manage My Direct Links <span class="text-[10px] text-gray-600 ml-2">(Max 25)</span>
+                <!-- ২৫টি লিংক ইনপুট বক্স কন্টেইনার -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="flex justify-between items-center bg-[#111223] p-4 rounded-2xl border border-gray-800/30">
+                        <h3 class="text-xs font-bold flex items-center uppercase tracking-wider text-gray-300">
+                            <i class="fas fa-link text-purple-500 mr-2"></i> Manage My Direct Links <span class="text-[10px] text-gray-600 normal-case ml-2">(Max 25 slots)</span>
                         </h3>
-                        <button id="save-all-btn" class="bg-green-600/10 text-green-500 border border-green-500/20 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition">Save All</button>
+                        <button id="save-all-btn" class="bg-purple-600/10 text-purple-400 border border-purple-500/20 px-5 py-1.5 rounded-xl text-xs font-bold hover:bg-purple-600 hover:text-white transition shadow-sm">Save All Links</button>
                     </div>
 
-                    <div id="links-container" class="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                        </div>
+                    <div id="links-container" class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- জাভাস্ক্রিপ্ট লুপের সাহায্যে ২৫টি স্লট এখানে রেন্ডার হবে -->
+                    </div>
                 </div>
 
+                <!-- ডান পাশের গাইডলাইন ও সিকিউরিটি রুলস ইনফো বক্স -->
                 <div class="lg:col-span-5 space-y-6">
-                    <div class="bg-purple-900/10 border border-purple-500/20 p-6 rounded-3xl">
+                    <div class="bg-purple-900/10 border border-purple-500/10 p-6 rounded-3xl">
                         <div class="flex items-start gap-4">
-                            <div class="bg-purple-600/20 p-3 rounded-xl">
-                                <i class="fas fa-shield-alt text-purple-400"></i>
+                            <div class="bg-purple-600/10 border border-purple-500/20 p-3 rounded-xl text-purple-400">
+                                <i class="fas fa-shield-alt text-sm"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold text-sm">Safety First!</h4>
-                                <p class="text-[11px] text-gray-400 mt-1 leading-relaxed">Make sure all 25 links are valid. Use direct links only from your Monetag or Adsterra dashboard. Bot traffic is strictly prohibited.</p>
+                                <h4 class="font-bold text-xs uppercase tracking-wide text-purple-300">Publisher Integrity Policy</h4>
+                                <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">Make sure all your submitted links are live and direct. Only clean, unshortened links from approved providers like <span class="text-purple-400 font-semibold">Adsterra</span> or <span class="text-purple-400 font-semibold">Monetag</span> are permitted. Use of bot services, automated proxies, or scripting tools will lead to permanent account termination.</p>
                             </div>
                         </div>
                     </div>
@@ -131,52 +154,63 @@
     const linksContainer = document.getElementById('links-container');
     const saveBtn = document.getElementById('save-all-btn');
 
-    // ২৫টি ইনপুট বক্স জেনারেট করা
+    // লুপের সাহায্যে নিখুঁতভাবে ২৫টি ইনপুট স্লট তৈরি করা
     for (let i = 1; i <= 25; i++) {
         const row = `
-            <div class="flex items-center gap-3">
-                <span class="text-[10px] text-gray-600 font-bold w-4">${String(i).padStart(2, '0')}</span>
-                <input type="url" id="link-${i}" placeholder="Paste Adsterra/Monetag Link ${i}" 
-                    class="flex-1 input-box rounded-xl px-4 py-3 text-xs text-gray-300 placeholder:text-gray-700 transition">
+            <div class="flex items-center gap-3 bg-[#111223]/50 p-1.5 pr-3 rounded-xl border border-gray-800/30">
+                <span class="text-[10px] text-gray-600 font-bold w-6 text-center">${String(i).padStart(2, '0')}</span>
+                <input type="url" id="link-${i}" placeholder="https://www.effectivecpmnetwork.com/... or Monetag link" 
+                    class="flex-1 input-box rounded-xl px-4 py-2.5 text-xs text-gray-300 placeholder:text-gray-700">
             </div>
         `;
         linksContainer.insertAdjacentHTML('beforeend', row);
     }
 
-    // ফায়ারবেস থেকে লাইভ ডাটা লোড
+    // ফায়ারবেস অথেনটিকেশন ও ফায়ারস্টোর ডাটাবেস হ্যান্ডেলিং লুপ
     auth.onAuthStateChanged(async (user) => {
-        if (!user) { window.location.href = "index.html"; return; }
+        if (!user) { 
+            window.location.href = "index.html"; 
+            return; 
+        }
 
-        document.getElementById('profile-name').innerText = user.displayName || "User";
-        document.getElementById('profile-handle').innerText = (user.displayName || "user").toLowerCase().replace(/\s+/g, '_');
-        document.getElementById('profile-img').src = user.photoURL || "https://i.pravatar.cc/100";
-        document.getElementById('user-avatar-top').src = user.photoURL || "https://i.pravatar.cc/100";
+        // ইউজার ইনফো ইন্টারফেসে বসানো
+        const defaultName = user.displayName || "AdLinkX Publisher";
+        document.getElementById('profile-name').innerText = defaultName;
+        document.getElementById('header-name').innerText = defaultName;
+        document.getElementById('profile-handle').innerText = defaultName.toLowerCase().replace(/\s+/g, '_');
+        document.getElementById('profile-img').src = user.photoURL || "https://i.pravatar.cc/150?u=" + user.uid;
+        document.getElementById('user-avatar-top').src = user.photoURL || "https://i.pravatar.cc/150?u=" + user.uid;
 
-        const userDocRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userDocRef);
+        try {
+            const userDocRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(userDocRef);
 
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            
-            // রিয়েল ডাটা সেট (ডাটা না থাকলে বাই ডিফল্ট ০ দেখাবে)
-            document.getElementById('user-points').innerText = data.points || 0;
-            document.getElementById('total-clicks').innerText = data.total_clicks || 0;
-            document.getElementById('stat-followers').innerText = data.followers_count || 0;
-            document.getElementById('stat-following').innerText = data.following_count || 0;
-            document.getElementById('stat-return-clicks').innerText = data.return_clicks || 0;
-            
-            if (data.links && data.links.length > 0) {
-                data.links.forEach((link, index) => {
-                    if(index < 25) {
-                        const input = document.getElementById(`link-${index + 1}`);
-                        if(input) input.value = link;
-                    }
-                });
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                // সেফ রিডিং মেকানিজম (ডাটাবেসে কোনো ফিল্ড মিসিং থাকলে এরর ক্র্যাশ আটকাবে)
+                document.getElementById('user-points').innerText = data.points || 0;
+                document.getElementById('total-clicks').innerText = data.total_clicks || 0;
+                document.getElementById('stat-followers').innerText = data.followers_count || 0;
+                document.getElementById('stat-following').innerText = data.following_count || 0;
+                document.getElementById('stat-return-clicks').innerText = data.return_clicks || 0;
+                
+                // ডাটাবেস থেকে ২৫টি ইনপুট বক্সে লিঙ্ক পুশ করা
+                if (data.links && Array.isArray(data.links)) {
+                    data.links.forEach((link, index) => {
+                        if (index < 25) {
+                            const input = document.getElementById(`link-${index + 1}`);
+                            if (input) input.value = link || "";
+                        }
+                    });
+                }
             }
+        } catch (error) {
+            console.error("Error fetching user document:", error);
         }
     });
 
-    // ১. সেভ বাটন লজিক
+    // ২৫টি লিঙ্ক ডাটাবেসে অ্যারে হিসেবে সাবমিট করার লজিক
     saveBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -184,63 +218,66 @@
         const linksArray = [];
         for (let i = 1; i <= 25; i++) {
             const val = document.getElementById(`link-${i}`).value.trim();
-            linksArray.push(val);
+            linksArray.push(val); // ফাঁকা স্লট থাকলে ফাঁকা স্ট্রিং হিসেবেই জমা হবে, যা পরবর্তীতে আপডেটে সাহায্য করবে
         }
 
-        saveBtn.innerText = "Saving...";
+        saveBtn.innerText = "Saving Links...";
         saveBtn.disabled = true;
+        saveBtn.className = "bg-gray-800 text-gray-500 border border-gray-700 px-5 py-1.5 rounded-xl text-xs font-bold cursor-not-allowed";
 
         try {
             const userDocRef = doc(db, "users", user.uid);
             await updateDoc(userDocRef, { links: linksArray });
-            alert("All links updated successfully! 🚀");
+            alert("আপনার ২৫টি লিঙ্ক সফলভাবে ফায়ারবেস ক্লাউডে আপডেট করা হয়েছে! 🚀");
         } catch (err) {
-            console.error(err);
-            alert("Error saving links.");
+            console.error("Error saving links to firestore:", err);
+            alert("লিঙ্ক সেভ করতে সমস্যা হয়েছে। দয়া করে ফায়ারবেস কনফিগারেশন চেক করুন।");
         } finally {
-            saveBtn.innerText = "Save All";
+            saveBtn.innerText = "Save All Links";
             saveBtn.disabled = false;
+            saveBtn.className = "bg-purple-600/10 text-purple-400 border border-purple-500/20 px-5 py-1.5 rounded-xl text-xs font-bold hover:bg-purple-600 hover:text-white transition";
         }
     });
 
-    // ২. প্রোফাইল এডিট বাটন সচল করা
+    // প্রোফাইল এডিট বাটন অ্যাকশন (রিয়েল-টাইম হেডার ও ড্যাশবোর্ড সিঙ্ক)
     document.getElementById('edit-profile-btn').addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
 
-        const newName = prompt("আপনার নতুন নাম লিখুন:", user.displayName);
+        const newName = prompt("আপনার নতুন প্রোফাইল নাম লিখুন:", user.displayName || "");
         if (newName && newName.trim() !== "") {
+            const cleanedName = newName.trim();
             try {
-                // Auth Profile আপডেট
-                await updateProfile(user, { displayName: newName.trim() });
+                // ১. ফায়ারবেস কোর প্রোফাইল আপডেট
+                await updateProfile(user, { displayName: cleanedName });
                 
-                // Firestore Database আপডেট
+                // ২. ফায়ারস্টোর ক্লাউড ডকুমেন্ট ডাটাবেস আপডেট
                 const userDocRef = doc(db, "users", user.uid);
-                await updateDoc(userDocRef, { displayName: newName.trim() });
+                await updateDoc(userDocRef, { displayName: cleanedName });
                 
-                // স্ক্রিন রিফ্রেশ না করেই নাম পরিবর্তন
-                document.getElementById('profile-name').innerText = newName;
-                document.getElementById('profile-handle').innerText = newName.toLowerCase().replace(/\s+/g, '_');
-                alert("প্রোফাইল নাম সফলভাবে আপডেট হয়েছে! 🎉");
+                // ৩. পেজ রিফ্রেশ ছাড়াই লাইভ ইন্টারফেস সিঙ্ক
+                document.getElementById('profile-name').innerText = cleanedName;
+                document.getElementById('header-name').innerText = cleanedName;
+                document.getElementById('profile-handle').innerText = cleanedName.toLowerCase().replace(/\s+/g, '_');
+                alert("আপনার নাম সফলভাবে ড্যাশবোর্ডে আপডেট করা হয়েছে! 🎉");
             } catch (error) {
-                console.error("Error updating profile:", error);
-                alert("নাম আপডেট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+                console.error("Error updating profile components:", error);
+                alert("প্রোফাইল নাম আপডেট করা সম্ভব হয়নি। আবার চেষ্টা করুন।");
             }
         }
     });
 
-    // ৩. শেয়ার বাটন সচল করা (প্রোফাইল লিঙ্ক ক্লিপবোর্ডে কপি হবে)
+    // ইউনিক ইউজার প্রোফাইল আইডি লিংক জেনারেটর (শেয়ার বাটন অ্যাকশন)
     document.getElementById('share-profile-btn').addEventListener('click', () => {
         const user = auth.currentUser;
         if (!user) return;
 
-        // ইউজারের ইউনিক আইডি দিয়ে প্রোফাইল ইউআরএল তৈরি
         const profileUrl = `${window.location.origin}/profile.html?uid=${user.uid}`;
         
         navigator.clipboard.writeText(profileUrl).then(() => {
-            alert("আপনার প্রোফাইল লিঙ্ক কপি করা হয়েছে! এখন এটি বন্ধুদের সাথে শেয়ার করতে পারেন। 🔗\n" + profileUrl);
+            alert("আপনার ইউনিক মেম্বার লিঙ্ক ক্লিপবোর্ডে কপি করা হয়েছে! 🔗\n\n" + profileUrl);
         }).catch(err => {
-            console.error('Could not copy text: ', err);
+            console.error('Could not copy string text: ', err);
         });
     });
 </script>
