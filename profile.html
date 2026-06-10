@@ -7,19 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #080915; color: white; font-family: 'Inter', sans-serif; }
+        body { background-color: #080915; color: white; font-family: sans-serif; }
         .sidebar { background-color: #0d0e1b; }
         .card { background-color: #111223; border: 1px solid rgba(255,255,255,0.05); }
+        .input-box { background-color: #080915; border: 1px solid #1f2937; }
+        .input-box:focus { border-color: #a855f7; outline: none; }
         .active-tab { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-left: 4px solid #a855f7; }
-        .link-input { background: #080915; border: 1px solid #1e293b; transition: all 0.3s; }
-        .link-input:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 10px rgba(168, 85, 247, 0.1); }
-        /* Custom scrollbar for links */
-        .link-list::-webkit-scrollbar { width: 5px; }
-        .link-list::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
     </style>
 </head>
 <body class="flex min-h-screen">
 
+    <!-- Sidebar -->
     <aside class="w-64 sidebar h-screen fixed hidden lg:block border-r border-gray-800">
         <div class="p-6 flex items-center">
             <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-2">
@@ -35,7 +33,7 @@
                 <i class="fas fa-th-large mr-3 w-5 text-center"></i> Dashboard
             </a>
             <a href="profile.html" class="flex items-center p-3 active-tab rounded-lg transition">
-                <i class="fas fa-user-circle mr-3 w-5 text-center"></i> My Profile
+                <i class="fas fa-user mr-3 w-5 text-center"></i> My Profile
             </a>
             <a href="#" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
                 <i class="fas fa-history mr-3 w-5 text-center"></i> History
@@ -43,197 +41,207 @@
         </nav>
     </aside>
 
-    <main class="lg:ml-64 w-full flex flex-col min-h-screen pb-24 lg:pb-0">
+    <!-- Main Content -->
+    <main class="lg:ml-64 w-full flex flex-col min-h-screen">
         
-        <header class="card h-16 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-50">
-            <div class="flex items-center">
-                <h2 class="text-lg font-bold text-gray-200">User Profile</h2>
-            </div>
+        <!-- Header -->
+        <header class="card h-16 flex items-center justify-between px-8 sticky top-0 z-50">
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">User Profile</h2>
             <div class="flex items-center space-x-4">
                 <div class="bg-gray-900 px-3 py-1.5 rounded-full flex items-center border border-yellow-500/20 text-sm">
-                    <span class="mr-1.5">💰</span> <span class="font-bold text-yellow-500">250</span>
+                    <span class="mr-1.5">💰</span> <span id="user-points" class="font-bold text-yellow-500">0</span>
                 </div>
-                <img src="https://i.pravatar.cc/100?img=33" class="w-8 h-8 rounded-full border-2 border-purple-500">
+                <img id="user-avatar-top" src="" class="w-8 h-8 rounded-full border border-purple-500">
             </div>
         </header>
 
-        <div class="p-4 lg:p-8 space-y-6">
+        <div class="p-4 lg:p-8 space-y-8">
             
-            <div class="card p-6 rounded-3xl flex flex-col md:flex-row items-center md:items-start gap-6">
-                <div class="relative">
-                    <img src="https://i.pravatar.cc/150?img=33" class="w-28 h-28 rounded-3xl border-4 border-purple-500/20 object-cover shadow-2xl">
-                    <button class="absolute -bottom-2 -right-2 bg-purple-600 w-8 h-8 rounded-full border-4 border-[#111223] flex items-center justify-center text-xs">
-                        <i class="fas fa-camera"></i>
-                    </button>
-                </div>
-                <div class="flex-1 text-center md:text-left">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <h1 class="text-2xl font-bold">Adomi <i class="fas fa-check-circle text-blue-500 text-sm ml-1"></i></h1>
-                            <p class="text-gray-500 text-sm">@adomi_official &bull; Joined June 2026</p>
-                            <p class="text-gray-400 text-sm mt-2 max-w-md">Passive income lover. Earning through Adsterra & Monetag direct links. Let's grow together!</p>
-                        </div>
-                        <div class="flex gap-2 justify-center">
-                            <button class="bg-gray-800 hover:bg-gray-700 px-5 py-2 rounded-xl text-sm font-bold transition">Edit Profile</button>
-                            <button class="bg-purple-600 hover:bg-purple-700 px-5 py-2 rounded-xl text-sm font-bold transition">Share</button>
+            <!-- User Info Card -->
+            <div class="card p-8 rounded-3xl relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+                    <div class="relative">
+                        <img id="profile-img" src="" class="w-32 h-32 rounded-2xl border-4 border-purple-500/20 object-cover">
+                        <div class="absolute -bottom-2 -right-2 bg-purple-600 p-2 rounded-lg cursor-pointer">
+                            <i class="fas fa-camera text-xs"></i>
                         </div>
                     </div>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                        <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800/50">
-                            <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Followers</p>
-                            <p class="text-xl font-bold">1.2k</p>
+                    <div class="flex-1 text-center md:text-left">
+                        <div class="flex flex-col md:flex-row md:items-center gap-2">
+                            <h1 id="profile-name" class="text-3xl font-bold">Loading...</h1>
+                            <i class="fas fa-check-circle text-blue-500 text-lg"></i>
                         </div>
-                        <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800/50">
-                            <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Following</p>
-                            <p class="text-xl font-bold">340</p>
+                        <p class="text-gray-400 text-sm mt-1">@<span id="profile-handle">username</span> • Joined June 2026</p>
+                        <p class="text-gray-500 text-sm mt-3 max-w-xl">Passive income lover. Earning through Adsterra & Monetag direct links. Let's grow together!</p>
+                        
+                        <div class="flex gap-3 mt-6 justify-center md:justify-start">
+                            <button class="bg-gray-800 hover:bg-gray-700 px-6 py-2 rounded-xl text-sm font-bold transition">Edit Profile</button>
+                            <button class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl text-sm font-bold transition">Share</button>
                         </div>
-                        <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800/50 text-indigo-400">
-                            <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Total Clicks</p>
-                            <p class="text-xl font-bold">5,670</p>
-                        </div>
-                        <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800/50 text-green-400">
-                            <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Return Clicks</p>
-                            <p class="text-xl font-bold">4,120</p>
-                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
+                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Followers</p>
+                        <p class="text-xl font-bold text-gray-200 mt-1">1.2k</p>
+                    </div>
+                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Following</p>
+                        <p class="text-xl font-bold text-gray-200 mt-1">340</p>
+                    </div>
+                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Clicks</p>
+                        <p id="total-clicks" class="text-xl font-bold text-blue-400 mt-1">0</p>
+                    </div>
+                    <div class="bg-gray-950/40 p-4 rounded-2xl border border-gray-800/50">
+                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Return Clicks</p>
+                        <p class="text-xl font-bold text-green-400 mt-1">4,120</p>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Management Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                <div class="lg:col-span-7 card p-6 rounded-3xl flex flex-col h-[600px]">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-lg"><i class="fas fa-link text-purple-500 mr-2"></i> Manage My Direct Links <span class="text-xs text-gray-500 font-normal ml-2">(Max 25)</span></h3>
-                        <button class="text-xs font-bold text-green-400 bg-green-500/10 px-3 py-1 rounded-full">Save All</button>
+                <!-- Links Column -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold flex items-center">
+                            <i class="fas fa-link text-purple-500 mr-2"></i> Manage My Direct Links <span class="text-[10px] text-gray-600 ml-2">(Max 25)</span>
+                        </h3>
+                        <button id="save-all-btn" class="bg-green-600/10 text-green-500 border border-green-500/20 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition">Save All</button>
                     </div>
-                    
-                    <div class="link-list overflow-y-auto pr-2 space-y-4">
-                        <div class="space-y-4" id="links-container">
-                            <div class="flex items-center gap-3">
-                                <span class="text-xs font-bold text-gray-600 w-6">01</span>
-                                <input type="text" class="link-input flex-1 p-3 rounded-xl text-xs" placeholder="Paste Adsterra/Monetag Link 1">
-                                <span class="text-green-500 text-xs"><i class="fas fa-check-circle"></i></span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="text-xs font-bold text-gray-600 w-6">02</span>
-                                <input type="text" class="link-input flex-1 p-3 rounded-xl text-xs" placeholder="Paste Adsterra/Monetag Link 2">
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="text-xs font-bold text-gray-600 w-6">03</span>
-                                <input type="text" class="link-input flex-1 p-3 rounded-xl text-xs" placeholder="Paste Adsterra/Monetag Link 3">
-                            </div>
-                            <script>
-                                // Let's auto-generate the remaining 22 link fields for demonstration
-                                const container = document.getElementById('links-container');
-                                for(let i=4; i<=25; i++) {
-                                    container.innerHTML += `
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-xs font-bold text-gray-600 w-6">${i < 10 ? '0'+i : i}</span>
-                                        <input type="text" class="link-input flex-1 p-3 rounded-xl text-xs" placeholder="Paste Adsterra/Monetag Link ${i}">
-                                    </div>`;
-                                }
-                            </script>
-                        </div>
+
+                    <div id="links-container" class="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Inputs generated by JS -->
                     </div>
                 </div>
 
+                <!-- Sidebar Analytics -->
                 <div class="lg:col-span-5 space-y-6">
-                    
                     <div class="card p-6 rounded-3xl">
-                        <h3 class="font-bold text-sm mb-4 tracking-wide">Daily Earning History</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-end">
-                                <div class="text-xs text-gray-500 uppercase font-bold">Today's Clicks</div>
-                                <div class="text-xl font-bold text-purple-400">142 <span class="text-[10px] text-green-500 ml-1"><i class="fas fa-caret-up"></i> 12%</span></div>
+                        <h4 class="font-bold text-sm mb-6">Daily Earning History</h4>
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex justify-between text-xs mb-2">
+                                    <span class="text-gray-400 uppercase font-bold">Today's Clicks</span>
+                                    <span class="text-purple-400 font-bold">142 <i class="fas fa-caret-up ml-1"></i></span>
+                                </div>
+                                <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-purple-600 h-full w-[70%]"></div>
+                                </div>
                             </div>
-                            <div class="w-full bg-gray-900 rounded-full h-2">
-                                <div class="bg-purple-600 h-2 rounded-full" style="width: 70%"></div>
-                            </div>
-                            
-                            <div class="flex justify-between items-end mt-6">
-                                <div class="text-xs text-gray-500 uppercase font-bold">Yesterday's Clicks</div>
-                                <div class="text-xl font-bold text-gray-300">128</div>
-                            </div>
-                            <div class="w-full bg-gray-900 rounded-full h-2">
-                                <div class="bg-gray-700 h-2 rounded-full" style="width: 60%"></div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-2">
+                                    <span class="text-gray-400 uppercase font-bold">Yesterday's Clicks</span>
+                                    <span class="text-gray-300 font-bold">128</span>
+                                </div>
+                                <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-gray-700 h-full w-[60%]"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card p-6 rounded-3xl">
-                        <h3 class="font-bold text-sm mb-4 flex justify-between">Recent Followers <a href="#" class="text-xs text-purple-400">See All</a></h3>
-                        <div class="grid grid-cols-5 gap-3">
-                            <img src="https://i.pravatar.cc/100?img=1" class="w-10 h-10 rounded-xl border border-gray-800">
-                            <img src="https://i.pravatar.cc/100?img=2" class="w-10 h-10 rounded-xl border border-gray-800">
-                            <img src="https://i.pravatar.cc/100?img=3" class="w-10 h-10 rounded-xl border border-gray-800">
-                            <img src="https://i.pravatar.cc/100?img=4" class="w-10 h-10 rounded-xl border border-gray-800">
-                            <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-[10px] font-bold">+80</div>
+                    <!-- Safety Card -->
+                    <div class="bg-purple-900/10 border border-purple-500/20 p-6 rounded-3xl">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-purple-600/20 p-3 rounded-xl">
+                                <i class="fas fa-shield-alt text-purple-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Safety First!</h4>
+                                <p class="text-[11px] text-gray-400 mt-1 leading-relaxed">Make sure all 25 links are valid. Use direct links only from your Monetag or Adsterra dashboard. Bot traffic is strictly prohibited.</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 p-6 rounded-3xl border border-purple-500/20">
-                        <h4 class="font-bold text-sm text-purple-300"><i class="fas fa-shield-alt mr-2"></i> Safety First!</h4>
-                        <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">
-                            Make sure all 25 links are valid. Use direct links only from your Monetag or Adsterra dashboard. Bot traffic is strictly prohibited.
-                        </p>
-                    </div>
-
                 </div>
 
             </div>
         </div>
     </main>
 
-    <div class="lg:hidden fixed bottom-0 left-0 w-full bg-[#0d0e1b] border-t border-gray-800/80 flex justify-around items-center py-3 z-50">
-        <a href="dashboard.html" class="flex flex-col items-center text-gray-500 text-xs">
-            <i class="fas fa-home text-lg mb-0.5"></i> Home
-        </a>
-        <a href="#" class="flex flex-col items-center text-gray-500 text-xs">
-            <i class="fas fa-th-large text-lg mb-0.5"></i> Dash
-        </a>
-        <div class="bg-purple-600 w-12 h-12 rounded-full -mt-7 flex items-center justify-center border-4 border-[#080915] shadow-lg shadow-purple-500/30 cursor-pointer">
-            <i class="fas fa-paper-plane text-white text-sm"></i>
-        </div>
-        <a href="#" class="flex flex-col items-center text-gray-500 text-xs">
-            <i class="fas fa-users text-lg mb-0.5"></i> Network
-        </a>
-        <a href="profile.html" class="flex flex-col items-center text-purple-500 text-xs">
-            <i class="fas fa-user text-lg mb-0.5"></i> Profile
-        </a>
-    </div>
-
 <script type="module">
-    import { db, auth, doc, setDoc } from './firebase-config.js';
+    import { db, auth } from './firebase-config.js';
+    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 'Save All' বাটনটি ধরছি
-    const saveBtn = document.querySelector('.text-green-400'); 
+    const linksContainer = document.getElementById('links-container');
+    const saveBtn = document.getElementById('save-all-btn');
 
+    // ২৫টি ইনপুট বক্স জেনারেট করা
+    for (let i = 1; i <= 25; i++) {
+        const row = `
+            <div class="flex items-center gap-3">
+                <span class="text-[10px] text-gray-600 font-bold w-4">${String(i).padStart(2, '0')}</span>
+                <input type="url" id="link-${i}" placeholder="Paste Adsterra/Monetag Link ${i}" 
+                    class="flex-1 input-box rounded-xl px-4 py-3 text-xs text-gray-300 placeholder:text-gray-700 transition">
+                <i class="fas fa-check-circle text-gray-800 text-sm"></i>
+            </div>
+        `;
+        linksContainer.insertAdjacentHTML('beforeend', row);
+    }
+
+    // ডাটা লোড করা
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) { window.location.href = "index.html"; return; }
+
+        // প্রোফাইল ডাটা সেট করা
+        document.getElementById('profile-name').innerText = user.displayName;
+        document.getElementById('profile-handle').innerText = user.displayName.toLowerCase().replace(/\s+/g, '_');
+        document.getElementById('profile-img').src = user.photoURL;
+        document.getElementById('user-avatar-top').src = user.photoURL;
+
+        const userDocRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('user-points').innerText = data.points || 0;
+            document.getElementById('total-clicks').innerText = data.total_clicks || 0;
+            
+            // যদি আগে থেকে লিঙ্ক সেভ করা থাকে তবে ইনপুটে বসানো
+            if (data.links && data.links.length > 0) {
+                data.links.forEach((link, index) => {
+                    if(index < 25) {
+                        const input = document.getElementById(`link-${index + 1}`);
+                        if(input) input.value = link;
+                    }
+                });
+            }
+        }
+    });
+
+    // সব লিঙ্ক সেভ করা
     saveBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
-        if (!user) {
-            alert("আগে লগইন করুন!");
-            return;
+        if (!user) return;
+
+        const linksArray = [];
+        for (let i = 1; i <= 25; i++) {
+            const val = document.getElementById(`link-${i}`).value.trim();
+            linksArray.push(val); // খালি থাকলেও পুশ হবে যাতে ইনডেক্স ঠিক থাকে
         }
 
-        // ২৫টি ইনপুট ফিল্ড থেকে লিঙ্কগুলো সংগ্রহ করছি
-        const linkInputs = document.querySelectorAll('.link-input');
-        const linksArray = Array.from(linkInputs).map(input => input.value);
+        saveBtn.innerText = "Saving...";
+        saveBtn.disabled = true;
 
         try {
-            // ডাটাবেসে ইউজারের ID অনুযায়ী ২৫টি লিঙ্ক সেভ হচ্ছে
-            await setDoc(doc(db, "users", user.uid), {
-                links: linksArray,
-                userId: user.uid,
-                lastUpdated: new Date()
-            }, { merge: true });
-            
-            alert("সবগুলো লিঙ্ক সেভ হয়েছে!");
-        } catch (error) {
-            alert("সেভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+            const userDocRef = doc(db, "users", user.uid);
+            await updateDoc(userDocRef, {
+                links: linksArray
+            });
+            alert("All links updated successfully! 🚀");
+        } catch (err) {
+            console.error(err);
+            alert("Error saving links.");
+        } finally {
+            saveBtn.innerText = "Save All";
+            saveBtn.disabled = false;
         }
     });
 </script>
-    
+
 </body>
 </html>
