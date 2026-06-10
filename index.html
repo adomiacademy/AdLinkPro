@@ -3,115 +3,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdLinkX - Login</title>
+    <title>AdLinkX - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #080915; color: white; }
-        .gradient-btn { background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%); }
-        .glass-card { background: rgba(17, 18, 35, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { background-color: #080915; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .sidebar { background-color: #0d0e1b; border-right: 1px solid #1f2937; }
+        .card { background-color: #111223; border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; }
+        .active-nav { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-left: 4px solid #a855f7; }
+        .progress-slot { background: #1a1b2e; border: 1px solid #2d2e45; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+        .btn-purple { background: #a855f7; transition: 0.3s; }
+        .btn-purple:hover { background: #9333ea; }
+        
+        /* বাটনের লক ও আনলক ইফেক্ট */
+        .link-btn-locked { background: #1a1b2e; color: #4b5563; border: 1px solid #2d2e45; cursor: not-allowed; }
+        .link-btn-active { background: linear-gradient(135deg, #a855f7, #6366f1); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2); }
+        .link-btn-active:hover { transform: translateY(-1px); }
+        .link-btn-completed { background: #065f46; color: #34d399; border: 1px solid #047857; cursor: default; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex min-h-screen">
 
-    <div class="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+    <!-- Sidebar -->
+    <aside class="w-64 sidebar hidden lg:flex flex-col fixed h-screen">
+        <div class="p-6 flex items-center mb-4">
+            <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
+                <i class="fas fa-link text-white text-xs"></i>
+            </div>
+            <span class="text-xl font-bold tracking-tight text-white">AdLinkX</span>
+        </div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="#" class="flex items-center p-3 active-nav rounded-lg">
+                <i class="fas fa-home mr-3 w-5 text-center"></i> Home
+            </a>
+            <a href="#" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg">
+                <i class="fas fa-th-large mr-3 w-5 text-center"></i> Dashboard
+            </a>
+            <a href="profile.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg">
+                <i class="fas fa-link mr-3 w-5 text-center"></i> My Links (25)
+            </a>
+        </nav>
+        <div class="p-6 text-[10px] text-gray-600 border-t border-gray-800">
+            © 2026 AdLinkX<br>All rights reserved.
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 w-full flex flex-col">
         
-        <!-- Left Side: Features -->
-        <div class="hidden md:block p-8">
-            <div class="flex items-center mb-8">
-                <div class="w-10 h-10 gradient-btn rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-link text-white"></i>
-                </div>
-                <h1 class="text-2xl font-bold tracking-tight">AdLinkX <br><span class="text-xs text-gray-400 font-normal">Traffic Exchange Network</span></h1>
+        <!-- Top Navigation -->
+        <header class="h-16 flex items-center justify-between px-8 bg-[#080915]/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-800/30">
+            <div class="flex space-x-6 text-sm font-medium text-gray-400">
+                <a href="#" class="hover:text-white transition">How It Works</a>
+                <a href="#" class="hover:text-white transition">Leaderboard</a>
             </div>
+            <div class="flex items-center space-x-4">
+                <div class="bg-gray-900 px-3 py-1.5 rounded-full flex items-center border border-yellow-500/10 text-xs">
+                    <span class="mr-2">💰</span> <span id="header-points" class="font-bold text-yellow-500">0</span>
+                </div>
+                <div class="flex items-center space-x-2 bg-gray-900/50 pr-4 pl-1 py-1 rounded-full border border-gray-800">
+                    <img id="header-avatar" src="https://via.placeholder.com/32" class="w-8 h-8 rounded-full border border-purple-500">
+                    <span id="header-name" class="text-[11px] font-bold uppercase tracking-wider">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-6 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <h2 class="text-4xl font-extrabold mb-4 leading-tight">Exchange Traffic.<br><span class="text-purple-500">Grow Together.</span></h2>
-            <p class="text-gray-400 mb-8">Share your links, earn credits, and get real traffic from active members.</p>
-
-            <div class="space-y-6">
-                <div class="flex items-start">
-                    <div class="p-3 bg-gray-800 rounded-lg mr-4"><i class="fas fa-users text-purple-400"></i></div>
-                    <div><h4 class="font-bold">Real People</h4><p class="text-sm text-gray-500">Get traffic from real active members</p></div>
-                </div>
-                <div class="flex items-start">
-                    <div class="p-3 bg-gray-800 rounded-lg mr-4"><i class="fas fa-bolt text-purple-400"></i></div>
-                    <div><h4 class="font-bold">Fast & Simple</h4><p class="text-sm text-gray-500">5 seconds timer, visit and earn</p></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Side: Login Form -->
-        <div class="glass-card p-8 rounded-3xl w-full max-w-md mx-auto">
-            <div class="text-center mb-8">
-                <h3 class="text-2xl font-bold">Welcome Back!</h3>
-                <p class="text-gray-400 text-sm">Login to your account and continue</p>
-            </div>
-
-            <form class="space-y-5">
-                <div>
-                    <label class="block text-xs uppercase text-gray-500 font-bold mb-2">Email Address</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500"><i class="far fa-envelope"></i></span>
-                        <input type="email" class="w-full bg-gray-900 border border-gray-800 rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-purple-500" placeholder="Enter your email">
+            <!-- Left Column: Tasks & Screen -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <!-- Bonus Progress Tracker -->
+                <div class="card p-6 bg-gradient-to-br from-[#111223] to-[#0d0e1b]">
+                    <div class="flex justify-between items-center mb-6">
+                        <p class="text-xs text-gray-400">Complete 10 visits and earn bonus <span class="text-purple-400 font-bold">10 points!</span></p>
+                        <span id="progress-text" class="text-[10px] text-green-400 bg-green-400/10 px-3 py-1 rounded-full font-bold">Visits Progress: 0/10</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div id="progress-dots" class="flex space-x-3">
+                            <div class="progress-slot"><i class="fas fa-lock text-[10px] text-gray-700"></i></div>
+                            <div class="progress-slot"><i class="fas fa-lock text-[10px] text-gray-700"></i></div>
+                            <div class="progress-slot"><i class="fas fa-lock text-[10px] text-gray-700"></i></div>
+                            <div class="progress-slot"><i class="fas fa-lock text-[10px] text-gray-700"></i></div>
+                            <div class="progress-slot"><i class="fas fa-lock text-[10px] text-gray-700"></i></div>
+                        </div>
+                        <button id="next-ten-btn" disabled class="bg-gray-800 text-gray-500 px-6 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed">Next 10 Links</button>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs uppercase text-gray-500 font-bold mb-2">Password</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500"><i class="fas fa-lock"></i></span>
-                        <input type="password" class="w-full bg-gray-900 border border-gray-800 rounded-xl py-3 pl-10 pr-10 focus:outline-none focus:border-purple-500" placeholder="Enter your password">
-                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"><i class="far fa-eye-slash"></i></span>
+                <!-- 10 Digital Post Tasks (চেইন বা সিরিয়াল লজিক) -->
+                <div class="card p-6">
+                    <h3 class="text-sm font-bold mb-4 flex items-center text-gray-300">
+                        <i class="fas fa-layer-group text-purple-500 mr-2"></i> Digital Post Tasks
+                    </h3>
+                    <div id="tasks-container" class="space-y-3">
+                        <!-- জাভাস্ক্রিপ্ট এখানে ১০টি বাটন সিরিয়ালি জেনারেট করবে -->
                     </div>
                 </div>
 
-                <div class="flex justify-between items-center text-sm">
-                    <label class="flex items-center text-gray-400 cursor-pointer"><input type="checkbox" class="mr-2 accent-purple-500"> Remember me</label>
-                    <a href="#" class="text-purple-400 hover:underline">Forgot Password?</a>
+                <!-- Ad Display Mini Screen (ছোট ডিসপ্লে) -->
+                <div id="ad-screen-container" class="card p-4 hidden">
+                    <div class="flex justify-between items-center mb-2 px-2">
+                        <span id="ad-timer" class="text-xs text-yellow-500 font-bold"><i class="fas fa-spinner fa-spin mr-1"></i> Waiting for click...</span>
+                        <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20">Live Mini Display</span>
+                    </div>
+                    <div class="w-full h-72 bg-black rounded-xl overflow-hidden border border-gray-800 relative">
+                        <iframe id="ad-frame" src="" class="w-full h-full border-none"></iframe>
+                    </div>
                 </div>
 
-                <button type="submit" class="w-full gradient-btn py-3 rounded-xl font-bold flex items-center justify-center">Login <i class="fas fa-chevron-right ml-2 text-xs"></i></button>
+            </div>
 
-                <div class="relative my-6 text-center">
-                    <span class="bg-[#111223] px-3 text-gray-500 text-xs uppercase relative z-10">Or Continue With</span>
-                    <hr class="absolute top-1/2 w-full border-gray-800">
+            <!-- Right Column: Profile & Live Users -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <!-- Mini Profile Card -->
+                <div class="card p-8 text-center flex flex-col items-center">
+                    <div class="relative mb-4">
+                        <img id="user-avatar-main" src="" class="w-20 h-20 rounded-full border-4 border-purple-500/20 object-cover">
+                        <div class="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-[#111223] rounded-full"></div>
+                    </div>
+                    <h3 id="user-name-main" class="font-bold text-lg tracking-wide uppercase">Loading...</h3>
+                    <span class="text-[10px] bg-purple-600/10 text-purple-400 border border-purple-500/20 px-4 py-1 rounded-full mt-2 font-bold">Active Member</span>
+                    
+                    <div class="grid grid-cols-3 w-full mt-8 border-t border-gray-800 pt-6">
+                        <div>
+                            <p id="stat-links" class="font-bold text-gray-200">0</p>
+                            <p class="text-[9px] text-gray-500 uppercase mt-1">My Links</p>
+                        </div>
+                        <div>
+                            <p id="stat-visits" class="font-bold text-gray-200">0</p>
+                            <p class="text-[9px] text-gray-500 uppercase mt-1">Total Visits</p>
+                        </div>
+                        <div>
+                            <p id="stat-referrals" class="font-bold text-gray-200">0</p>
+                            <p class="text-[9px] text-gray-500 uppercase mt-1">Referrals</p>
+                        </div>
+                    </div>
                 </div>
 
-                <button class="w-full bg-transparent border border-gray-800 py-3 rounded-xl font-medium flex items-center justify-center hover:bg-gray-900 transition mb-3">
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5 mr-3" alt="Google"> Continue with Google
-                </button>
-            </form>
+                <!-- Who to Follow (রিয়েল ফায়ারবেস ইউজার) -->
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-sm font-bold">Who to Follow</h4>
+                        <span class="text-[10px] text-gray-500 font-bold uppercase">Live Users</span>
+                    </div>
+                    <div id="users-list-container" class="space-y-4">
+                        <p class="text-xs text-gray-600 text-center">Searching active members...</p>
+                    </div>
+                </div>
 
-            <p class="text-center mt-8 text-sm text-gray-500">Don't have an account? <a href="#" class="text-purple-400 font-bold hover:underline">Sign Up</a></p>
+            </div>
         </div>
+    </main>
 
+    <!-- Ad Loading Global Pop-up (পপ-আপ মডেল) -->
+    <div id="loading-popup" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center z-50">
+        <div class="bg-[#111223] border border-purple-500/20 p-8 rounded-3xl text-center max-w-sm w-full mx-4 shadow-2xl">
+            <div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h3 class="text-lg font-bold text-white mb-1">অ্যাড লোড করা হচ্ছে...</h3>
+            <p class="text-xs text-gray-400">দয়া করে একটু অপেক্ষা করুন, নতুন লিংক সাজানো হচ্ছে।</p>
+        </div>
     </div>
 
 <script type="module">
-    import { auth, provider, signInWithPopup, db, doc, setDoc } from './firebase-config.js';
+    import { db, auth } from './firebase-config.js';
+    import { doc, getDoc, collection, getDocs, updateDoc, increment, query, where, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const googleBtn = document.querySelector('.google-login-btn') || document.querySelector('button:has(img[src*="google"])');
+    let currentActiveIndex = 0; // বর্তমানে কোন বাটন খোলা আছে (০ মানে ১ম বাটন)
+    let fetchedLinks = [];       // ডাটাবেস থেকে আসা ১০টি লিংকের ডাটা হোল্ড করবে
+    let completedCount = 0;
 
-    if (googleBtn) {
-        googleBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            // ইউজারের ইনফো সেটআপ
+            document.getElementById('header-name').innerText = user.displayName || "User";
+            document.getElementById('header-avatar').src = user.photoURL || "https://via.placeholder.com/150";
+            document.getElementById('user-name-main').innerText = user.displayName || "User";
+            document.getElementById('user-avatar-main').src = user.photoURL || "https://via.placeholder.com/150";
 
-                // ইউজারের ডাটাবেস প্রোফাইল তৈরি
-                await setDoc(doc(db, "users", user.uid), {
-                    uid: user.uid,
-                    displayName: user.displayName,
-                    email: user.email,
-                    lastLogin: new Date()
-                }, { merge: true });
-
-                window.location.href = "dashboard.html";
-            } catch (error) {
-                alert("লগইন ফেইল: " + error.message);
+            // ডাটাবেস স্ট্যাটাস আপডেট
+            const userDocRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(userDocRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById('header-points').innerText = data.points || 0;
+                document.getElementById('stat-links').innerText = data.links ? data.links.filter(l => l !== "").length : 0;
+                document.getElementById('stat-visits').innerText = data.total_clicks || 0;
+                document.getElementById('stat-referrals').innerText = data.referrals_count || 0;
             }
+
+            loadLiveUsers(user.uid);
+            loadTrafficExchangeLinks();
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    // সায়েন্স কুয়েরি: শুধুমাত্র যাদের পয়েন্ট আছে (> 0) তাদের লিংকগুলো হোম পেজে পুশ করা হবে
+    async function loadTrafficExchangeLinks() {
+        const container = document.getElementById('tasks-container');
+        container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Loading digital posts...</p>`;
+        
+        fetchedLinks = [];
+        currentActiveIndex = 0;
+        completedCount = 0;
+        document.getElementById('progress-text').innerText = `Visits Progress: 0/10`;
+        document.getElementById('next-ten-btn').disabled = true;
+        document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-6 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed";
+
+        try {
+            // যাদের points > 0 শুধুমাত্র তাদের ডাটা কুয়েরি করা হচ্ছে
+            const q = query(collection(db, "users"), where("points", ">", 0), limit(15));
+            const querySnapshot = await getDocs(q);
+            
+            querySnapshot.forEach((uDoc) => {
+                const uData = uDoc.data();
+                if (uData.links && uData.links.length > 0) {
+                    const validLinks = uData.links.filter(l => l !== "");
+                    validLinks.forEach(linkUrl => {
+                        if (fetchedLinks.length < 10) {
+                            fetchedLinks.push({
+                                ownerUid: uDoc.id,
+                                url: linkUrl
+                            });
+                        }
+                    });
+                }
+            });
+
+            // যদি সাইটে কোনো লিংক না থাকে (ব্যাকআপ লিংক হিসেবে আপনার অ্যাড কোড বা যেকোনো লিংক দিতে পারেন)
+            while (fetchedLinks.length < 10) {
+                fetchedLinks.push({
+                    ownerUid: "system",
+                    url: "https://www.google.com" 
+                });
+            }
+
+            renderTaskButtons();
+        } catch (err) {
+            console.error("Error fetching links:", err);
+        }
+    }
+
+    // ১০টি বাটন ডাইনামিক রেন্ডার ও লক-আনলক ম্যানেজমেন্ট
+    function renderTaskButtons() {
+        const container = document.getElementById('tasks-container');
+        container.innerHTML = "";
+
+        fetchedLinks.forEach((linkData, index) => {
+            let btnClass = "link-btn-locked";
+            let btnText = `<i class="fas fa-lock mr-2 text-[10px]"></i> Locked Task`;
+
+            if (index === 0) {
+                btnClass = "link-btn-active";
+                btnText = `<i class="fas fa-play mr-2 text-[10px]"></i> Visit Post #${index + 1}`;
+            }
+
+            const rowHtml = `
+                <div class="flex items-center justify-between p-3 bg-[#15162c] rounded-xl border border-gray-800/50">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs font-bold text-gray-500 w-4">${index + 1}.</span>
+                        <p class="text-xs font-semibold text-gray-300">Digital Ad Placement #${index + 1}</p>
+                    </div>
+                    <button id="task-btn-${index}" data-index="${index}" class="px-5 py-2 rounded-xl text-[11px] font-bold transition-all ${btnClass}">
+                        ${btnText}
+                    </button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', rowHtml);
+            
+            // ইভেন্ট লিসেনার সেট করা
+            const btn = document.getElementById(`task-btn-${index}`);
+            btn.addEventListener('click', () => handleTaskClick(index));
         });
+    }
+
+    // কন্টিনিউ বাটন ক্লিক ও ১০ সেকেন্ডের চেইন টাইমার
+    async function handleTaskClick(index) {
+        if (index !== currentActiveIndex) return; // সিরিয়াল ব্রেক করলে কাজ করবে না
+
+        const currentBtn = document.getElementById(`task-btn-${index}`);
+        const nextBtn = document.getElementById(`task-btn-${index + 1}`);
+        const screenContainer = document.getElementById('ad-screen-container');
+        const frame = document.getElementById('ad-frame');
+        const timerText = document.getElementById('ad-timer');
+
+        // স্ক্রিন ও আইফ্রেম ওপেন করা
+        screenContainer.classList.remove('hidden');
+        frame.src = fetchedLinks[index].url;
+
+        // কারেন্ট বাটনকে প্রসেসিং স্টেটে নেওয়া
+        currentBtn.disabled = true;
+        currentBtn.className = "px-5 py-2 rounded-xl text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20";
+        
+        let timeLeft = 10;
+        timerText.innerHTML = `<i class="fas fa-clock fa-spin mr-1 text-yellow-500"></i> ${timeLeft}s Remaining...`;
+        currentBtn.innerHTML = `<i class="fas fa-hourglass-start animate-spin mr-1"></i> ${timeLeft}s`;
+
+        const interval = setInterval(async () => {
+            timeLeft--;
+            timerText.innerHTML = `<i class="fas fa-clock fa-spin mr-1 text-yellow-500"></i> ${timeLeft}s Remaining...`;
+            currentBtn.innerHTML = `<i class="fas fa-hourglass-start animate-spin mr-1"></i> ${timeLeft}s`;
+
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                
+                // ১. কারেন্ট বাটন কমপ্লিট করা
+                currentBtn.className = "px-5 py-2 rounded-xl text-[11px] font-bold link-btn-completed";
+                currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Completed`;
+                timerText.innerHTML = `<span class="text-green-400 font-bold"><i class="fas fa-check-circle"></i> View verified! +1 Point</span>`;
+
+                // ২. পয়েন্ট ক্রেডিট ও ডেবিট লজিক (The Science)
+                const user = auth.currentUser;
+                if (user) {
+                    // যিনি দেখছেন তার অ্যাকাউন্টে ১ পয়েন্ট যোগ
+                    const viewerRef = doc(db, "users", user.uid);
+                    await updateDoc(viewerRef, {
+                        points: increment(1),
+                        total_clicks: increment(1)
+                    });
+
+                    // যার লিংক শো হয়েছে তার অ্যাকাউন্ট থেকে ১ পয়েন্ট বিয়োগ (যদি সিস্টেমের ব্যাকআপ লিংক না হয়)
+                    const ownerUid = fetchedLinks[index].ownerUid;
+                    if (ownerUid !== "system" && ownerUid !== user.uid) {
+                        const ownerRef = doc(db, "users", ownerUid);
+                        await updateDoc(ownerRef, { points: increment(-1) });
+                    }
+
+                    // লাইভ পয়েন্ট আপডেট স্ক্রিনে
+                    let currentPts = parseInt(document.getElementById('header-points').innerText);
+                    document.getElementById('header-points').innerText = currentPts + 1;
+                }
+
+                // ৩. প্রোগ্রেস ট্র্যাকিং আপডেট
+                completedCount++;
+                document.getElementById('progress-text').innerText = `Visits Progress: ${completedCount}/10`;
+
+                // ৪. পরবর্তী বাটন আনলক করা (সিরিয়াল চেইন)
+                currentActiveIndex++;
+                if (index < 9 && nextBtn) {
+                    nextBtn.className = "px-5 py-2 rounded-xl text-[11px] font-bold link-btn-active";
+                    nextBtn.innerHTML = `<i class="fas fa-play mr-2 text-[10px]"></i> Visit Post #${index + 2}`;
+                }
+
+                // ৫. ১০টি টাস্ক শেষ হলে নেক্সট বাটন একটিভ করা
+                if (completedCount === 10) {
+                    const nextTenBtn = document.getElementById('next-ten-btn');
+                    nextTenBtn.disabled = false;
+                    nextTenBtn.className = "bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-purple-500/20";
+                    
+                    // বোনাস ১০ পয়েন্ট দেওয়া
+                    const viewerRef = doc(db, "users", user.uid);
+                    await updateDoc(viewerRef, { points: increment(10) });
+                    alert("অসাধারণ হাসান ভাই! ১০টি টাস্ক সফলভাবে শেষ করায় আপনার ব্যালেন্সে আরও ১০ বোনাস পয়েন্ট যোগ হয়েছে! 🎉");
+                }
+            }
+        }, 1000);
+    }
+
+    // পপ-আপ সহ পরবর্তী ১০টি অ্যাড লোড করার বাটন ইভেন্ট
+    document.getElementById('next-ten-btn').addEventListener('click', () => {
+        const popup = document.getElementById('loading-popup');
+        popup.classList.remove('hidden'); // পপ-আপ ওপেন
+
+        setTimeout(() => {
+            popup.classList.add('hidden'); // ৩ সেকেন্ড পর পপ-আপ হাইড
+            document.getElementById('ad-screen-container').classList.add('hidden'); // স্ক্রিন রিসেট
+            loadTrafficExchangeLinks(); // পরবর্তী নতুন ১০টি লিংক ফায়ারবেস থেকে লোড হবে
+        }, 3000);
+    });
+
+    // ডাইনামিক লাইভ মেম্বারদের লোড করার ফাংশন
+    async function loadLiveUsers(currentUid) {
+        const container = document.getElementById('users-list-container');
+        container.innerHTML = "";
+
+        try {
+            const querySnapshot = await getDocs(collection(db, "users"), limit(5));
+            let hasOtherUsers = false;
+
+            querySnapshot.forEach((doc) => {
+                if (doc.id !== currentUid) {
+                    hasOtherUsers = true;
+                    const userData = doc.data();
+                    const name = userData.displayName || "AdLinkX User";
+                    const photo = userData.photoURL || `https://i.pravatar.cc/100?u=${doc.id}`;
+                    const handle = name.toLowerCase().replace(/\s+/g, '_');
+
+                    const itemHtml = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img src="${photo}" class="w-9 h-9 rounded-xl mr-3 object-cover border border-purple-500/10">
+                                <div>
+                                    <p class="text-xs font-bold">${name}</p>
+                                    <p class="text-[10px] text-gray-500">@${handle}</p>
+                                </div>
+                            </div>
+                            <button class="bg-gray-800 hover:bg-purple-600 hover:text-white px-4 py-1.5 rounded-lg text-[10px] font-bold transition">Follow</button>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', itemHtml);
+                }
+            });
+
+            if (!hasOtherUsers) {
+                container.innerHTML = `<p class="text-xs text-gray-600 text-center">No other members registered yet.</p>`;
+            }
+        } catch (err) {
+            console.error(err);
+        }
     }
 </script>
 
