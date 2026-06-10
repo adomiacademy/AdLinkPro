@@ -15,6 +15,7 @@
 </head>
 <body class="flex min-h-screen">
 
+    <!-- Sidebar -->
     <aside class="w-64 sidebar h-screen fixed hidden lg:block border-r border-gray-800">
         <div class="p-6 flex items-center">
             <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-2">
@@ -50,8 +51,10 @@
         </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="lg:ml-64 w-full flex flex-col min-h-screen pb-24 lg:pb-0">
         
+        <!-- Header -->
         <header class="card h-16 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-50">
             <div class="flex items-center lg:hidden cursor-pointer">
                 <i class="fas fa-bars text-xl text-gray-300"></i>
@@ -67,29 +70,33 @@
                 <a href="profile.html" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl text-xs font-bold transition">
                     + Add Link
                 </a>
+                <!-- ডাইনামিক পয়েন্ট জোন -->
                 <div class="bg-gray-900 px-3 py-1.5 rounded-full flex items-center border border-yellow-500/20 text-sm">
-                    <span class="mr-1.5">💰</span> <span class="font-bold text-yellow-500">250</span>
+                    <span class="mr-1.5">💰</span> <span id="user-points" class="font-bold text-yellow-500">0</span>
                 </div>
-                <div class="flex items-center space-x-2 cursor-pointer">
-                    <img src="https://i.pravatar.cc/100?img=33" class="w-8 h-8 rounded-full border-2 border-purple-500" alt="User">
-                    <span class="text-sm font-medium hidden sm:inline-block text-gray-300">Adomi <i class="fas fa-chevron-down text-xs ml-1 text-gray-500"></i></span>
+                <!-- ডাইনামিক ইউজার প্রোফাইল -->
+                <div class="flex items-center space-x-2 cursor-pointer" id="logout-btn">
+                    <img id="user-avatar" src="https://i.pravatar.cc/100?img=33" class="w-8 h-8 rounded-full border-2 border-purple-500" alt="User">
+                    <span class="text-sm font-medium hidden sm:inline-block text-gray-300"><span id="user-name">Loading...</span> <i class="fas fa-sign-out-alt text-xs ml-1 text-red-400"></i></span>
                 </div>
             </div>
         </header>
 
         <div class="p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <div class="lg:col-span-8 space-y-5">
+            <!-- Left Feed Column -->
+            <div class="lg:col-span-8 space-y-5" id="feed-container">
                 
+                <!-- Progress Card -->
                 <div class="card p-5 rounded-2xl">
                     <div class="flex justify-between items-center mb-3">
                         <p class="text-xs lg:text-sm text-gray-400">Complete 10 visits and earn bonus <span class="text-purple-400 font-bold">10 points!</span></p>
-                        <span class="text-xs text-green-400 bg-green-500/10 px-2 py-0.5 rounded-md font-bold">Visits Progress: 1/10</span>
+                        <span id="progress-text" class="text-xs text-green-400 bg-green-500/10 px-2 py-0.5 rounded-md font-bold">Visits Progress: 0/10</span>
                     </div>
                     
                     <div class="flex flex-wrap items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold shadow-md shadow-purple-500/20"><i class="fas fa-check text-[10px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex flex-col items-center justify-center text-[10px] font-bold text-gray-400 relative">2 <span class="text-[7px] text-purple-400 absolute -bottom-1">5s</span></div>
+                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
                         <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
                         <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
                         <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
@@ -105,85 +112,42 @@
                     </div>
                 </div>
 
-                <div class="card p-5 rounded-2xl space-y-4">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center">
-                            <img src="https://i.pravatar.cc/100?img=12" class="w-10 h-10 rounded-xl mr-3" alt="User">
-                            <div>
-                                <h4 class="font-bold text-sm">Hasan Mahmud</h4>
-                                <p class="text-[11px] text-gray-500">@hasan_marketer &bull; 2m ago</p>
-                            </div>
-                        </div>
-                        <button class="text-xs font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-4 py-1.5 rounded-full hover:bg-purple-600 hover:text-white transition">Follow</button>
-                    </div>
-                    <div>
-                        <span class="bg-green-500/10 text-green-400 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">CPA Marketing</span>
-                        <h3 class="text-base font-bold mt-1.5 text-gray-200">High Converting CPA Offer - World Wide</h3>
-                        <p class="text-xs text-gray-500 mt-0.5">https://adsterra.com/abc12345</p>
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-gray-900">
-                        <span class="text-xs text-gray-500"><i class="far fa-eye mr-1"></i> 120 Visits</span>
-                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-8 py-2.5 rounded-xl font-bold transition tracking-wide shadow-md shadow-indigo-600/10">
-                            Visit
-                        </button>
-                    </div>
+                <!-- এটি একটি ডাইনামিক পোস্ট লোডার মেসেজ, নিচে স্ক্রিপ্ট দিয়ে ফায়ারবেস থেকে আসল পোস্ট এখানে আসবে -->
+                <div id="loading-posts" class="text-center py-8 text-gray-500 text-sm">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>Loading live network links...
                 </div>
 
-                <div class="card p-5 rounded-2xl space-y-4">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center">
-                            <img src="https://i.pravatar.cc/100?img=45" class="w-10 h-10 rounded-xl mr-3" alt="User">
-                            <div>
-                                <h4 class="font-bold text-sm">Jannatul Islam</h4>
-                                <p class="text-[11px] text-gray-500">@jannat_official &bull; 4m ago</p>
-                            </div>
-                        </div>
-                        <button class="text-xs font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-4 py-1.5 rounded-full hover:bg-purple-600 hover:text-white transition">Follow</button>
-                    </div>
-                    <div>
-                        <span class="bg-blue-500/10 text-blue-400 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Online Earning</span>
-                        <h3 class="text-base font-bold mt-1.5 text-gray-200">Make Money Online From Home</h3>
-                        <p class="text-xs text-gray-500 mt-0.5">https://adsterra.com/xyz456</p>
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-gray-900">
-                        <span class="text-xs text-gray-500"><i class="far fa-eye mr-1"></i> 98 Visits</span>
-                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-8 py-2.5 rounded-xl font-bold transition tracking-wide shadow-md shadow-indigo-600/10">
-                            Visit
-                        </button>
-                    </div>
-                </div>
-
-                <button class="w-full bg-gradient-to-r from-purple-600/20 to-indigo-600/20 hover:from-purple-600/30 hover:to-indigo-600/30 border border-purple-500/10 py-3.5 rounded-xl font-bold text-purple-400 text-sm transition flex items-center justify-center">
-                    Next 10 Links <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                </button>
             </div>
 
+            <!-- Right Sidebar Column -->
             <div class="lg:col-span-4 space-y-6">
                 
+                <!-- Profile Right Card -->
                 <div class="card p-6 rounded-2xl text-center relative overflow-hidden">
                     <div class="relative inline-block mt-2">
-                        <img src="https://i.pravatar.cc/100?img=33" class="w-20 h-20 rounded-full mx-auto border-4 border-purple-500/20">
+                        <img id="card-avatar" src="https://i.pravatar.cc/100?img=33" class="w-20 h-20 rounded-full mx-auto border-4 border-purple-500/20">
                         <span class="absolute bottom-1 right-1 bg-green-500 w-3.5 h-3.5 rounded-full border-4 border-[#111223]"></span>
                     </div>
-                    <h3 class="text-lg font-bold mt-3">Adomi</h3>
+                    <h3 id="card-name" class="text-lg font-bold mt-3">Loading...</h3>
                     <p class="text-xs text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full inline-block mt-1 font-medium scale-90">Active Member</p>
                     
                     <div class="grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-gray-800/60">
                         <div>
-                            <p class="text-base font-bold text-gray-200">20</p>
+                            <p id="stat-links" class="text-base font-bold text-gray-200">0</p>
                             <p class="text-[9px] text-gray-500 uppercase tracking-wider font-bold">My Links</p>
                         </div>
                         <div>
-                            <p class="text-base font-bold text-gray-200">340</p>
+                            <p id="stat-clicks" class="text-base font-bold text-gray-200">0</p>
                             <p class="text-[9px] text-gray-500 uppercase tracking-wider font-bold">Total Visits</p>
                         </div>
                         <div>
-                            <p class="text-base font-bold text-gray-200">12</p>
+                            <p class="text-base font-bold text-gray-200">0</p>
                             <p class="text-[9px] text-gray-500 uppercase tracking-wider font-bold">Referrals</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- Who to Follow -->
                 <div class="card p-5 rounded-2xl">
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="font-bold text-sm tracking-wide">Who to Follow</h4>
@@ -213,6 +177,7 @@
                     </div>
                 </div>
 
+                <!-- Top Earners -->
                 <div class="card p-5 rounded-2xl">
                     <h4 class="font-bold text-sm tracking-wide mb-4"><i class="fas fa-trophy text-yellow-500 mr-1.5"></i> Top Earners</h4>
                     <div class="space-y-3">
@@ -237,6 +202,7 @@
 
     </main>
 
+    <!-- Mobile Bottom Nav -->
     <div class="lg:hidden fixed bottom-0 left-0 w-full bg-[#0d0e1b] border-t border-gray-800/80 flex justify-around items-center py-3 z-50">
         <a href="dashboard.html" class="flex flex-col items-center text-purple-500 text-xs">
             <i class="fas fa-home text-lg mb-0.5"></i> Home
@@ -256,36 +222,124 @@
     </div>
 
 <script type="module">
-    // ফায়ারবেস থেকে প্রয়োজনীয় ফাংশনগুলো নিয়ে আসছি
     import { db, auth } from './firebase-config.js';
-    import { collection, query, limit, getDocs, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { collection, query, limit, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // পেজ লোড হলে অন্য ইউজারদের লিঙ্কগুলো ডাটাবেস থেকে এনে দেখানোর ফাংশন
-    async function loadAdFeed() {
-        const querySnapshot = await getDocs(query(collection(db, "users"), limit(10)));
-        const feedContainer = document.querySelector('.lg:col-span-8.space-y-5'); 
-        
-        // এখানে আমরা আগের ডামি পোস্টগুলো সরিয়ে রিয়েল পোস্ট বসাবো
-        // (আপাতত আপনার ডিজাইন ঠিক রাখতে আমরা জাভাস্ক্রিপ্ট দিয়ে বাটনগুলোকে সচল করছি)
-    }
-
-    // ৬ সেকেন্ড টাইমার এবং লিঙ্ক ওপেন করার আসল লজিক
-    window.startAdVisit = function(element, adLink) {
-        if(!adLink || adLink.includes('adsterra.com/abc12345')) {
-            alert("এটি একটি ডেমো লিঙ্ক। টেস্ট করার জন্য profile.html এ গিয়ে আগে একটি আসল লিঙ্ক সেভ করুন!");
+    // ১. পেজ লোড হলে লগইন করা ইউজারের রিয়েল ডাটা ডাটাবেস থেকে এনে দেখানো
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+            window.location.href = "index.html";
             return;
         }
 
-        // ১. ছোট উইন্ডো বা নতুন ট্যাবে ডাইরেক্ট লিঙ্কটি ওপেন হবে
+        // টপ বার এবং কার্ডে ইউজারের গুগলের নাম ও ছবি সেট করা
+        document.getElementById('user-name').innerText = user.displayName || "User";
+        document.getElementById('card-name').innerText = user.displayName || "User";
+        if (user.photoURL) {
+            document.getElementById('user-avatar').src = user.photoURL;
+            document.getElementById('card-avatar').src = user.photoURL;
+        }
+
+        try {
+            // ফায়ারবেস Firestore থেকে ইউজারের পয়েন্ট এবং ক্লিক কাউন্ট রিড করা
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                document.getElementById('user-points').innerText = userData.points || 0;
+                document.getElementById('stat-clicks').innerText = userData.total_clicks || 0;
+                document.getElementById('stat-links').innerText = userData.links ? userData.links.filter(l => l !== "").length : 0;
+                
+                let currentProgress = (userData.total_clicks || 0) % 10;
+                document.getElementById('progress-text').innerText = `Visits Progress: ${currentProgress}/10`;
+            }
+        } catch (error) {
+            console.error("Error loading user points:", error);
+        }
+
+        // ইউজার ডাটা পাওয়ার পর গ্লোবাল ফিড লোড করা
+        loadAdFeed(user.uid);
+    });
+
+    // ২. ডাটাবেস থেকে অন্যান্য একটিভ মেম্বারদের সেভ করা লিঙ্কগুলো ফিডে দেখানো
+    async function loadAdFeed(currentUid) {
+        try {
+            const querySnapshot = await getDocs(query(collection(db, "users"), limit(15)));
+            const feedContainer = document.getElementById('feed-container');
+            const loadingDiv = document.getElementById('loading-posts');
+            
+            if(loadingDiv) loadingDiv.remove();
+
+            let hasLinks = false;
+
+            querySnapshot.forEach((userDoc) => {
+                const userData = userDoc.data();
+                // নিজের লিঙ্ক নিজের ড্যাশবোর্ডে দেখাবে না এবং খালি লিঙ্ক বাদ যাবে
+                if (userDoc.id !== currentUid && userData.links && userData.links.length > 0) {
+                    
+                    // ২৫টি লিঙ্কের মধ্য থেকে যেকোনো একটি ভ্যালিড লিঙ্ক বেছে নেওয়া
+                    const validLinks = userData.links.filter(link => link && link.trim() !== "");
+                    
+                    if(validLinks.length > 0) {
+                        hasLinks = true;
+                        const randomLink = validLinks[Math.floor(Math.random() * validLinks.length)];
+                        
+                        const postHtml = `
+                            <div class="card p-5 rounded-2xl space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <img src="${userData.photoURL || 'https://i.pravatar.cc/100'}" class="w-10 h-10 rounded-xl mr-3" alt="User">
+                                        <div>
+                                            <h4 class="font-bold text-sm">${userData.displayName || 'Active Networker'}</h4>
+                                            <p class="text-[11px] text-gray-500">@member &bull; Live</p>
+                                        </div>
+                                    </div>
+                                    <button class="text-xs font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-4 py-1.5 rounded-full hover:bg-purple-600 hover:text-white transition">Follow</button>
+                                </div>
+                                <div>
+                                    <span class="bg-green-500/10 text-green-400 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Earning Link</span>
+                                    <h3 class="text-base font-bold mt-1.5 text-gray-200">Support member link to exchange traffic</h3>
+                                    <p class="text-xs text-gray-500 mt-0.5">${randomLink.substring(0, 50)}...</p>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-gray-900">
+                                    <span class="text-xs text-gray-500"><i class="far fa-eye mr-1"></i> Active Link</span>
+                                    <button onclick="startAdVisit(this, '${randomLink}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-8 py-2.5 rounded-xl font-bold transition tracking-wide shadow-md shadow-indigo-600/10">
+                                        Visit
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        feedContainer.insertAdjacentHTML('beforeend', postHtml);
+                    }
+                }
+            });
+
+            if (!hasLinks) {
+                feedContainer.insertAdjacentHTML('beforeend', '<div class="text-center py-6 text-gray-500">No active links in network yet. Go to Profile to add yours!</div>');
+            }
+
+        } catch (error) {
+            console.error("Error loading network feed:", error);
+        }
+    }
+
+    // ৩. ৬ সেকেন্ডের কাউন্টডাউন এবং লাইভ পয়েন্ট যোগ করার লজিক
+    window.startAdVisit = function(element, adLink) {
+        if(!adLink) {
+            alert("ভ্যালিড কোনো লিঙ্ক পাওয়া যায়নি!");
+            return;
+        }
+
+        // উইন্ডো পপ-আপ ওপেন করা
         window.open(adLink, '_blank', 'width=450,height=600,top=100,left=100');
 
         let timeLeft = 6;
-        element.disabled = true; // বাটন লক করে দিলাম যাতে বারবার ক্লিক না করতে পারে
+        element.disabled = true;
         element.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
         element.classList.add('bg-gray-700', 'cursor-not-allowed');
         element.innerText = `Wait ${timeLeft}s`;
 
-        // ২. টাইমার কাউন্টডাউন শুরু
         const timer = setInterval(async () => {
             timeLeft--;
             element.innerText = `Wait ${timeLeft}s`;
@@ -296,33 +350,46 @@
                 element.classList.remove('bg-gray-700');
                 element.classList.add('bg-green-600');
 
-                // ৩. ক্রেডিট বা পয়েন্ট আপডেট (ইউজারকে ১০ পয়েন্ট দেওয়া)
                 const user = auth.currentUser;
                 if (user) {
-                    const userDocRef = doc(db, "users", user.uid);
-                    await updateDoc(userDocRef, {
-                        points: increment(10), // ১০ পয়েন্ট যোগ হবে
-                        total_clicks: increment(1) // ইউজারের টোটাল ক্লিক ১ বাড়বে
-                    });
-                    
-                    // স্ক্রিনে পয়েন্টের সংখ্যা আপডেট করা
-                    const pointsText = document.querySelector('.text-yellow-500');
-                    if(pointsText) {
-                        let currentPoints = parseInt(pointsText.innerText) || 0;
-                        pointsText.innerText = currentPoints + 10;
+                    try {
+                        const userDocRef = doc(db, "users", user.uid);
+                        // ডাটাবেসে রিয়েল-টাইমে ১০ পয়েন্ট বৃদ্ধি
+                        await updateDoc(userDocRef, {
+                            points: increment(10),
+                            total_clicks: increment(1)
+                        });
+                        
+                        // সাথে সাথে স্ক্রিনের পয়েন্ট ১০ বাড়িয়ে দেওয়া
+                        const pointsText = document.getElementById('user-points');
+                        const totalClicksText = document.getElementById('stat-clicks');
+                        if(pointsText) {
+                            let currentPoints = parseInt(pointsText.innerText) || 0;
+                            pointsText.innerText = currentPoints + 10;
+                        }
+                        if(totalClicksText) {
+                            let currentClicks = parseInt(totalClicksText.innerText) || 0;
+                            totalClicksText.innerText = currentClicks + 1;
+                            
+                            let currentProgress = (currentClicks + 1) % 10;
+                            document.getElementById('progress-text').innerText = `Visits Progress: ${currentProgress}/10`;
+                        }
+                        
+                        alert("অভিনন্দন! আপনি ১০ পয়েন্ট বোনাস পেয়েছেন।");
+                    } catch (err) {
+                        console.error("Error updating points:", err);
                     }
-                    
-                    alert("সফল হয়েছে! আপনি ১০ পয়েন্ট বোনাস পেয়েছেন।");
                 }
             }
         }, 1000);
     }
 
-    // চেক করা ইউজার লগইন আছে কিনা
-    auth.onAuthStateChanged((user) => {
-        if (!user) {
-            // যদি লগইন না থাকে তবে ইনডেক্স পেজে পাঠিয়ে দেবে
-            window.location.href = "index.html";
+    // ৪. প্রোফাইল লোগো আইকনে ক্লিক করলে লগআউট হওয়ার মেকানিজম
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        if(confirm("আপনি কি লগআউট করতে চান?")) {
+            auth.signOut().then(() => {
+                window.location.href = "index.html";
+            });
         }
     });
 </script>
