@@ -1,9 +1,7 @@
-// ১. ফায়ারবেস কনফিগারেশন ফাইল
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// নিচের এই তথ্যগুলো আপনি আপনার Firebase Console থেকে পাবেন
 const firebaseConfig = {
   apiKey: "AIzaSyCmtwe_lMDqTcHLRPLR2fmLm6Lpj1CcabA",
   authDomain: "adlinkpro-23c35.firebaseapp.com",
