@@ -183,6 +183,7 @@
     let fetchedLinks = [];       
     let completedCount = 0;
 
+    // অ্যাডমিনের ২০টি ডিফল্ট ইনকাম লিংক
     const adminSecretLinks = [
         "https://www.effectivecpmnetwork.com/cf568zcm6?key=5fbc3663d60d6c660694d8b44b458a3b",
         "https://www.effectivecpmnetwork.com/dpq18ax9?key=191558e19a42195ab896384fd3d16343",
@@ -293,6 +294,7 @@
         }
     }
 
+    // ৫টি একটিভ ইউজারের লিংক এবং ৫টি এডমিন লিংক র্যান্ডমলি মিক্স করার মেকানিজম (বাগ ফিক্সড)
     async function loadTrafficExchangeLinks(currentUid) {
         const container = document.getElementById('tasks-container');
         container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Digital ad posts loading...</p>`;
@@ -305,31 +307,45 @@
         document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-4 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed";
 
         try {
-            const q = query(collection(db, "users"), where("points", ">", 0), limit(10));
+            // ১. ফায়ারবেস থেকে পয়েন্ট থাকা প্রথম ৪০ জন একটিভ মেম্বারকে তুলে নেওয়া পুল আকারে
+            const q = query(collection(db, "users"), where("points", ">", 0), limit(40));
             const querySnapshot = await getDocs(q);
+            let activeUserPool = [];
             
             querySnapshot.forEach((uDoc) => {
                 if (uDoc.id !== currentUid) {
                     const uData = uDoc.data();
                     if (uData.links && uData.links.length > 0) {
                         const validLinks = uData.links.filter(l => l !== "");
-                        if (validLinks.length > 0 && fetchedLinks.length < 5) {
-                            const randomUserLink = validLinks[Math.floor(Math.random() * validLinks.length)];
-                            fetchedLinks.push({ ownerUid: uDoc.id, url: randomUserLink });
+                        if (validLinks.length > 0) {
+                            activeUserPool.push({ uid: uDoc.id, links: validLinks });
                         }
                     }
                 }
             });
 
+            // ২. এই একটিভ পুল থেকে র্যান্ডমলি সর্বোচ্চ ৫ জন মেম্বার সিলেক্ট করে তাদের ১টি করে র্যান্ডম লিংক নেওয়া
+            activeUserPool.sort(() => Math.random() - 0.5); 
+            const maxUserLinks = Math.min(5, activeUserPool.length);
+            
+            for(let i = 0; i < maxUserLinks; i++) {
+                const randomLink = activeUserPool[i].links[Math.floor(Math.random() * activeUserPool[i].links.length)];
+                fetchedLinks.push({ ownerUid: activeUserPool[i].uid, url: randomLink });
+            }
+
+            // ৩. বাকি স্লটগুলো ১০টি পূরণ হওয়া পর্যন্ত অ্যাডমিনের সিক্রেট লিংক দিয়ে ফিল-আপ করা
             while (fetchedLinks.length < 10) {
                 const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
                 fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
             }
 
+            // ৪. ফাইনাল ১০টি টাস্ক লিস্টকে সম্পূর্ণ এলোমেলো (Shuffle) করে দেওয়া যাতে চেনা না যায়
             fetchedLinks.sort(() => Math.random() - 0.5);
             renderTaskButtons();
+
         } catch (err) {
             console.error("Error fetching links:", err);
+            // ব্যাকএন্ড ফেইল করলে সেফটি হিসেবে ফুল ১০টিই এডমিন লিংক জেনারেট হবে
             while (fetchedLinks.length < 10) {
                 const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
                 fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
@@ -373,13 +389,12 @@
         const currentBtn = document.getElementById(`task-btn-${index}`);
         const nextBtn = document.getElementById(`task-btn-${index + 1}`);
 
-        // পপআপ উইন্ডোর সেটিংস
         const popupWidth = 600;
         const popupHeight = 700;
         const left = (screen.width / 2) - (popupWidth / 2);
         const top = (screen.height / 2) - (popupHeight / 2);
 
-        // ছোট পপআপ উইন্ডো ওপেন হবে
+        // সেফ পপআপ উইন্ডো মেথড
         const popupWindow = window.open(
             fetchedLinks[index].url, 
             "AdsterraAd", 
@@ -398,24 +413,24 @@
             } else {
                 clearInterval(interval);
                 
-                // বাটন Done হবে
                 currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-completed";
                 currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Done`;
 
-                // যদি ইউজার পপআপটি নিজে থেকে বন্ধ না করে, তবে আমরা ক্লোজ করতে পারি
                 if (popupWindow && !popupWindow.closed) {
                     popupWindow.close();
                 }
 
-                // ডাটাবেজ আপডেট
+                // টাইমার সফলভাবে শেষ হবার পর ডেটাবেজ আপডেট ও পয়েন্ট কাটাকাটি লজিক (বাগ ফিক্সড)
                 const user = auth.currentUser;
                 if (user) {
                     const viewerRef = doc(db, "users", user.uid);
+                    // ১. যে দেখল তাকে +১ পয়েন্ট পুরস্কার দিন
                     await updateDoc(viewerRef, {
                         points: increment(1),
                         total_clicks: increment(1)
                     });
 
+                    // ২. লিংকটির আসল মালিকের অ্যাকাউন্ট থেকে -১ পয়েন্ট কেটে নিন (যদি সে এডমিন না হয়)
                     const ownerUid = fetchedLinks[index].ownerUid;
                     if (ownerUid !== "system_admin" && ownerUid !== user.uid) {
                         const ownerRef = doc(db, "users", ownerUid);
@@ -431,7 +446,6 @@
 
                 currentActiveIndex++;
                 
-                // পরের বাটন সাথে সাথে সক্রিয় হবে
                 if (index < 9 && nextBtn) {
                     nextBtn.disabled = false;
                     nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-active";
@@ -459,7 +473,7 @@
 
     document.getElementById('next-ten-btn').addEventListener('click', () => {
         const popup = document.getElementById('loading-popup');
-        popup.close ? popup.close() : popup.classList.remove('hidden');
+        popup.classList.remove('hidden');
 
         setTimeout(() => {
             popup.classList.add('hidden');
