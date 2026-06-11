@@ -147,7 +147,7 @@
     const linksContainer = document.getElementById('links-container');
     const saveBtn = document.getElementById('save-all-btn');
 
-    // 🎯 ফিক্সড: window.location.search ব্যবহার করে সঠিকভাবে UID রিড করা হলো
+    // URL থেকে টার্গেট ইউজারের আইডি বের করা
     const urlParams = new URLSearchParams(window.location.search);
     const targetUid = urlParams.get('uid');
 
@@ -172,11 +172,12 @@
         const profileOwnerId = targetUid || currentUser.uid;
         const isMyOwnProfile = (profileOwnerId === currentUser.uid);
 
+        // হেডার ও টপ মেনু সেটআপ
         const myName = currentUser.displayName || "AdLinkX Publisher";
         if (document.getElementById('header-name')) document.getElementById('header-name').innerText = myName;
         if (document.getElementById('user-avatar-top')) document.getElementById('user-avatar-top').src = currentUser.photoURL || "https://i.pravatar.cc/150?u=" + currentUser.uid;
 
-        // ভিউ ইন্টারফেস সেটআপ
+        // ভিউ ইন্টারফেস মোড অ্যাডজাস্টমেন্ট
         if (isMyOwnProfile) {
             document.getElementById('edit-profile-btn').classList.remove('hidden');
             document.getElementById('follow-action-container').classList.add('hidden');
@@ -194,9 +195,11 @@
         }
 
         try {
+            // প্রোফাইল মালিকের ডাটা ডাটাবেস থেকে রিড করা
             const userDocRef = doc(db, "users", profileOwnerId);
             const docSnap = await getDoc(userDocRef);
 
+            // লগইন করা নিজের ডাটা রিড করা
             const myDocRef = doc(db, "users", currentUser.uid);
             const mySnap = await getDoc(myDocRef);
             let myFollowingList = [];
@@ -212,7 +215,8 @@
                 if (document.getElementById('profile-handle')) document.getElementById('profile-handle').innerText = profileName.toLowerCase().replace(/\s+/g, '_');
                 if (document.getElementById('profile-img')) document.getElementById('profile-img').src = data.photoURL || "https://i.pravatar.cc/150?u=" + profileOwnerId;
 
-                if (document.getElementById('user-points')) document.getElementById('user-points').innerText = data.points || 0;
+                // লাইভ মেট্রিকেস সংখ্যা লোড করা
+                if (document.getElementById('user-points')) document.getElementById('user-points').innerText = isMyOwnProfile ? (data.points || 0) : (mySnap.data()?.points || 0);
                 if (document.getElementById('total-clicks')) document.getElementById('total-clicks').innerText = data.total_clicks || 0;
                 if (document.getElementById('stat-followers')) document.getElementById('stat-followers').innerText = data.followers_count || 0;
                 if (document.getElementById('stat-following')) document.getElementById('stat-following').innerText = data.following_count || 0;
@@ -227,11 +231,12 @@
                     });
                 }
 
-                // 🎯 ডুপ্লিকেট প্রতিরোধক ফলো/আনফলো মেকানিজম
+                // 🎯 ডুপ্লিকেট প্রতিরোধক ফলো/আনফলো অ্যাকশন লজিক
                 if (!isMyOwnProfile) {
                     const followBtn = document.getElementById('follow-btn');
                     let isFollowing = myFollowingList.includes(profileOwnerId);
 
+                    // ইনিশিয়াল বাটন স্টাইল
                     if (isFollowing) {
                         followBtn.innerText = "Following";
                         followBtn.className = "bg-gray-800 text-purple-400 border border-purple-500/30 px-6 py-2 rounded-xl text-xs font-bold transition";
@@ -244,7 +249,7 @@
                         followBtn.disabled = true;
                         try {
                             if (isFollowing) {
-                                // ❌ ফিক্সড: আনফলো লজিকের টাইপো রিমুভ করা হয়েছে
+                                // ❌ আনফলো প্রসেস
                                 await updateDoc(myDocRef, { following_list: arrayRemove(profileOwnerId), following_count: increment(-1) });
                                 await updateDoc(userDocRef, { followers_count: increment(-1) });
                                 
@@ -253,7 +258,7 @@
                                 followBtn.className = "bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-purple-500/10";
                                 document.getElementById('stat-followers').innerText = Math.max(0, parseInt(document.getElementById('stat-followers').innerText) - 1);
                             } else {
-                                // 👥 ফলো লজিক (অ্যারে পুশ মোড)
+                                // 👥 ফলো প্রসেস (লিস্টে আইডি সেভ হবে, ফলে ডুপ্লিকেট হওয়ার রাস্তা বন্ধ)
                                 await updateDoc(myDocRef, { following_list: arrayUnion(profileOwnerId), following_count: increment(1) });
                                 await updateDoc(userDocRef, { followers_count: increment(1) });
                                 
@@ -264,6 +269,7 @@
                             }
                         } catch (fErr) {
                             console.error("Follow Action Error:", fErr);
+                            alert("ফলো রিকোয়েস্ট ডাটাবেস দ্বারা রিজেক্ট হয়েছে। দয়া করে ফায়ারবেস Rules চেক করুন।");
                         } finally {
                             followBtn.disabled = false;
                         }
@@ -278,7 +284,7 @@
         }
     });
 
-    // ২৫টি লিঙ্ক ডাটাবেসে সাবমিট করার লজিক
+    // ২৫টি লিঙ্ক সাবমিট করার লজিক
     saveBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -295,7 +301,7 @@
         try {
             const userDocRef = doc(db, "users", user.uid);
             await updateDoc(userDocRef, { links: linksArray });
-            alert("আপনার ২৫টি লিঙ্ক সফলভাবে ফায়ারবেস ক্লাউডে আপডেট করা হয়েছে! 🚀");
+            alert("আপনার ২৫টি লিঙ্ক সফলভাবে ক্লাউডে আপডেট করা হয়েছে! 🚀");
         } catch (err) {
             console.error("Error saving links to firestore:", err);
             alert("লিঙ্ক সেভ করতে সমস্যা হয়েছে।");
