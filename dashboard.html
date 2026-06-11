@@ -8,20 +8,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background-color: #080915; color: white; font-family: sans-serif; }
-        .sidebar { background-color: #0d0e1b; }
+        .sidebar { background-color: #0d0e1b; transition: transform 0.3s ease-in-out; }
         .card { background-color: #111223; border: 1px solid rgba(255,255,255,0.05); }
         .active-tab { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-left: 4px solid #a855f7; }
     </style>
 </head>
-<body class="flex min-h-screen">
+<body class="flex min-h-screen relative overflow-x-hidden">
 
-    <!-- Sidebar -->
-    <aside class="w-64 sidebar h-screen fixed hidden lg:block border-r border-gray-800">
-        <div class="p-6 flex items-center">
-            <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-2">
-                <i class="fas fa-link text-white text-sm"></i>
+    <aside id="sidebar-menu" class="w-64 sidebar h-screen fixed top-0 left-0 z-50 -translate-x-full lg:translate-x-0 border-r border-gray-800 lg:block bg-[#0d0e1b]">
+        <div class="p-6 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-2">
+                    <i class="fas fa-link text-white text-sm"></i>
+                </div>
+                <span class="text-xl font-bold tracking-wide">AdLinkX</span>
             </div>
-            <span class="text-xl font-bold tracking-wide">AdLinkX</span>
+            <button id="close-sidebar" class="lg:hidden text-gray-400 hover:text-white text-xl">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         
         <nav class="mt-4 px-4 space-y-2">
@@ -51,12 +55,12 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
+
     <main class="lg:ml-64 w-full flex flex-col min-h-screen pb-24 lg:pb-0">
         
-        <!-- Header -->
-        <header class="card h-16 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-50">
-            <div class="flex items-center lg:hidden cursor-pointer">
+        <header class="card h-16 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30">
+            <div id="open-sidebar" class="flex items-center lg:hidden cursor-pointer p-2 hover:bg-gray-800 rounded-lg transition">
                 <i class="fas fa-bars text-xl text-gray-300"></i>
                 <span class="text-lg font-bold ml-3 tracking-wide">AdLinkX</span>
             </div>
@@ -66,63 +70,61 @@
                 <a href="#" class="hover:text-white transition">Leaderboard</a>
             </div>
             
-            <div class="flex items-center space-x-4">
-                <a href="profile.html" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl text-xs font-bold transition">
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <a href="profile.html" class="bg-purple-600 hover:bg-purple-700 px-3 py-2 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">
                     + Add Link
                 </a>
-                <!-- ডাইনামিক পয়েন্ট জোন -->
-                <div class="bg-gray-900 px-3 py-1.5 rounded-full flex items-center border border-yellow-500/20 text-sm">
-                    <span class="mr-1.5">💰</span> <span id="user-points" class="font-bold text-yellow-500">0</span>
+                <div class="bg-gray-900 px-2.5 py-1.5 rounded-full flex items-center border border-yellow-500/20 text-xs sm:text-sm">
+                    <span class="mr-1">💰</span> <span id="user-points" class="font-bold text-yellow-500">0</span>
                 </div>
-                <!-- ডাইনামিক ইউজার প্রোফাইল -->
-                <div class="flex items-center space-x-2 cursor-pointer" id="logout-btn">
+                <div class="flex items-center space-x-2 cursor-pointer p-1 hover:bg-gray-800 rounded-xl transition" id="logout-btn">
                     <img id="user-avatar" src="https://i.pravatar.cc/100?img=33" class="w-8 h-8 rounded-full border-2 border-purple-500" alt="User">
-                    <span class="text-sm font-medium hidden sm:inline-block text-gray-300"><span id="user-name">Loading...</span> <i class="fas fa-sign-out-alt text-xs ml-1 text-red-400"></i></span>
+                    <span class="text-sm font-medium hidden sm:inline-block text-gray-300">
+                        <span id="user-name">Loading...</span> 
+                        <i class="fas fa-sign-out-alt text-xs ml-1 text-red-400"></i>
+                    </span>
                 </div>
             </div>
         </header>
 
         <div class="p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <!-- Left Feed Column -->
             <div class="lg:col-span-8 space-y-5" id="feed-container">
                 
-                <!-- Progress Card -->
                 <div class="card p-5 rounded-2xl">
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
                         <p class="text-xs lg:text-sm text-gray-400">Complete 10 visits and earn bonus <span class="text-purple-400 font-bold">10 points!</span></p>
-                        <span id="progress-text" class="text-xs text-green-400 bg-green-500/10 px-2 py-0.5 rounded-md font-bold">Visits Progress: 0/10</span>
+                        <span id="progress-text" class="text-xs text-green-400 bg-green-500/10 px-2.5 py-1 rounded-md font-bold self-start sm:self-auto">Visits Progress: 0/10</span>
                     </div>
                     
                     <div class="flex flex-wrap items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                        <div id="progress-dots" class="flex flex-wrap gap-2">
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                        </div>
                         
-                        <button disabled class="ml-auto bg-gray-900 border border-gray-800/80 px-4 py-2 rounded-xl text-xs text-gray-600 font-bold cursor-not-allowed">
+                        <button id="next-links-btn" disabled class="ml-auto w-full sm:w-auto bg-gray-900 border border-gray-800/80 px-4 py-2 rounded-xl text-xs text-gray-600 font-bold cursor-not-allowed mt-2 sm:mt-0">
                             Next 10 Links
                         </button>
                     </div>
                 </div>
 
-                <!-- এটি একটি ডাইনামিক পোস্ট লোডার মেসেজ, নিচে স্ক্রিপ্ট দিয়ে ফায়ারবেস থেকে আসল পোস্ট এখানে আসবে -->
-                <div id="loading-posts" class="text-center py-8 text-gray-500 text-sm">
-                    <i class="fas fa-spinner fa-spin mr-2"></i>Loading live network links...
+                <div id="loading-posts" class="text-center py-8 text-gray-500 text-sm card rounded-2xl">
+                    <i class="fas fa-spinner fa-spin mr-2 text-purple-500"></i>Loading live network links...
                 </div>
 
             </div>
 
-            <!-- Right Sidebar Column -->
             <div class="lg:col-span-4 space-y-6">
                 
-                <!-- Profile Right Card -->
                 <div class="card p-6 rounded-2xl text-center relative overflow-hidden">
                     <div class="relative inline-block mt-2">
                         <img id="card-avatar" src="https://i.pravatar.cc/100?img=33" class="w-20 h-20 rounded-full mx-auto border-4 border-purple-500/20">
@@ -147,7 +149,6 @@
                     </div>
                 </div>
 
-                <!-- Who to Follow -->
                 <div class="card p-5 rounded-2xl">
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="font-bold text-sm tracking-wide">Who to Follow</h4>
@@ -177,7 +178,6 @@
                     </div>
                 </div>
 
-                <!-- Top Earners -->
                 <div class="card p-5 rounded-2xl">
                     <h4 class="font-bold text-sm tracking-wide mb-4"><i class="fas fa-trophy text-yellow-500 mr-1.5"></i> Top Earners</h4>
                     <div class="space-y-3">
@@ -202,8 +202,7 @@
 
     </main>
 
-    <!-- Mobile Bottom Nav -->
-    <div class="lg:hidden fixed bottom-0 left-0 w-full bg-[#0d0e1b] border-t border-gray-800/80 flex justify-around items-center py-3 z-50">
+    <div class="lg:hidden fixed bottom-0 left-0 w-full bg-[#0d0e1b] border-t border-gray-800/80 flex justify-around items-center py-3 z-40">
         <a href="dashboard.html" class="flex flex-col items-center text-purple-500 text-xs">
             <i class="fas fa-home text-lg mb-0.5"></i> Home
         </a>
@@ -225,14 +224,54 @@
     import { db, auth } from './firebase-config.js';
     import { collection, query, limit, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // ১. পেজ লোড হলে লগইন করা ইউজারের রিয়েল ডাটা ডাটাবেস থেকে এনে দেখানো
+    // মোবাইল মেনু কন্ট্রোল করার লজিক
+    const openSidebar = document.getElementById('open-sidebar');
+    const closeSidebar = document.getElementById('close-sidebar');
+    const sidebarMenu = document.getElementById('sidebar-menu');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+    function toggleSidebar() {
+        sidebarMenu.classList.toggle('-translate-x-full');
+        sidebarOverlay.classList.toggle('hidden');
+    }
+
+    if(openSidebar) openSidebar.addEventListener('click', toggleSidebar);
+    if(closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
+    if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    // প্রোগ্রেস ডট বা লক আপডেট করার ফাংশন
+    function updateProgressUI(clicks) {
+        let currentProgress = clicks % 10;
+        document.getElementById('progress-text').innerText = `Visits Progress: ${currentProgress}/10`;
+        
+        const dots = document.querySelectorAll('.progress-dot');
+        dots.forEach((dot, index) => {
+            if (index < currentProgress) {
+                dot.innerHTML = '✅';
+                dot.className = "progress-dot w-8 h-8 rounded-full bg-green-500/20 border border-green-500/50 flex items-center justify-center text-[10px] font-bold text-green-400";
+            } else {
+                dot.innerHTML = '<i class="fas fa-lock text-[9px]"></i>';
+                dot.className = "progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600";
+            }
+        });
+
+        const nextBtn = document.getElementById('next-links-btn');
+        if(currentProgress === 0 && clicks > 0) {
+            nextBtn.removeAttribute('disabled');
+            nextBtn.className = "ml-auto w-full sm:w-auto bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl text-xs text-white font-bold cursor-pointer mt-2 sm:mt-0 transition";
+        } else {
+            nextBtn.setAttribute('disabled', 'true');
+            nextBtn.className = "ml-auto w-full sm:w-auto bg-gray-900 border border-gray-800/80 px-4 py-2 rounded-xl text-xs text-gray-600 font-bold cursor-not-allowed mt-2 sm:mt-0";
+        }
+    }
+
+    // ১. পেজ লোড হলে ইউজারের ডাটাবেস ডাটা রেন্ডার করা
     auth.onAuthStateChanged(async (user) => {
         if (!user) {
             window.location.href = "index.html";
             return;
         }
 
-        // টপ বার এবং কার্ডে ইউজারের গুগলের নাম ও ছবি সেট করা
         document.getElementById('user-name').innerText = user.displayName || "User";
         document.getElementById('card-name').innerText = user.displayName || "User";
         if (user.photoURL) {
@@ -241,7 +280,6 @@
         }
 
         try {
-            // ফায়ারবেস Firestore থেকে ইউজারের পয়েন্ট এবং ক্লিক কাউন্ট রিড করা
             const userDocRef = doc(db, "users", user.uid);
             const userDocSnap = await getDoc(userDocRef);
 
@@ -251,18 +289,16 @@
                 document.getElementById('stat-clicks').innerText = userData.total_clicks || 0;
                 document.getElementById('stat-links').innerText = userData.links ? userData.links.filter(l => l !== "").length : 0;
                 
-                let currentProgress = (userData.total_clicks || 0) % 10;
-                document.getElementById('progress-text').innerText = `Visits Progress: ${currentProgress}/10`;
+                updateProgressUI(userData.total_clicks || 0);
             }
         } catch (error) {
             console.error("Error loading user points:", error);
         }
 
-        // ইউজার ডাটা পাওয়ার পর গ্লোবাল ফিড লোড করা
         loadAdFeed(user.uid);
     });
 
-    // ২. ডাটাবেস থেকে অন্যান্য একটিভ মেম্বারদের সেভ করা লিঙ্কগুলো ফিডে দেখানো
+    // ২. লাইভ নেটওয়ার্ক লিঙ্ক ফিড লোড করা
     async function loadAdFeed(currentUid) {
         try {
             const querySnapshot = await getDocs(query(collection(db, "users"), limit(15)));
@@ -270,15 +306,11 @@
             const loadingDiv = document.getElementById('loading-posts');
             
             if(loadingDiv) loadingDiv.remove();
-
             let hasLinks = false;
 
             querySnapshot.forEach((userDoc) => {
                 const userData = userDoc.data();
-                // নিজের লিঙ্ক নিজের ড্যাশবোর্ডে দেখাবে না এবং খালি লিঙ্ক বাদ যাবে
                 if (userDoc.id !== currentUid && userData.links && userData.links.length > 0) {
-                    
-                    // ২৫টি লিঙ্কের মধ্য থেকে যেকোনো একটি ভ্যালিড লিঙ্ক বেছে নেওয়া
                     const validLinks = userData.links.filter(link => link && link.trim() !== "");
                     
                     if(validLinks.length > 0) {
@@ -300,11 +332,11 @@
                                 <div>
                                     <span class="bg-green-500/10 text-green-400 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Earning Link</span>
                                     <h3 class="text-base font-bold mt-1.5 text-gray-200">Support member link to exchange traffic</h3>
-                                    <p class="text-xs text-gray-500 mt-0.5">${randomLink.substring(0, 50)}...</p>
+                                    <p class="text-xs text-gray-500 mt-0.5 break-all">${randomLink.substring(0, 50)}...</p>
                                 </div>
                                 <div class="flex justify-between items-center pt-2 border-t border-gray-900">
                                     <span class="text-xs text-gray-500"><i class="far fa-eye mr-1"></i> Active Link</span>
-                                    <button onclick="startAdVisit(this, '${randomLink}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-8 py-2.5 rounded-xl font-bold transition tracking-wide shadow-md shadow-indigo-600/10">
+                                    <button data-link="${randomLink}" class="visit-btn bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-8 py-2.5 rounded-xl font-bold transition tracking-wide shadow-md shadow-indigo-600/10">
                                         Visit
                                     </button>
                                 </div>
@@ -316,22 +348,29 @@
             });
 
             if (!hasLinks) {
-                feedContainer.insertAdjacentHTML('beforeend', '<div class="text-center py-6 text-gray-500">No active links in network yet. Go to Profile to add yours!</div>');
+                feedContainer.insertAdjacentHTML('beforeend', '<div class="text-center py-6 text-gray-500 card rounded-2xl">No active links in network yet. Go to Profile to add yours!</div>');
             }
+
+            // ভিজিট বাটনের ইভেন্ট লিসেনার সেটআপ
+            document.querySelectorAll('.visit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const adLink = this.getAttribute('data-link');
+                    startAdVisit(this, adLink);
+                });
+            });
 
         } catch (error) {
             console.error("Error loading network feed:", error);
         }
     }
 
-    // ৩. ৬ সেকেন্ডের কাউন্টডাউন এবং লাইভ পয়েন্ট যোগ করার লজিক
-    window.startAdVisit = function(element, adLink) {
+    // ৩. কাউন্টডাউন এবং লাইভ পয়েন্ট অ্যাড মেকানিজম
+    function startAdVisit(element, adLink) {
         if(!adLink) {
-            alert("ভ্যালিড কোনো লিঙ্ক পাওয়া যায়নি!");
+            alert("ভ্যালিড কোনো লিঙ্ক পাওয়া যায়নি!");
             return;
         }
 
-        // উইন্ডো পপ-আপ ওপেন করা
         window.open(adLink, '_blank', 'width=450,height=600,top=100,left=100');
 
         let timeLeft = 6;
@@ -354,28 +393,27 @@
                 if (user) {
                     try {
                         const userDocRef = doc(db, "users", user.uid);
-                        // ডাটাবেসে রিয়েল-টাইমে ১০ পয়েন্ট বৃদ্ধি
                         await updateDoc(userDocRef, {
                             points: increment(10),
                             total_clicks: increment(1)
                         });
                         
-                        // সাথে সাথে স্ক্রিনের পয়েন্ট ১০ বাড়িয়ে দেওয়া
                         const pointsText = document.getElementById('user-points');
                         const totalClicksText = document.getElementById('stat-clicks');
+                        let currentClicks = 0;
+
                         if(pointsText) {
                             let currentPoints = parseInt(pointsText.innerText) || 0;
                             pointsText.innerText = currentPoints + 10;
                         }
                         if(totalClicksText) {
-                            let currentClicks = parseInt(totalClicksText.innerText) || 0;
-                            totalClicksText.innerText = currentClicks + 1;
-                            
-                            let currentProgress = (currentClicks + 1) % 10;
-                            document.getElementById('progress-text').innerText = `Visits Progress: ${currentProgress}/10`;
+                            currentClicks = parseInt(totalClicksText.innerText) || 0;
+                            currentClicks = currentClicks + 1;
+                            totalClicksText.innerText = currentClicks;
                         }
                         
-                        alert("অভিনন্দন! আপনি ১০ পয়েন্ট বোনাস পেয়েছেন।");
+                        updateProgressUI(currentClicks);
+                        alert("অভিনন্দন! আপনি ১০ পয়েন্ট বোনাস পেয়েছেন।");
                     } catch (err) {
                         console.error("Error updating points:", err);
                     }
@@ -384,7 +422,7 @@
         }, 1000);
     }
 
-    // ৪. প্রোফাইল লোগো আইকনে ক্লিক করলে লগআউট হওয়ার মেকানিজম
+    // ৪. লগআউট মেকানিজম
     document.getElementById('logout-btn').addEventListener('click', () => {
         if(confirm("আপনি কি লগআউট করতে চান?")) {
             auth.signOut().then(() => {
