@@ -147,11 +147,11 @@
     const linksContainer = document.getElementById('links-container');
     const saveBtn = document.getElementById('save-all-btn');
 
-    // URL থেকে uid প্যারামিটার বের করার মেকানিজম (যেমন: profile.html?uid=xyz)
-    const urlParams = new URLSearchParams(window.search);
+    // 🎯 ফিক্সড: window.location.search ব্যবহার করে সঠিকভাবে UID রিড করা হলো
+    const urlParams = new URLSearchParams(window.location.search);
     const targetUid = urlParams.get('uid');
 
-    // লুপের সাহায্যে নিখুঁতভাবে ২৫টি ইনপুট স্লট তৈরি করা
+    // ২৫টি ইনপুট স্লট তৈরি করা
     for (let i = 1; i <= 25; i++) {
         const row = `
             <div class="flex items-center gap-3 bg-[#111223]/50 p-1.5 pr-3 rounded-xl border border-gray-800/30">
@@ -163,23 +163,20 @@
         linksContainer.insertAdjacentHTML('beforeend', row);
     }
 
-    // ফায়ারবেস অথেনটিকেশন ও ফায়ারস্টোর ডাটাবেস হ্যান্ডেলিং লুপ
     auth.onAuthStateChanged(async (currentUser) => {
         if (!currentUser) {
             window.location.href = "index.html";
             return;
         }
 
-        // যার প্রোফাইল দেখা হচ্ছে তার আইডি (লিঙ্কে আইডি থাকলে সেটি, না থাকলে নিজের আইডি)
         const profileOwnerId = targetUid || currentUser.uid;
         const isMyOwnProfile = (profileOwnerId === currentUser.uid);
 
-        // হেডার ও টপ মেনুতে সবসময় লগইন করা নিজের ইনফো থাকবে
         const myName = currentUser.displayName || "AdLinkX Publisher";
         if (document.getElementById('header-name')) document.getElementById('header-name').innerText = myName;
         if (document.getElementById('user-avatar-top')) document.getElementById('user-avatar-top').src = currentUser.photoURL || "https://i.pravatar.cc/150?u=" + currentUser.uid;
 
-        // প্রোফাইল মোড অ্যাডজাস্টমেন্ট (নিজের প্রোফাইল নাকি অন্যের প্রোফাইল)
+        // ভিউ ইন্টারফেস সেটআপ
         if (isMyOwnProfile) {
             document.getElementById('edit-profile-btn').classList.remove('hidden');
             document.getElementById('follow-action-container').classList.add('hidden');
@@ -190,7 +187,6 @@
             document.getElementById('save-all-btn').classList.add('hidden');
             document.getElementById('links-title-text').innerHTML = `<i class="fas fa-link text-purple-500 mr-2"></i> Publisher's Shared Links`;
             
-            // অন্যের প্রোফাইল হলে ইনপুট বক্সগুলো লক (Read-Only) করে দেওয়া হবে
             for (let i = 1; i <= 25; i++) {
                 const input = document.getElementById(`link-${i}`);
                 if (input) input.disabled = true;
@@ -198,11 +194,9 @@
         }
 
         try {
-            // প্রোফাইল মালিকের ডাটা ফায়ারস্টোর থেকে লোড করা
             const userDocRef = doc(db, "users", profileOwnerId);
             const docSnap = await getDoc(userDocRef);
 
-            // লগইন করা ইউজারের নিজস্ব ডাটাবেস স্ন্যাপশট (ফলো স্ট্যাটাস চেক করার জন্য)
             const myDocRef = doc(db, "users", currentUser.uid);
             const mySnap = await getDoc(myDocRef);
             let myFollowingList = [];
@@ -213,20 +207,17 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
 
-                // প্রোফাইলের ইন্টারফেসে মালিকের ডাটা বসানো
                 const profileName = data.displayName || "AdLinkX Publisher";
                 if (document.getElementById('profile-name')) document.getElementById('profile-name').innerText = profileName;
                 if (document.getElementById('profile-handle')) document.getElementById('profile-handle').innerText = profileName.toLowerCase().replace(/\s+/g, '_');
                 if (document.getElementById('profile-img')) document.getElementById('profile-img').src = data.photoURL || "https://i.pravatar.cc/150?u=" + profileOwnerId;
 
-                // লাইভ স্ট্যাটাস কাউন্টার লোড
                 if (document.getElementById('user-points')) document.getElementById('user-points').innerText = data.points || 0;
                 if (document.getElementById('total-clicks')) document.getElementById('total-clicks').innerText = data.total_clicks || 0;
                 if (document.getElementById('stat-followers')) document.getElementById('stat-followers').innerText = data.followers_count || 0;
                 if (document.getElementById('stat-following')) document.getElementById('stat-following').innerText = data.following_count || 0;
                 if (document.getElementById('stat-return-clicks')) document.getElementById('stat-return-clicks').innerText = data.return_clicks || 0;
 
-                // ২৫টি ইনপুট বক্সে লিঙ্ক পুশ করা
                 if (data.links && Array.isArray(data.links)) {
                     data.links.forEach((link, index) => {
                         if (index < 25) {
@@ -236,12 +227,11 @@
                     });
                 }
 
-                // 🎯 ডুপ্লিকেট ফলো এড়ানোর রিয়েল-টাইম বাটন লজিক সেটআপ
+                // 🎯 ডুপ্লিকেট প্রতিরোধক ফলো/আনফলো মেকানিজম
                 if (!isMyOwnProfile) {
                     const followBtn = document.getElementById('follow-btn');
                     let isFollowing = myFollowingList.includes(profileOwnerId);
 
-                    // বাটন ইন্টারফেস আপডেট
                     if (isFollowing) {
                         followBtn.innerText = "Following";
                         followBtn.className = "bg-gray-800 text-purple-400 border border-purple-500/30 px-6 py-2 rounded-xl text-xs font-bold transition";
@@ -250,21 +240,20 @@
                         followBtn.className = "bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-purple-500/10";
                     }
 
-                    // ফলো/আনফলো ক্লিকের আসল অ্যাকশন (ডুপ্লিকেট প্রুফ)
                     followBtn.onclick = async () => {
                         followBtn.disabled = true;
                         try {
                             if (isFollowing) {
-                                // ❌ আনফলো লজিক
-                                await updateDoc(myDocRef, { following_list: arrayRemove(profileOwnerId),劇 following_count: increment(-1) });
+                                // ❌ ফিক্সড: আনফলো লজিকের টাইপো রিমুভ করা হয়েছে
+                                await updateDoc(myDocRef, { following_list: arrayRemove(profileOwnerId), following_count: increment(-1) });
                                 await updateDoc(userDocRef, { followers_count: increment(-1) });
                                 
                                 isFollowing = false;
                                 followBtn.innerText = "Follow";
                                 followBtn.className = "bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-purple-500/10";
-                                document.getElementById('stat-followers').innerText = parseInt(document.getElementById('stat-followers').innerText) - 1;
+                                document.getElementById('stat-followers').innerText = Math.max(0, parseInt(document.getElementById('stat-followers').innerText) - 1);
                             } else {
-                                //  ফলো লজিক (লিস্টে আইডি যুক্ত হবে, ফলে ডুপ্লিকেট অসম্ভব)
+                                // 👥 ফলো লজিক (অ্যারে পুশ মোড)
                                 await updateDoc(myDocRef, { following_list: arrayUnion(profileOwnerId), following_count: increment(1) });
                                 await updateDoc(userDocRef, { followers_count: increment(1) });
                                 
@@ -289,7 +278,7 @@
         }
     });
 
-    // ২৫টি লিঙ্ক ডাটাবেসে অ্যারে হিসেবে সাবমিট করার লজিক
+    // ২৫টি লিঙ্ক ডাটাবেসে সাবমিট করার লজিক
     saveBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -316,7 +305,7 @@
         }
     });
 
-    // প্রোফাইল এডিট বাটন অ্যাকশন
+    // প্রোফাইল নাম এডিট অ্যাকশন
     document.getElementById('edit-profile-btn').addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -340,7 +329,7 @@
         }
     });
 
-    // ইউনিক ইউজার প্রোফাইল আইডি লিংক জেনারেটর (শেয়ার বাটন অ্যাকশন)
+    // মেম্বার লিংক জেনারেটর (শেয়ার বাটন অ্যাকশন)
     document.getElementById('share-profile-btn').addEventListener('click', () => {
         const user = auth.currentUser;
         if (!user) return;
