@@ -373,12 +373,11 @@
         const currentBtn = document.getElementById(`task-btn-${index}`);
         const nextBtn = document.getElementById(`task-btn-${index + 1}`);
 
-        // ক্লিক করার সাথে সাথে নতুন উইন্ডোতে এড ওপেন হবে
+        // নতুন ট্যাবে বিজ্ঞাপন ওপেন হবে
         window.open(fetchedLinks[index].url, '_blank');
 
         let timeLeft = 10;
         currentBtn.disabled = true;
-        // বাটনের ব্যাকগ্রাউন্ড ও টেক্সট পরিবর্তন করে লাইভ কাউন্টডাউন শুরু করা হলো
         currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
         currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
 
@@ -389,11 +388,11 @@
             } else {
                 clearInterval(interval);
                 
-                // ১০ সেকেন্ড পুর্ন হলে বাটন কমপ্লিট হবে
+                // ১০ সেকেন্ড কাউন্টডাউন শেষ, বাটন Done হবে
                 currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-completed";
                 currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Done`;
 
-                // ডাটাবেজে পয়েন্ট যোগ/বিয়োগ মেকানিজম
+                // ডাটাবেজ পয়েন্ট আপডেট
                 const user = auth.currentUser;
                 if (user) {
                     const viewerRef = doc(db, "users", user.uid);
@@ -417,24 +416,11 @@
 
                 currentActiveIndex++;
                 
-                // আপনার আগের লজিক অনুযায়ী—বর্তমান টাস্ক শেষ হওয়ার সাথে সাথেই পরবর্তী বাটন আনলক হবে না, সেখানেও একটি ১০ সেকেন্ডের কুলডাউন টাইমার চলবে
+                // ফিক্সড লজিক: কোনো অতিরিক্ত অপেক্ষা ছাড়াই পরবর্তী বাটন সাথে সাথে এক্টিভ হয়ে যাবে!
                 if (index < 9 && nextBtn) {
-                    let unlockTimeLeft = 10;
-                    nextBtn.disabled = true;
-                    nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-gray-900 text-gray-500 border border-gray-800 cursor-not-allowed";
-                    nextBtn.innerHTML = `Wait ${unlockTimeLeft}s...`;
-                    
-                    const unlockInterval = setInterval(() => {
-                        unlockTimeLeft--;
-                        if (unlockTimeLeft > 0) {
-                            nextBtn.innerHTML = `Wait ${unlockTimeLeft}s...`;
-                        } else {
-                            clearInterval(unlockInterval);
-                            nextBtn.disabled = false;
-                            nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-active";
-                            nextBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 2}`;
-                        }
-                    }, 1000);
+                    nextBtn.disabled = false;
+                    nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-active";
+                    nextBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 2}`;
                 }
 
                 if (completedCount === 10) {
