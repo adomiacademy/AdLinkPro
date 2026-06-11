@@ -373,8 +373,18 @@
         const currentBtn = document.getElementById(`task-btn-${index}`);
         const nextBtn = document.getElementById(`task-btn-${index + 1}`);
 
-        // নতুন ট্যাবে বিজ্ঞাপন ওপেন হবে
-        window.open(fetchedLinks[index].url, '_blank');
+        // পপআপ উইন্ডোর সেটিংস
+        const popupWidth = 600;
+        const popupHeight = 700;
+        const left = (screen.width / 2) - (popupWidth / 2);
+        const top = (screen.height / 2) - (popupHeight / 2);
+
+        // ছোট পপআপ উইন্ডো ওপেন হবে
+        const popupWindow = window.open(
+            fetchedLinks[index].url, 
+            "AdsterraAd", 
+            `width=${popupWidth},height=${popupHeight},top=${top},left=${left},resizable=yes,scrollbars=yes`
+        );
 
         let timeLeft = 10;
         currentBtn.disabled = true;
@@ -388,11 +398,16 @@
             } else {
                 clearInterval(interval);
                 
-                // ১০ সেকেন্ড কাউন্টডাউন শেষ, বাটন Done হবে
+                // বাটন Done হবে
                 currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-completed";
                 currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Done`;
 
-                // ডাটাবেজ পয়েন্ট আপডেট
+                // যদি ইউজার পপআপটি নিজে থেকে বন্ধ না করে, তবে আমরা ক্লোজ করতে পারি
+                if (popupWindow && !popupWindow.closed) {
+                    popupWindow.close();
+                }
+
+                // ডাটাবেজ আপডেট
                 const user = auth.currentUser;
                 if (user) {
                     const viewerRef = doc(db, "users", user.uid);
@@ -416,7 +431,7 @@
 
                 currentActiveIndex++;
                 
-                // ফিক্সড লজিক: কোনো অতিরিক্ত অপেক্ষা ছাড়াই পরবর্তী বাটন সাথে সাথে এক্টিভ হয়ে যাবে!
+                // পরের বাটন সাথে সাথে সক্রিয় হবে
                 if (index < 9 && nextBtn) {
                     nextBtn.disabled = false;
                     nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-active";
