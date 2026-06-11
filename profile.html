@@ -168,41 +168,50 @@
 
     // ফায়ারবেস অথেনটিকেশন ও ফায়ারস্টোর ডাটাবেস হ্যান্ডেলিং লুপ
     auth.onAuthStateChanged(async (user) => {
-        if (!user) { 
-            window.location.href = "index.html"; 
-            return; 
+    if (!user) {
+        window.location.href = "index.html"; // লগইন না থাকলে ইনডেক্সে পাঠাবে
+        return;
+    }
+
+    // ইউজার ইনফো ইন্টারফেসে বসানো
+    const defaultName = user.displayName || "AdLinkX Publisher";
+    document.getElementById('profile-name').innerText = defaultName;
+    document.getElementById('header-name').innerText = defaultName;
+    document.getElementById('profile-handle').innerText = defaultName.toLowerCase().replace(/\s+/g, '_');
+    document.getElementById('profile-img').src = user.photoURL || "https://i.pravatar.cc/150?u=" + user.uid;
+    document.getElementById('user-avatar-top').src = user.photoURL || "https://i.pravatar.cc/150?u=" + user.uid;
+
+    try {
+        const userDocRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+
+            // সেফ রিডিং মেকানিজম (ডাটাবেসে কোনো ফিল্ড মিসিং থাকলে এরর ক্র্যাশ আটকাবে)
+            document.getElementById('user-points').innerText = data.points || 0;
+            document.getElementById('total-clicks').innerText = data.total_clicks || 0;
+            
+            // ফলোয়ার্স এবং ফলোয়িং লাইভ সংখ্যা শো করানোর আসল লজিক:
+            document.getElementById('stat-followers').innerText = data.followers_count || 0;
+            document.getElementById('stat-following').innerText = data.following_count || 0;
+            
+            document.getElementById('stat-return-clicks').innerText = data.return_clicks || 0;
+
+            // ডাটাবেস থেকে ২৫টি ইনপুট বক্সে লিঙ্ক পুশ করা
+            if (data.links && Array.isArray(data.links)) {
+                data.links.forEach((link, index) => {
+                    if (index < 25) {
+                        const input = document.getElementById(`link-${index + 1}`);
+                        if (input) input.value = link || "";
+                    }
+                });
+            }
         }
-
-        // ইউজার ইনফো ইন্টারফেসে বসানো
-        const defaultName = user.displayName || "AdLinkX Publisher";
-        document.getElementById('profile-name').innerText = defaultName;
-        document.getElementById('header-name').innerText = defaultName;
-        document.getElementById('profile-handle').innerText = defaultName.toLowerCase().replace(/\s+/g, '_');
-        document.getElementById('profile-img').src = user.photoURL || "https://i.pravatar.cc/150?u=" + user.uid;
-        document.getElementById('user-avatar-top').src = user.photoURL || "https://i.pravatar.cc/150?u=" + user.uid;
-
-        try {
-            const userDocRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(userDocRef);
-
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                
-                // সেফ রিডিং মেকানিজম (ডাটাবেসে কোনো ফিল্ড মিসিং থাকলে এরর ক্র্যাশ আটকাবে)
-                document.getElementById('user-points').innerText = data.points || 0;
-                document.getElementById('total-clicks').innerText = data.total_clicks || 0;
-                document.getElementById('stat-followers').innerText = data.followers_count || 0;
-                document.getElementById('stat-following').innerText = data.following_count || 0;
-                document.getElementById('stat-return-clicks').innerText = data.return_clicks || 0;
-                
-                // ডাটাবেস থেকে ২৫টি ইনপুট বক্সে লিঙ্ক পুশ করা
-                if (data.links && Array.isArray(data.links)) {
-                    data.links.forEach((link, index) => {
-                        if (index < 25) {
-                            const input = document.getElementById(`link-${index + 1}`);
-                            if (input) input.value = link || "";
-                        }
-                    });
+    } catch (err) {
+        console.error("Error loading profile data:", err);
+    }
+});
                 }
             }
         } catch (error) {
