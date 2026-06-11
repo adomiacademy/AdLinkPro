@@ -142,7 +142,7 @@
                             <i class="fas fa-info-circle"></i> Community Guidelines
                         </h4>
                         <p class="text-[10px] lg:text-[11px] text-gray-400 leading-relaxed">
-                            টেলিগ্রাম গ্রুপে স্ক্রিনশট শেয়ার করুন। কোনো ভুল বা ফেক কাজ জমা দিলে অ্যাডমিন প্যানেল থেকে আপনার অ্যাকাউন্টটি ডিলিট বা ব্লক করে দেওয়া হতে পারে।
+                            টেলিগ্রাম গ্রুপে স্ক্রিনশট শেয়ার করুন। কোনো ভুল বা ফেক কাজ জমা দিলে অ্যাডমিন প্যানেল থেকে আপনার অ্যাকাউন্টটি ডিলিট বা ব্লক করে দেওয়া হতে পারে।
                         </p>
                     </div>
                 </div>
@@ -175,32 +175,15 @@
         </div>
     </div>
 
-    <div id="ad-task-popup" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-[#111223] border border-purple-500/20 p-6 rounded-3xl text-center max-w-md w-full shadow-2xl relative">
-            <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-3">
-                <span class="text-[10px] bg-purple-500/10 text-purple-400 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Live Ad Tracker</span>
-                <div id="popup-timer-badge" class="text-xs text-yellow-500 font-bold bg-yellow-500/10 px-3 py-1 rounded-full">
-                    <i class="fas fa-clock fa-spin mr-1"></i> <span id="popup-countdown">10</span>s Left
-                </div>
-            </div>
-
-            <div class="w-14 h-14 bg-purple-600/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-purple-400 text-lg animate-bounce">
-                <i class="fas fa-bolt"></i>
-            </div>
-            <h3 class="text-base font-bold text-white mb-2">অ্যাড ভেরিফিকেশন রানিং...</h3>
-            <p class="text-xs text-gray-400 leading-relaxed mb-6">আপনি সফলভাবে অ্যাডটি ওপেন করেছেন! পয়েন্ট রিডিম করার জন্য এই ট্যাবে ১০ সেকেন্ড অপেক্ষা করুন। টাইমার শেষ হলে বোনাস যোগ হবে।</p>
-            <p class="text-[10px] text-gray-600 mt-4"><i class="fas fa-info-circle mr-1"></i> ১০ সেকেন্ড পূর্ণ হলে এই উইন্ডোটি স্বয়ংক্রিয়ভাবে বন্ধ হয়ে যাবে।</p>
-        </div>
-    </div>
-
 <script type="module">
     import { db, auth } from './firebase-config.js';
-    import { doc, getDoc, collection, getDocs, updateDoc, increment, query, where, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { doc, getDoc, collection, getDocs, updateDoc, increment, query, where, limit, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     let currentActiveIndex = 0; 
     let fetchedLinks = [];       
     let completedCount = 0;
 
+    // আপনার সরবরাহকৃত ১৯টি অরিজিনাল সিক্রেট ডিফল্ট অ্যাডমিন লিংক (অপরিবর্তিত)
     const adminSecretLinks = [
         "https://www.effectivecpmnetwork.com/cf568zcm6?key=5fbc3663d60d6c660694d8b44b458a3b",
         "https://www.effectivecpmnetwork.com/dpq18ax9?key=191558e19a42195ab896384fd3d16343",
@@ -251,15 +234,18 @@
 
             const userDocRef = doc(db, "users", user.uid);
             const docSnap = await getDoc(userDocRef);
+            let myFollowingList = [];
+
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 document.getElementById('header-points').innerText = data.points || 0;
                 document.getElementById('stat-links').innerText = data.links ? data.links.filter(l => l !== "").length : 0;
                 document.getElementById('stat-visits').innerText = data.total_clicks || 0;
                 document.getElementById('stat-referrals').innerText = data.referrals_count || 0;
+                myFollowingList = data.following_list || []; // ইউজারের ফলোয়িং লিস্ট রিড করা হলো
             }
 
-            loadLiveMembersList(user.uid);
+            loadLiveMembersList(user.uid, myFollowingList);
             loadTrafficExchangeLinks(user.uid);
             listenToSystemSettings();
         } else {
@@ -267,12 +253,13 @@
         }
     });
 
-    async function loadLiveMembersList(currentUid) {
+    // ডাইনামিক ফলো মেম্বার লিস্ট উইথ রিলোড প্রোটেকশন
+    async function loadLiveMembersList(currentUid, myFollowingList) {
         const container = document.getElementById('users-list-container');
         container.innerHTML = `<p class="text-xs text-gray-600 text-center py-2">Searching members...</p>`;
 
         try {
-            const qUsers = query(collection(db, "users"), limit(5)); // ১ লাখ মেম্বার হ্যান্ডেল করার লিমিট সেট
+            const qUsers = query(collection(db, "users"), limit(15)); // ১ লাখ মেম্বার ক্র্যাশ প্রোটেকশন লিমিট ১৫
             const querySnapshot = await getDocs(qUsers);
             container.innerHTML = "";
             let userCount = 0;
@@ -283,8 +270,10 @@
                     const userData = uDoc.data();
                     const name = userData.displayName || "AdLink Member";
                     const photo = userData.photoURL || `https://i.pravatar.cc/100?u=${uDoc.id}`;
-                    const handle = name.toLowerCase().replace(/\s+/g, '_');
                     const pts = userData.points || 0;
+
+                    // ডাটাবেজ অনুযায়ী ইউজার আগে থেকেই ফলো করা আছে কিনা চেক
+                    const isAlreadyFollowing = myFollowingList.includes(uDoc.id);
 
                     const itemHtml = `
                         <div class="flex items-center justify-between p-2 bg-[#16172a]/40 rounded-xl border border-gray-800/40 hover:border-purple-500/20 transition">
@@ -295,12 +284,22 @@
                                     <p class="text-[9px] text-gray-500 truncate">💰 ${pts} Pts</p>
                                 </div>
                             </div>
-                            <button onclick="followUser('${uDoc.id}', this)" class="bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white border border-purple-500/20 px-2.5 py-1 rounded-lg text-[9px] font-bold transition flex-shrink-0">
-                                Follow
+                            <button id="follow-btn-${uDoc.id}" data-uid="${uDoc.id}" ${isAlreadyFollowing ? 'disabled' : ''} class="follow-action-btn ${isAlreadyFollowing ? 'bg-green-600 text-white cursor-default' : 'bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white border border-purple-500/20'} px-2.5 py-1 rounded-lg text-[9px] font-bold transition flex-shrink-0">
+                                ${isAlreadyFollowing ? 'Following' : 'Follow'}
                             </button>
                         </div>
                     `;
                     container.insertAdjacentHTML('beforeend', itemHtml);
+                </div>
+            });
+
+            // রিয়েল-টাইম ফলো বাটনে ক্লিক ইভেন্ট লিসেনার সেট করা
+            document.querySelectorAll('.follow-action-btn').forEach(btn => {
+                if (!btn.disabled) {
+                    btn.addEventListener('click', async () => {
+                        const targetUid = btn.getAttribute('data-uid');
+                        await executeFollowSystem(targetUid, btn);
+                    });
                 }
             });
 
@@ -309,6 +308,38 @@
             }
         } catch (err) {
             console.error("Error loading users:", err);
+        }
+    }
+
+    // ফায়ারবেস ডেটাবেজ ফলো অ্যাকশন স্ক্রিপ্ট
+    async function executeFollowSystem(targetUid, btnElement) {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        btnElement.innerText = "Wait..";
+        btnElement.disabled = true;
+
+        try {
+            // ১. নিজের অ্যাকাউন্টে ফলোয়িং লিস্ট এবং সংখ্যা বাড়ানো
+            const myRef = doc(db, "users", currentUser.uid);
+            await updateDoc(myRef, {
+                following_count: increment(1),
+                following_list: arrayUnion(targetUid)
+            });
+
+            // ২. যাকে ফলো করা হলো তার প্রোফাইলে ফলোয়ার সংখ্যা বাড়ানো
+            const targetRef = doc(db, "users", targetUid);
+            await updateDoc(targetRef, {
+                followers_count: increment(1)
+            });
+
+            // সাকসেস মুডে বাটন কালার চেইঞ্জ
+            btnElement.innerText = "Following";
+            btnElement.className = "bg-green-600 text-white px-2.5 py-1 rounded-lg text-[9px] font-bold transition cursor-default";
+        } catch (error) {
+            console.error("Follow error:", error);
+            btnElement.innerText = "Follow";
+            btnElement.disabled = false;
         }
     }
 
@@ -321,7 +352,7 @@
         completedCount = 0;
         document.getElementById('progress-text').innerText = `Visits: 0/10`;
         document.getElementById('next-ten-btn').disabled = true;
-        document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-4 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed";
+        document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-4 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed whitespace-nowrap";
 
         try {
             const q = query(collection(db, "users"), where("points", ">", 0), limit(10));
@@ -386,32 +417,29 @@
         });
     }
 
+    // ইন-বাটন লাইভ টাইমার প্রসেস (কোনো পপ-আপ মডাল ছাড়াই সরাসরি বাটন ব্যাকগ্রাউন্ড কাউন্টডাউন)
     async function handleTaskClick(index) {
         if (index !== currentActiveIndex) return;
 
         const currentBtn = document.getElementById(`task-btn-${index}`);
         const nextBtn = document.getElementById(`task-btn-${index + 1}`);
-        const taskPopup = document.getElementById('ad-task-popup');
-        const popupCountdown = document.getElementById('popup-countdown');
 
+        // নতুন উইন্ডোতে এড লিংক ওপেন করা হচ্ছে
         window.open(fetchedLinks[index].url, '_blank');
 
-        taskPopup.classList.remove('hidden');
-        let timeLeft = 10;
-        popupCountdown.innerText = timeLeft;
-        
         currentBtn.disabled = true;
-        currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20";
-        currentBtn.innerHTML = `<i class="fas fa-hourglass-start animate-spin mr-1"></i> Wait...`;
+        let timeLeft = 10;
+        currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
+        currentBtn.innerHTML = `<i class="fas fa-clock fa-spin mr-1"></i> ${timeLeft}s Left`;
 
         const interval = setInterval(async () => {
             timeLeft--;
-            popupCountdown.innerText = timeLeft;
-
-            if (timeLeft <= 0) {
+            if (timeLeft > 0) {
+                currentBtn.innerHTML = `<i class="fas fa-clock fa-spin mr-1"></i> ${timeLeft}s Left`;
+            } else {
                 clearInterval(interval);
                 
-                taskPopup.classList.add('hidden');
+                // বাটন সাকসেস স্টেট পরিবর্তন
                 currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-completed";
                 currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Done`;
 
@@ -468,12 +496,6 @@
             }
         }, 1000);
     }
-
-    window.followUser = function(uid, btnElement) {
-        btnElement.innerText = "Following";
-        btnElement.className = "bg-green-600 text-white px-2 py-1 rounded-lg text-[9px] font-bold transition cursor-default";
-        btnElement.disabled = true;
-    };
 
     document.getElementById('next-ten-btn').addEventListener('click', () => {
         const popup = document.getElementById('loading-popup');
