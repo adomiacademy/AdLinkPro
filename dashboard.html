@@ -12,6 +12,30 @@
         .card { background-color: #111223; border: 1px solid rgba(255,255,255,0.05); }
         .active-tab { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-left: 4px solid #a855f7; }
     </style>
+
+    /* আপনার বর্তমান ১৩ নম্বর লাইনের .active-tab স্টাইল এর নিচে */
+        .active-tab { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-left: 4px solid #a855f7; }
+    </style>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+          .then(() => console.log("Service Worker Registered"))
+          .catch((err) => console.log("Service Worker Failed", err));
+      }
+    </script>
+
+</head> <body class="flex min-h-screen relative overflow-x-hidden"> ```
+
+### ছোট একটি বোনাস টিপস (ফ্যাভিকন আইকন):
+আপনার বাম পাশের ফাইল লিস্টে দেখতে পাচ্ছি **`favicon.png`** ফাইলটি অলরেডি আছে। আপনি চাইলে এই কোডটুকুর সাথেই আপনার ফ্যাভিকন বা ফেব আইকনের লাইনটিও একবারে বসিয়ে দিতে পারেন। অর্থাৎ এই লাইনটি:
+```html
+<link rel="icon" type="image/png" href="favicon.png">
+    
+
 </head>
 <body class="flex min-h-screen relative overflow-x-hidden">
 
