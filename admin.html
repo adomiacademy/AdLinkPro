@@ -21,116 +21,165 @@
 </head>
 <body class="min-h-screen bg-[#080915]">
 
-    <header class="border-b border-gray-800/40 bg-[#0d0e1b]/80 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-tr from-purple-600 via-indigo-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
-                    <i class="fas fa-user-shield text-white text-sm animate-pulse"></i>
+    <div id="main-admin-layout">
+        <header class="border-b border-gray-800/40 bg-[#0d0e1b]/80 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-4">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-tr from-purple-600 via-indigo-600 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+                        <i class="fas fa-user-shield text-white text-sm animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-sm lg:text-base font-bold tracking-wide flex items-center gap-2">
+                            AdLink Pro 
+                            <span class="text-red-400 text-[10px] font-bold bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20 uppercase tracking-widest">HQ Admin</span>
+                        </h1>
+                        <p class="text-[10px] text-gray-500 font-medium">Ultimate Control Dashboard</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-sm lg:text-base font-bold tracking-wide flex items-center gap-2">
-                        AdLink Pro 
-                        <span class="text-red-400 text-[10px] font-bold bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20 uppercase tracking-widest">HQ Admin</span>
-                    </h1>
-                    <p class="text-[10px] text-gray-500 font-medium">Ultimate Control Dashboard</p>
+                <a href="index.html" class="text-[11px] lg:text-xs bg-gray-900/80 hover:bg-gray-900 text-gray-300 hover:text-white border border-gray-800/80 px-4 py-2 rounded-xl transition flex items-center gap-2 shadow-inner">
+                    <i class="fas fa-arrow-left text-gray-400"></i> Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 lg:px-8 py-8 space-y-8">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="admin-card p-5 lg:p-6 space-y-4">
+                    <h3 class="text-xs lg:text-sm font-bold text-gray-200 flex items-center gap-2">
+                        <i class="fas fa-bullhorn text-purple-400"></i> Realtime Notice Board
+                    </h3>
+                    <textarea id="input-notice" rows="2" class="w-full bg-gray-950/40 border border-gray-800/80 focus:border-purple-500/50 rounded-xl p-3 text-xs focus:outline-none text-gray-300 transition resize-none placeholder-gray-600" placeholder="ইউজারদের ড্যাশবোর্ডের জন্য নতুন গুরুত্বপূর্ণ নোটিশ লিখুন..."></textarea>
+                    <button id="save-notice-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-purple-500/10 flex items-center justify-center gap-2">
+                        <i class="fas fa-paper-plane text-[10px]"></i> Broadcast Live Notice
+                    </button>
+                </div>
+
+                <div class="admin-card p-5 lg:p-6 space-y-4">
+                    <h3 class="text-xs lg:text-sm font-bold text-gray-200 flex items-center gap-2">
+                        <i class="fab fa-telegram-plane text-[#24A1DE]"></i> Telegram Support Link
+                    </h3>
+                    <input id="input-telegram" type="url" class="w-full bg-gray-950/40 border border-gray-800/80 focus:border-blue-500/50 rounded-xl p-3 text-xs focus:outline-none text-gray-300 transition placeholder-gray-600" placeholder="https://t.me/your_group_link">
+                    <button id="save-telegram-btn" class="w-full bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/10 flex items-center justify-center gap-2">
+                        <i class="fas fa-save text-[10px]"></i> Update Gateway Link
+                    </button>
                 </div>
             </div>
-            <a href="index.html" class="text-[11px] lg:text-xs bg-gray-900/80 hover:bg-gray-900 text-gray-300 hover:text-white border border-gray-800/80 px-4 py-2 rounded-xl transition flex items-center gap-2 shadow-inner">
-                <i class="fas fa-arrow-left text-gray-400"></i> Dashboard
-            </a>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="admin-card p-5 lg:p-6 flex items-center justify-between bg-gradient-to-br from-[#111223] to-[#0d0e1b]">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Global Registered Users</p>
+                        <h3 id="stat-total-users" class="text-2xl lg:text-3xl font-black text-white mt-1.5 tracking-tight">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-500/5 border border-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 text-lg shadow-inner">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="admin-card p-5 lg:p-6 flex items-center justify-between bg-gradient-to-br from-[#111223] to-[#0d0e1b]">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active System Performers</p>
+                        <h3 id="stat-active-workers" class="text-2xl lg:text-3xl font-black text-green-400 mt-1.5 tracking-tight">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-green-500/5 border border-green-500/10 rounded-2xl flex items-center justify-center text-green-400 text-lg shadow-inner">
+                        <i class="fas fa-running"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card p-4 lg:p-6 overflow-hidden">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
+                    <div>
+                        <h2 class="text-xs lg:text-sm font-bold text-gray-200 flex items-center gap-2">
+                            <i class="fas fa-users-cog text-purple-500"></i> Core User Database Control
+                        </h2>
+                        <p class="text-[10px] text-gray-500 mt-0.5">সব মেম্বারের অ্যাকাউন্ট ব্যালেন্স, কাজের রিপোর্ট ও জয়েনিং ডেট মনিটর করুন (নাম বা ছবিতে ক্লিক করুন)</p>
+                    </div>
+                    <div class="text-[10px] bg-purple-500/10 border border-purple-500/20 text-purple-400 px-3 py-1 rounded-lg font-bold self-start sm:self-center">
+                        Live Server Attached
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-gray-800/40">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="bg-[#0d0e1b] border-b border-gray-800/80 text-[10px] lg:text-[11px] text-gray-400 uppercase font-bold tracking-wider">
+                                <th class="p-4">User Details</th>
+                                <th class="p-4">Registration Date</th>
+                                <th class="p-4">Points Balance</th>
+                                <th class="p-4">Total Engagement</th>
+                                <th class="p-4 text-center">Security Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-tbody" class="text-xs divide-y divide-gray-800/30">
+                            <tr>
+                                <td colspan="5" class="p-12 text-center text-gray-500 font-medium">
+                                    <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                                    Syncing active core database rows...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="user-profile-view-layout" class="hidden min-h-screen max-w-5xl mx-auto px-4 lg:px-8 py-8 space-y-6">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+            <div>
+                <h2 class="text-lg font-bold text-gray-200 flex items-center gap-2">
+                    <i class="fas fa-user text-purple-500"></i> Member Deep Profile Insights
+                </h2>
+                <p class="text-xs text-gray-500">ইউজারের বিস্তারিত কাজের রিপোর্ট ও লিঙ্ক ভিউয়ার</p>
+            </div>
+            <button id="close-profile-btn" class="bg-gray-900 text-gray-300 hover:bg-gray-800 hover:text-white px-4 py-2 border border-gray-800 text-xs font-bold rounded-xl transition flex items-center gap-2">
+                <i class="fas fa-chevron-left"></i> Back to List
+            </button>
         </div>
-    </header>
 
-    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-8 space-y-8">
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="admin-card p-5 lg:p-6 space-y-4">
-                <h3 class="text-xs lg:text-sm font-bold text-gray-200 flex items-center gap-2">
-                    <i class="fas fa-bullhorn text-purple-400"></i> Realtime Notice Board
-                </h3>
-                <textarea id="input-notice" rows="2" class="w-full bg-gray-950/40 border border-gray-800/80 focus:border-purple-500/50 rounded-xl p-3 text-xs focus:outline-none text-gray-300 transition resize-none placeholder-gray-600" placeholder="ইউজারদের ড্যাশবোর্ডের জন্য নতুন গুরুত্বপূর্ণ নোটিশ লিখুন..."></textarea>
-                <button id="save-notice-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-purple-500/10 flex items-center justify-center gap-2">
-                    <i class="fas fa-paper-plane text-[10px]"></i> Broadcast Live Notice
-                </button>
-            </div>
-
-            <div class="admin-card p-5 lg:p-6 space-y-4">
-                <h3 class="text-xs lg:text-sm font-bold text-gray-200 flex items-center gap-2">
-                    <i class="fab fa-telegram-plane text-[#24A1DE]"></i> Telegram Support Link
-                </h3>
-                <input id="input-telegram" type="url" class="w-full bg-gray-950/40 border border-gray-800/80 focus:border-blue-500/50 rounded-xl p-3 text-xs focus:outline-none text-gray-300 transition placeholder-gray-600" placeholder="https://t.me/your_group_link">
-                <button id="save-telegram-btn" class="w-full bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/10 flex items-center justify-center gap-2">
-                    <i class="fas fa-save text-[10px]"></i> Update Gateway Link
-                </button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="admin-card p-5 lg:p-6 flex items-center justify-between bg-gradient-to-br from-[#111223] to-[#0d0e1b]">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="admin-card p-6 flex flex-col items-center justify-center text-center space-y-3 md:col-span-1">
+                <img id="detail-user-photo" src="" class="w-20 h-20 rounded-full border-2 border-purple-500 p-1 object-cover">
                 <div>
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Global Registered Users</p>
-                    <h3 id="stat-total-users" class="text-2xl lg:text-3xl font-black text-white mt-1.5 tracking-tight">0</h3>
-                </div>
-                <div class="w-12 h-12 bg-blue-500/5 border border-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 text-lg shadow-inner">
-                    <i class="fas fa-users"></i>
+                    <h3 id="detail-user-name" class="font-bold text-base text-white">---</h3>
+                    <p id="detail-user-email" class="text-xs text-gray-500">---</p>
                 </div>
             </div>
-            <div class="admin-card p-5 lg:p-6 flex items-center justify-between bg-gradient-to-br from-[#111223] to-[#0d0e1b]">
-                <div>
-                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active System Performers</p>
-                    <h3 id="stat-active-workers" class="text-2xl lg:text-3xl font-black text-green-400 mt-1.5 tracking-tight">0</h3>
+
+            <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="admin-card p-5 flex flex-col justify-center">
+                    <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total Visits Given</span>
+                    <h4 id="detail-user-clicks" class="text-xl font-mono font-bold text-indigo-400 mt-1">0 Clicks</h4>
                 </div>
-                <div class="w-12 h-12 bg-green-500/5 border border-green-500/10 rounded-2xl flex items-center justify-center text-green-400 text-lg shadow-inner">
-                    <i class="fas fa-running"></i>
+                <div class="admin-card p-5 flex flex-col justify-center">
+                    <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Total Referrals Count</span>
+                    <h4 id="detail-user-referrals" class="text-xl font-mono font-bold text-green-400 mt-1">0 Users</h4>
+                </div>
+                <div class="admin-card p-5 flex flex-col justify-center">
+                    <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Points Balance</span>
+                    <h4 id="detail-user-points" class="text-xl font-mono font-bold text-yellow-500 mt-1">0 Pts</h4>
                 </div>
             </div>
         </div>
 
-        <div class="admin-card p-4 lg:p-6 overflow-hidden">
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
-                <div>
-                    <h2 class="text-xs lg:text-sm font-bold text-gray-200 flex items-center gap-2">
-                        <i class="fas fa-users-cog text-purple-500"></i> Core User Database Control
-                    </h2>
-                    <p class="text-[10px] text-gray-500 mt-0.5">সব মেম্বারের অ্যাকাউন্ট ব্যালেন্স, কাজের রিপোর্ট ও জয়েনিং ডেট মনিটর করুন</p>
+        <div class="admin-card p-6 space-y-4">
+            <h3 class="text-sm font-bold text-gray-200 flex items-center gap-2 border-b border-gray-800 pb-3">
+                <i class="fas fa-link text-indigo-400"></i> Managed Web Links Slot (Max 25)
+            </h3>
+            <div id="detail-links-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2">
                 </div>
-                <div class="text-[10px] bg-purple-500/10 border border-purple-500/20 text-purple-400 px-3 py-1 rounded-lg font-bold self-start sm:self-center">
-                    Live Server Attached
-                </div>
-            </div>
-
-            <div class="overflow-x-auto rounded-xl border border-gray-800/40">
-                <table class="w-full text-left border-collapse min-w-[700px]">
-                    <thead>
-                        <tr class="bg-[#0d0e1b] border-b border-gray-800/80 text-[10px] lg:text-[11px] text-gray-400 uppercase font-bold tracking-wider">
-                            <th class="p-4">User Details</th>
-                            <th class="p-4">Registration Date</th>
-                            <th class="p-4">Points Balance</th>
-                            <th class="p-4">Total Engagement</th>
-                            <th class="p-4 text-center">Security Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-users-tbody" class="text-xs divide-y divide-gray-800/30">
-                        <tr>
-                            <td colspan="5" class="p-12 text-center text-gray-500 font-medium">
-                                <div class="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                                Syncing active core database rows...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
-    </main>
+    </div>
 
 <script type="module">
     import { db, auth } from '/firebase-config.js';
     import { collection, getDocs, doc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 🎯 এডমিন মেইল আইডি (প্রয়োজনীয় পরিবর্তন করতে পারবেন)
     const SUPER_ADMIN_EMAIL = "shohozvashay@gmail.com"; 
+    let globalUsersData = {}; // গ্লোবাল অবজেক্টে মেম্বারদের ডাটা সাময়িক সেভ রাখার জন্য
 
-    // সিকিউরিটি অ্যাক্সেস গেটওয়ে
+    // সিকিউরিটি অ্যাক্সেস গেটওয়ে
     auth.onAuthStateChanged(async (user) => {
         if (user && user.email === SUPER_ADMIN_EMAIL) {
             document.body.style.display = "block";
@@ -170,17 +219,21 @@
         } catch (e) { alert("ত্রুটি হয়েছে!"); }
     });
 
-    // মেম্বার লিস্ট মেকানিজম ও জয়েনিং ডেট জেনারেটর
+    // মেম্বার লিস্ট মেকানিজম ও জয়েনিং ডেট জেনারেটর
     async function fetchSystemStats() {
         const tbody = document.getElementById('admin-users-tbody');
         try {
             const querySnapshot = await getDocs(collection(db, "users"));
             let totalUsers = 0, activeWorkers = 0, rowsHtml = "";
+            globalUsersData = {}; // ডাটা রিসেট
 
             querySnapshot.forEach((userDoc) => {
                 totalUsers++;
                 const uData = userDoc.data();
                 const uId = userDoc.id;
+                
+                // গ্লোবাল ডাটায় সেভ করে রাখা যাতে ক্লিকে সরাসরি পাওয়া যায়
+                globalUsersData[uId] = uData;
 
                 const name = uData.displayName || "Anonymous User";
                 const email = uData.email || "No Email Bound";
@@ -188,7 +241,6 @@
                 const points = uData.points || 0;
                 const clicks = uData.total_clicks || 0;
 
-                // 🗓️ জয়েন ডেট ফরম্যাটিং সেফটি লজিক
                 let joinDateStr = "N/A";
                 if (uData.createdAt) {
                     if (uData.createdAt.seconds) {
@@ -201,7 +253,6 @@
                         });
                     }
                 } else if (auth.currentUser && auth.currentUser.metadata && auth.currentUser.metadata.creationTime) {
-                    // যদি কোনো অ্যাকাউন্টে ডেট না থাকে তবে সিকিউরড মেটাডাটা ব্যাকআপ ডেট শো করবে
                     joinDateStr = new Date(auth.currentUser.metadata.creationTime).toLocaleDateString('en-GB', {
                         day: '2-digit', month: 'short', year: 'numeric'
                     });
@@ -212,10 +263,10 @@
                 rowsHtml += `
                     <tr class="table-row transition border-b border-gray-800/20" id="row-${uId}">
                         <td class="p-4">
-                            <div class="flex items-center space-x-3">
-                                <img src="${photo}" class="w-8 h-8 rounded-full border border-purple-500/20 object-cover flex-shrink-0">
+                            <div class="flex items-center space-x-3 cursor-pointer group" onclick="viewUserProfile('${uId}')">
+                                <img src="${photo}" class="w-8 h-8 rounded-full border border-purple-500/20 group-hover:border-purple-500 object-cover flex-shrink-0 transition">
                                 <div class="min-w-0">
-                                    <p class="font-bold text-gray-200 truncate max-w-[150px]">${name}</p>
+                                    <p class="font-bold text-gray-200 group-hover:text-purple-400 truncate max-w-[150px] transition">${name}</p>
                                     <p class="text-[10px] text-gray-500 truncate max-w-[180px]">${email}</p>
                                 </div>
                             </div>
@@ -246,10 +297,66 @@
         }
     }
 
+    // 🌟 সিঙ্গেল মেম্বার ইনফরমেশন ভিউ জেনারেটর (নতুন পেজ লাইক লেআউট)
+    window.viewUserProfile = function(uid) {
+        const uData = globalUsersData[uid];
+        if(!uData) return;
+
+        // মেইন লিস্ট হাইড করে প্রোফাইল উইন্ডো ওপেন করা
+        document.getElementById('main-admin-layout').classList.add('hidden');
+        const profileLayout = document.getElementById('user-profile-view-layout');
+        profileLayout.classList.remove('hidden');
+
+        // বেসিক টেক্সট ডাটা পুশ
+        document.getElementById('detail-user-photo').src = uData.photoURL || `https://i.pravatar.cc/100?u=${uid}`;
+        document.getElementById('detail-user-name').innerText = uData.displayName || "Anonymous User";
+        document.getElementById('detail-user-email').innerText = uData.email || "No Email Bound";
+        document.getElementById('detail-user-clicks').innerText = (uData.total_clicks || 0).toLocaleString() + " Clicks";
+        document.getElementById('detail-user-referrals').innerText = (uData.referrals_count || 0).toLocaleString() + " Users";
+        document.getElementById('detail-user-points').innerText = (uData.points || 0).toLocaleString() + " Pts";
+
+        // ২৫টি স্লটের লিঙ্ক লুপ মেকানিজম
+        const linksContainer = document.getElementById('detail-links-container');
+        linksContainer.innerHTML = ""; // আগের লিঙ্ক রিমুভ
+
+        const userLinks = uData.links || [];
+        
+        // ফিক্সড ২৫টি ঘর প্রিন্ট করা
+        for (let i = 0; i < 25; i++) {
+            const currentLink = userLinks[i] || "";
+            const isSet = currentLink.trim() !== "";
+
+            const slotHtml = `
+                <div class="bg-gray-950/40 border ${isSet ? 'border-purple-500/20' : 'border-gray-800/40'} p-3 rounded-xl flex flex-col space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold ${isSet ? 'text-purple-400' : 'text-gray-600'}">SLOT ${i + 1}</span>
+                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${isSet ? 'bg-green-500/10 text-green-400 border border-green-500/10' : 'bg-gray-900 text-gray-500'}">
+                            ${isSet ? 'Active Link' : 'Not Set'}
+                        </span>
+                    </div>
+                    ${isSet ? 
+                        `<a href="${currentLink}" target="_blank" class="text-xs text-indigo-400 hover:underline truncate font-medium break-all mt-1 flex items-center gap-1">
+                            <i class="fas fa-external-link-alt text-[9px]"></i> ${currentLink}
+                         </a>` : 
+                        `<p class="text-xs text-gray-600 italic font-medium mt-1">No traffic exchange link added yet.</p>`
+                    }
+                </div>
+            `;
+            linksContainer.insertAdjacentHTML('beforeend', slotHtml);
+        }
+    };
+
+    // প্রোফাইল ভিউ থেকে লিস্টে ব্যাক করার বাটন লজিক
+    document.getElementById('close-profile-btn').addEventListener('click', () => {
+        document.getElementById('user-profile-view-layout').classList.add('hidden');
+        document.getElementById('main-admin-layout').classList.remove('hidden');
+    });
+
     // ইউজার টার্মিনেট বা ডিলিট ফাংশনালিটি
     function attachDeleteEvents() {
         document.querySelectorAll('.remove-user-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation(); // টেবিল রো এর ক্লিক ইভেন্টকে ব্লক করার জন্য
                 const id = btn.getAttribute('data-id');
                 const name = btn.getAttribute('data-name');
                 if (confirm(`⚠️ সতর্কবার্তা!\nআপনি কি নিশ্চিতভাবে "${name}" এর সম্পূর্ণ অ্যাকাউন্টটি ডেটাবেজ থেকে ডিলেট করতে চান? এই কাজ আর রিভার্স করা যাবে না।`)) {
@@ -257,12 +364,10 @@
                         await deleteDoc(doc(db, "users", id));
                         const targetRow = document.getElementById(`row-${id}`);
                         if(targetRow) targetRow.remove();
-                        
-                        // লাইভ স্ট্যাট রিলোড করা
                         fetchSystemStats();
-                        alert("✅ অ্যাকাউন্টটি সফলভাবে মুছে ফেলা হয়েছে।");
+                        alert("✅ অ্যাকাউন্টটি সফলভাবে মুছে ফেলা হয়েছে।");
                     } catch (error) {
-                        alert("মুছে ফেলার সময় সমস্যা হয়েছে!");
+                        alert("মুছে ফেলার সময় সমস্যা হয়েছে!");
                     }
                 }
             });
