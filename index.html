@@ -465,11 +465,45 @@
         }, 1000);
     }
 
-    window.followUser = function(uid, btnElement) {
+  window.followUser = async function(targetUid, btnElement) {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+        alert("দয়া করে আগে লগইন করুন!");
+        return;
+    }
+
+    if (currentUser.uid === targetUid) {
+        alert("আপনি নিজেকে নিজে ফলো করতে পারবেন না ভাই!");
+        return;
+    }
+
+    // বাটন ইনস্ট্যান্টলি লক করে লোডিং স্টেট দেখানো
+    btnElement.innerText = "Processing...";
+    btnElement.disabled = true;
+
+    try {
+        // ১. যে ফলো করছে (আমার নিজের) 'following_count' বাড়ানো
+        const myRef = doc(db, "users", currentUser.uid);
+        await updateDoc(myRef, {
+            following_count: increment(1)
+        });
+
+        // ২. যাকে ফলো করা হলো (অন্য ইউজারের) 'followers_count' বাড়ানো
+        const targetRef = doc(db, "users", targetUid);
+        await updateDoc(targetRef, {
+            followers_count: increment(1)
+        });
+
+        // বাটন সফলভাবে পরিবর্তন করা
         btnElement.innerText = "Following";
         btnElement.className = "bg-green-600 text-white px-2 py-1 rounded-lg text-[9px] font-bold transition cursor-default";
-        btnElement.disabled = true;
-    };
+    } catch (err) {
+        console.error("Follow error:", err);
+        alert("ফলো করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+        btnElement.innerText = "Follow";
+        btnElement.disabled = false;
+    }
+};
 
     document.getElementById('next-ten-btn').addEventListener('click', () => {
         const popup = document.getElementById('loading-popup');
