@@ -177,7 +177,8 @@
 
 <script type="module">
     import { db, auth } from './firebase-config.js';
-    import { doc, getDoc, collection, getDocs, updateDoc, increment, query, where, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // 🌟 এখানে arrayUnion মেথডটি যুক্ত করা হয়েছে ফলোয়ার ট্র্যাকিংয়ের জন্য
+    import { doc, getDoc, collection, getDocs, updateDoc, increment, query, where, limit, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     let currentActiveIndex = 0; 
     let fetchedLinks = [];       
@@ -242,6 +243,7 @@
                 document.getElementById('stat-referrals').innerText = data.referrals_count || 0;
             }
 
+            // 👥 মেম্বার লিস্ট লোড করার কল
             loadLiveMembersList(user.uid);
             loadTrafficExchangeLinks(user.uid);
             listenToSystemSettings();
@@ -250,51 +252,65 @@
         }
     });
 
+    // 🌟 ফিক্সড মেম্বার লিস্ট লোডার (যা ফলোয়িং লিস্ট ফিল্টার করে দেখাবে)
     async function loadLiveMembersList(currentUid) {
         const container = document.getElementById('users-list-container');
         container.innerHTML = `<p class="text-xs text-gray-600 text-center py-2">Searching members...</p>`;
 
         try {
-            const qUsers = query(collection(db, "users"), limit(5)); 
+            // কারেন্ট ইউজারের নিজের ডাটা থেকে ফলোয়িং অ্যারে তুলে আনা
+            const myDocSnap = await getDoc(doc(db, "users", currentUid));
+            let myFollowingList = [];
+            if (myDocSnap.exists()) {
+                myFollowingList = myDocSnap.data().following_list || [];
+            }
+
+            // বেশি ইউজার লোড করার স্কোপ রাখা হলো যাতে ফিল্টারের পর মেম্বার খালি না দেখায়
+            const qUsers = query(collection(db, "users"), limit(30)); 
             const querySnapshot = await getDocs(qUsers);
             container.innerHTML = "";
             let userCount = 0;
 
             querySnapshot.forEach((uDoc) => {
-                if (uDoc.id !== currentUid) { 
+                // শর্ত: আইডি নিজের হতে পারবে না এবং অলরেডি ফলো করা লিস্টে থাকা যাবে激活 না
+                if (uDoc.id !== currentUid && !myFollowingList.includes(uDoc.id)) { 
                     userCount++;
-                    const userData = uDoc.data();
-                    const name = userData.displayName || "AdLink Member";
-                    const photo = userData.photoURL || `https://i.pravatar.cc/100?u=${uDoc.id}`;
-                    const pts = userData.points || 0;
+                    // স্ক্রিনে শুধু ৫টি ইউজার দেখানোর কাউন্টার লক
+                    if (userCount <= 5) {
+                        const userData = uDoc.data();
+                        const name = userData.displayName || "AdLink Member";
+                        const photo = userData.photoURL || `https://i.pravatar.cc/100?u=${uDoc.id}`;
+                        const pts = userData.points || 0;
 
-                    const itemHtml = `
-                        <div class="flex items-center justify-between p-2 bg-[#16172a]/40 rounded-xl border border-gray-800/40 hover:border-purple-500/20 transition">
-                            <div class="flex items-center min-w-0">
-                                <img src="${photo}" class="w-8 h-8 rounded-full mr-2.5 object-cover border-2 border-purple-500/20 flex-shrink-0">
-                                <div class="min-w-0">
-                                    <p class="text-xs font-bold text-gray-200 truncate">${name}</p>
-                                    <p class="text-[9px] text-gray-500 truncate">💰 ${pts} Pts</p>
+                        // ডিনামিক আইডি ট্যাগ যুক্ত করা হয়েছে পুরো বক্সটি রিমুভ করার জন্য
+                        const itemHtml = `
+                            <div id="home-user-card-${uDoc.id}" class="flex items-center justify-between p-2 bg-[#16172a]/40 rounded-xl border border-gray-800/40 hover:border-purple-500/20 transition">
+                                <div class="flex items-center min-w-0">
+                                    <img src="${photo}" class="w-8 h-8 rounded-full mr-2.5 object-cover border-2 border-purple-500/20 flex-shrink-0">
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-bold text-gray-200 truncate">${name}</p>
+                                        <p class="text-[9px] text-gray-500 truncate">💰 ${pts} Pts</p>
+                                    </div>
                                 </div>
+                                <button onclick="followUser('${uDoc.id}', this)" class="bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white border border-purple-500/20 px-2.5 py-1 rounded-lg text-[9px] font-bold transition flex-shrink-0">
+                                    Follow
+                                </button>
                             </div>
-                            <button onclick="followUser('${uDoc.id}', this)" class="bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white border border-purple-500/20 px-2.5 py-1 rounded-lg text-[9px] font-bold transition flex-shrink-0">
-                                Follow
-                            </button>
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', itemHtml);
+                        `;
+                        container.insertAdjacentHTML('beforeend', itemHtml);
+                    }
                 }
             });
 
-            if (userCount === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-600 text-center py-4">No other members yet.</p>`;
+            if (userCount === 0 || container.children.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-600 text-center py-4">No new members to follow.</p>`;
             }
         } catch (err) {
             console.error("Error loading users:", err);
         }
     }
 
-    // ৫টি একটিভ ইউজারের লিংক এবং ৫টি এডমিন লিংক র্যান্ডমলি মিক্স করার মেকানিজম (বাগ ফিক্সড)
+    // ৫টি একটিভ ইউজারের লিংক এবং ৫টি এডমিন লিংক র্যান্ডমলি মিক্স করার মেকানিজম
     async function loadTrafficExchangeLinks(currentUid) {
         const container = document.getElementById('tasks-container');
         container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Digital ad posts loading...</p>`;
@@ -304,10 +320,9 @@
         completedCount = 0;
         document.getElementById('progress-text').innerText = `Visits: 0/10`;
         document.getElementById('next-ten-btn').disabled = true;
-        document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-4 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed";
+        document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-4 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed whitespace-nowrap";
 
         try {
-            // ১. ফায়ারবেস থেকে পয়েন্ট থাকা প্রথম ৪০ জন একটিভ মেম্বারকে তুলে নেওয়া পুল আকারে
             const q = query(collection(db, "users"), where("points", ">", 0), limit(40));
             const querySnapshot = await getDocs(q);
             let activeUserPool = [];
@@ -324,7 +339,6 @@
                 }
             });
 
-            // ২. এই একটিভ পুল থেকে র্যান্ডমলি সর্বোচ্চ ৫ জন মেম্বার সিলেক্ট করে তাদের ১টি করে র্যান্ডম লিংক নেওয়া
             activeUserPool.sort(() => Math.random() - 0.5); 
             const maxUserLinks = Math.min(5, activeUserPool.length);
             
@@ -333,19 +347,16 @@
                 fetchedLinks.push({ ownerUid: activeUserPool[i].uid, url: randomLink });
             }
 
-            // ৩. বাকি স্লটগুলো ১০টি পূরণ হওয়া পর্যন্ত অ্যাডমিনের সিক্রেট লিংক দিয়ে ফিল-আপ করা
             while (fetchedLinks.length < 10) {
                 const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
                 fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
             }
 
-            // ৪. ফাইনাল ১০টি টাস্ক লিস্টকে সম্পূর্ণ এলোমেলো (Shuffle) করে দেওয়া যাতে চেনা না যায়
             fetchedLinks.sort(() => Math.random() - 0.5);
             renderTaskButtons();
 
         } catch (err) {
             console.error("Error fetching links:", err);
-            // ব্যাকএন্ড ফেইল করলে সেফটি হিসেবে ফুল ১০টিই এডমিন লিংক জেনারেট হবে
             while (fetchedLinks.length < 10) {
                 const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
                 fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
@@ -394,7 +405,6 @@
         const left = (screen.width / 2) - (popupWidth / 2);
         const top = (screen.height / 2) - (popupHeight / 2);
 
-        // সেফ পপআপ উইন্ডো মেথড
         const popupWindow = window.open(
             fetchedLinks[index].url, 
             "AdsterraAd", 
@@ -420,17 +430,14 @@
                     popupWindow.close();
                 }
 
-                // টাইমার সফলভাবে শেষ হবার পর ডেটাবেজ আপডেট ও পয়েন্ট কাটাকাটি লজিক (বাগ ফিক্সড)
                 const user = auth.currentUser;
                 if (user) {
                     const viewerRef = doc(db, "users", user.uid);
-                    // ১. যে দেখল তাকে +১ পয়েন্ট পুরস্কার দিন
                     await updateDoc(viewerRef, {
                         points: increment(1),
                         total_clicks: increment(1)
                     });
 
-                    // ২. লিংকটির আসল মালিকের অ্যাকাউন্ট থেকে -১ পয়েন্ট কেটে নিন (যদি সে এডমিন না হয়)
                     const ownerUid = fetchedLinks[index].ownerUid;
                     if (ownerUid !== "system_admin" && ownerUid !== user.uid) {
                         const ownerRef = doc(db, "users", ownerUid);
@@ -465,45 +472,59 @@
         }, 1000);
     }
 
-  window.followUser = async function(targetUid, btnElement) {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-        alert("দয়া করে আগে লগইন করুন!");
-        return;
-    }
+    // 🎯 ফিক্সড গ্লোবাল ফলো ফাংশন (যা ডাটাবেসে অ্যারে যুক্ত করবে এবং স্ক্রিন থেকে কার্ড ভ্যানিশ করবে)
+    window.followUser = async function(targetUid, btnElement) {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+            alert("দয়া করে আগে লগইন করুন!");
+            return;
+        }
 
-    if (currentUser.uid === targetUid) {
-        alert("আপনি নিজেকে নিজে ফলো করতে পারবেন না ভাই!");
-        return;
-    }
+        if (currentUser.uid === targetUid) {
+            alert("আপনি নিজেকে নিজে ফলো করতে পারবেন না ভাই!");
+            return;
+        }
 
-    // বাটন ইনস্ট্যান্টলি লক করে লোডিং স্টেট দেখানো
-    btnElement.innerText = "Processing...";
-    btnElement.disabled = true;
+        btnElement.innerText = "Processing...";
+        btnElement.disabled = true;
 
-    try {
-        // ১. যে ফলো করছে (আমার নিজের) 'following_count' বাড়ানো
-        const myRef = doc(db, "users", currentUser.uid);
-        await updateDoc(myRef, {
-            following_count: increment(1)
-        });
+        try {
+            const myRef = doc(db, "users", currentUser.uid);
+            const targetRef = doc(db, "users", targetUid);
 
-        // ২. যাকে ফলো করা হলো (অন্য ইউজারের) 'followers_count' বাড়ানো
-        const targetRef = doc(db, "users", targetUid);
-        await updateDoc(targetRef, {
-            followers_count: increment(1)
-        });
+            // ১. নিজের 'following_list' এ টার্গেট আইডি পুশ করা এবং কাউন্টার ১ বাড়ানো
+            await updateDoc(myRef, {
+                following_list: arrayUnion(targetUid),
+                following_count: increment(1)
+            });
 
-        // বাটন সফলভাবে পরিবর্তন করা
-        btnElement.innerText = "Following";
-        btnElement.className = "bg-green-600 text-white px-2 py-1 rounded-lg text-[9px] font-bold transition cursor-default";
-    } catch (err) {
-        console.error("Follow error:", err);
-        alert("ফলো করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-        btnElement.innerText = "Follow";
-        btnElement.disabled = false;
-    }
-};
+            // ২. যাকে ফলো করা হলো তার 'followers_count' ১ বাড়ানো
+            await updateDoc(targetRef, {
+                followers_count: increment(1)
+            });
+
+            // ৩. 🌟 ইনস্ট্যান্টলি স্ক্রিন থেকে ওই ইউজারের সম্পূর্ণ বক্সটি রিমুভ করে দেওয়া
+            const targetedCard = document.getElementById(`home-user-card-${targetUid}`);
+            if (targetedCard) {
+                targetedCard.style.opacity = '0';
+                targetedCard.style.transition = 'opacity 0.2s ease';
+                setTimeout(() => {
+                    targetedCard.remove();
+                    // যদি লিস্ট সম্পূর্ণ খালি হয়ে যায় তবে নোটিশ দেখানো
+                    const container = document.getElementById('users-list-container');
+                    if (container && container.children.length === 0) {
+                        container.innerHTML = `<p class="text-xs text-gray-600 text-center py-4">No new members to follow.</p>`;
+                    }
+                }, 200);
+            }
+
+        } catch (err) {
+            console.error("Follow error:", err);
+            alert("ফলো করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+            btnElement.innerText = "Follow";
+            btnElement.disabled = false;
+        }
+    };
 
     document.getElementById('next-ten-btn').addEventListener('click', () => {
         const popup = document.getElementById('loading-popup');
