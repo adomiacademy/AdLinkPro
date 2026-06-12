@@ -31,7 +31,7 @@
             <a href="index.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
                 <i class="fas fa-home mr-3 w-5 text-center"></i> Home
             </a>
-            <a href="index.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
+            <a href="dashboard.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
                 <i class="fas fa-th-large mr-3 w-5 text-center"></i> Dashboard
             </a>
             <a href="profile.html" class="flex items-center p-3 active-tab rounded-lg transition">
@@ -50,7 +50,7 @@
                     <span class="mr-2">💰</span> <span id="user-points" class="font-bold text-yellow-500">0</span>
                 </div>
                 <div class="flex items-center space-x-2 bg-gray-900/50 pr-4 pl-1 py-1 rounded-full border border-gray-800">
-                    <img id="user-avatar-top" src="https://via.placeholder.com/32" class="w-8 h-8 rounded-full border border-purple-500">
+                    <img id="user-avatar-top" src="https://via.placeholder.com/32" class="w-8 h-8 rounded-full border border-purple-500 object-cover">
                     <span id="header-name" class="text-[11px] font-bold uppercase tracking-wider">Loading...</span>
                 </div>
             </div>
@@ -180,7 +180,7 @@
         }
 
         try {
-            // ১. কারেন্ট ইউজারের (আপনার নিজের) ফলোয়িং লিস্ট লোড করা
+            // ১. কারেন্ট ইউজারের ফলোয়িং লিস্ট লোড করা
             const myDocRef = doc(db, "users", currentUser.uid);
             let mySnap = await getDoc(myDocRef);
             let myFollowingList = [];
@@ -188,7 +188,7 @@
                 myFollowingList = mySnap.data().following_list || [];
             }
 
-            // ২. এই প্রোফাইলের মালিকের ডাটা রিড করা
+            // ২. প্রোফাইলের মালিকের ডাটা রিড করা
             const userDocRef = doc(db, "users", profileOwnerId);
             const docSnap = await getDoc(userDocRef);
 
@@ -202,7 +202,9 @@
                 document.getElementById('total-clicks').innerText = data.total_clicks || 0;
                 document.getElementById('stat-followers').innerText = data.followers_count || 0;
                 document.getElementById('stat-following').innerText = data.following_count || 0;
-                document.getElementById('stat-return-clicks').innerText = data.return_clicks || 0;
+                
+                // এখানে ডাটাবেজ কালেকশন received_clicks রিড করে রিটার্ন ক্লিকের লাইভ ভ্যালু বসানো হয়েছে 🎯
+                document.getElementById('stat-return-clicks').innerText = data.received_clicks || 0;
 
                 if (data.links && Array.isArray(data.links)) {
                     data.links.forEach((link, index) => {
@@ -212,7 +214,7 @@
                     });
                 }
 
-                // 🎯 ফলো/আনফলো পার্মানেন্ট লক লজিক
+                // ফলো/আনফলো লজিক
                 if (!isMyOwnProfile) {
                     const followBtn = document.getElementById('follow-btn');
                     let isFollowing = myFollowingList.includes(profileOwnerId);
@@ -232,24 +234,20 @@
                         followBtn.disabled = true;
                         try {
                             if (isFollowing) {
-                                // আনফলো অ্যাকশন
                                 await updateDoc(myDocRef, { following_list: arrayRemove(profileOwnerId), following_count: increment(-1) });
                                 await updateDoc(userDocRef, { followers_count: increment(-1) });
                                 isFollowing = false;
                             } else {
-                                // ফলো অ্যাকশন
                                 await updateDoc(myDocRef, { following_list: arrayUnion(profileOwnerId), following_count: increment(1) });
                                 await updateDoc(userDocRef, { followers_count: increment(1) });
                                 isFollowing = true;
                             }
                             updateButtonUI();
                             
-                            // লাইভ কাউন্টার আপডেট
                             const freshSnap = await getDoc(userDocRef);
                             if (freshSnap.exists()) {
                                 document.getElementById('stat-followers').innerText = freshSnap.data().followers_count || 0;
                             }
-                            // ফলো করার পর লিস্ট আপডেট করা
                             loadSuggestions(currentUser.uid, myFollowingList);
                         } catch (fErr) {
                             console.error("Action Failed:", fErr);
@@ -260,7 +258,6 @@
                 }
             }
 
-            // 👥 সাজেস্টেড ইউজারদের কালেকশন লোড করার ফাংশন কল
             loadSuggestions(currentUser.uid, myFollowingList);
 
         } catch (err) {
@@ -268,7 +265,6 @@
         }
     });
 
-    // 🌟 সাজেস্টেড লিস্ট লোড করার ডাইনামিক ফাংশন
     async function loadSuggestions(myUid, followingList) {
         try {
             const querySnapshot = await getDocs(collection(db, "users"));
@@ -279,7 +275,6 @@
                 const uId = userDoc.id;
                 const uData = userDoc.data();
 
-                // শর্ত: আইডি নিজের হতে পারবে না এবং অলরেডি ফলো করা লিস্টে থাকা যাবে না
                 if (uId !== myUid && !followingList.includes(uId)) {
                     hasSuggestions = true;
                     const uName = uData.displayName || "AdLinkX Member";
@@ -313,7 +308,6 @@
         }
     }
 
-    // ২৫টি লিঙ্ক সেভ লজিক
     saveBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -329,16 +323,15 @@
 
         try {
             await updateDoc(doc(db, "users", user.uid), { links: linksArray });
-            alert("আপনার ২৫টি লিঙ্ক সফলভাবে ক্লাউডে সেভ হয়েছে! 🚀");
+            alert("আপনার ২৫টি লিঙ্ক সফলভাবে ক্লাউডে সেভ হয়েছে! 🚀");
         } catch (err) {
-            alert("লিঙ্ক সেভ করতে সমস্যা হয়েছে।");
+            alert("লিঙ্ক সেভ করতে সমস্যা হয়েছে।");
         } finally {
             saveBtn.innerText = "Save All Links";
             saveBtn.disabled = false;
         }
     });
 
-    // প্রোফাইল নাম চেঞ্জার
     document.getElementById('edit-profile-btn').addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -356,16 +349,14 @@
         }
     });
 
-    // শেয়ার প্রোফাইল লিঙ্ক জেনারেটর
     document.getElementById('share-profile-btn').addEventListener('click', () => {
         const user = auth.currentUser;
         if (!user) return;
         const profileUrl = `${window.location.origin}${window.location.pathname}?uid=${user.uid}`;
         navigator.clipboard.writeText(profileUrl).then(() => {
-            alert("আপনার ইউনিক মেম্বার লিঙ্ক কপি করা হয়েছে! 🔗\n\n" + profileUrl);
+            alert("আপনার ইউনিক মেম্বার লিঙ্ক কপি করা হয়েছে! 🔗\n\n" + profileUrl);
         });
     });
 </script>
-
 </body>
 </html>
