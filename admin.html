@@ -12,7 +12,6 @@
         .admin-card:hover { border-color: rgba(168, 85, 247, 0.2); box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.1); }
         .table-row { transition: background-color 0.2s; }
         .table-row:hover { background-color: rgba(168, 85, 247, 0.03); }
-        /* কাস্টম স্ক্রলবার */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #080915; }
         ::-webkit-scrollbar-thumb { background: #1f223f; border-radius: 10px; }
@@ -183,21 +182,19 @@
 
     const SUPER_ADMIN_EMAIL = "shohozvashay@gmail.com"; 
     let globalUsersData = {}; 
-    let currentActiveProfileUid = null; // বর্তমান ওপেন থাকা প্রোফাইল ট্র্যাক করার জন্য
+    let currentActiveProfileUid = null; 
 
-    // সিকিউরিটি অ্যাক্সেস গেটওয়ে
     auth.onAuthStateChanged(async (user) => {
         if (user && user.email === SUPER_ADMIN_EMAIL) {
             document.body.style.display = "block";
             loadSettings();
-            initRealtimeStats(); // লাইভ লিসেনার চালু করা হলো
+            initRealtimeStats(); 
         } else {
             alert("⚠️ Access Denied! You are not authorized.");
             window.location.href = "index.html";
         }
     });
 
-    // সেটিংস ডেটা প্রিলোড লজিক
     async function loadSettings() {
         const docSnap = await getDoc(doc(db, "system", "settings"));
         if (docSnap.exists()) {
@@ -207,7 +204,6 @@
         }
     }
 
-    // নোটিশ ব্রডকাস্ট বাটন 
     document.getElementById('save-notice-btn').addEventListener('click', async () => {
         const txt = document.getElementById('input-notice').value;
         try {
@@ -216,7 +212,6 @@
         } catch (e) { alert("ত্রুটি হয়েছে!"); }
     });
 
-    // টেলিগ্রাম লিংক আপডেট বাটন
     document.getElementById('save-telegram-btn').addEventListener('click', async () => {
         const url = document.getElementById('input-telegram').value;
         try {
@@ -225,11 +220,9 @@
         } catch (e) { alert("ত্রুটি হয়েছে!"); }
     });
 
-    // রিয়েল-টাইম মেম্বার লিস্ট মনিটরিং মেকানিজম (onSnapshot) 🚀
     function initRealtimeStats() {
         const tbody = document.getElementById('admin-users-tbody');
         
-        // getDocs এর বদলে onSnapshot ব্যবহার করা হয়েছে যাতে ডাটাবেজ চেঞ্জ হলেই UI অটো আপডেট হয়
         onSnapshot(collection(db, "users"), (querySnapshot) => {
             let totalUsers = 0, activeWorkers = 0, rowsHtml = "";
             globalUsersData = {}; 
@@ -246,7 +239,7 @@
                 const photo = uData.photoURL || `https://i.pravatar.cc/100?u=${uId}`;
                 const points = uData.points || 0;
                 const clicks = uData.total_clicks || 0;
-                const receivedClicks = uData.received_clicks || 0; // লাইভ কাউন্টার রিড লজিক 🎯
+                const receivedClicks = uData.received_clicks || 0; 
 
                 let joinDateStr = "N/A";
                 if (uData.createdAt) {
@@ -299,7 +292,6 @@
             document.getElementById('stat-active-workers').innerText = activeWorkers;
             tbody.innerHTML = totalUsers === 0 ? `<tr><td colspan="6" class="p-8 text-center text-gray-500">No Users database records found.</td></tr>` : rowsHtml;
             
-            // যদি কোনো ইউজারের ডিটেইল প্রোফাইল ওপেন থাকে, তবে রিয়েল টাইমে সেখানকার ডাটাও আপডেট হবে
             if (currentActiveProfileUid && globalUsersData[currentActiveProfileUid]) {
                 updateProfileUIData(currentActiveProfileUid);
             }
@@ -311,7 +303,6 @@
         });
     }
 
-    // প্রোফাইল ভিউ-এর ভেতরের ডাটা আপডেট করার ফাংশন
     function updateProfileUIData(uid) {
         const uData = globalUsersData[uid];
         if(!uData) return;
@@ -352,16 +343,15 @@
         }
     }
 
-    // 🌟 সিঙ্গেল মেম্বার ইনফরমেশন ভিউ জেনারেটর
     window.viewUserProfile = function(uid) {
-        currentActiveProfileUid = uid; // অ্যাক্টিভ আইডি সেট করা হলো
+        currentActiveProfileUid = uid; 
         document.getElementById('main-admin-layout').classList.add('hidden');
         document.getElementById('user-profile-view-layout').classList.remove('hidden');
         updateProfileUIData(uid);
     };
 
     document.getElementById('close-profile-btn').addEventListener('click', () => {
-        currentActiveProfileUid = null; // আইডি রিসেট
+        currentActiveProfileUid = null; 
         document.getElementById('user-profile-view-layout').classList.add('hidden');
         document.getElementById('main-admin-layout').classList.remove('hidden');
     });
