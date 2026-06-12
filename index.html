@@ -393,7 +393,7 @@
                         <span class="text-[11px] font-bold text-gray-500 w-3">${index + 1}.</span>
                         <p class="text-[11px] lg:text-xs font-semibold text-gray-300 truncate">Digital Post #${index + 1}</p>
                     </div>
-                    <button id="task-btn-${index}" data-index="${index}" class="px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 ${btnClass}">
+                    <button id="task-btn-${index}" class="px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 ${btnClass}">
                         ${btnText}
                     </button>
                 </div>
@@ -403,7 +403,7 @@
         });
     }
 
-   // 🌟 ফিক্সড সিকিউর টাস্ক ক্লিক হ্যান্ডলার (Visibility API + চোর ধরার নিখুঁত ফাঁদ)
+    // 🌟 ফিক্সড সিকিউর টাস্ক ক্লিক হ্যান্ডলার (Visibility API ও নোটিফিকেশন সিস্টেম সহ)
     async function handleTaskClick(index) {
         if (index !== currentActiveIndex) return;
 
@@ -412,19 +412,17 @@
         const adFrame = document.getElementById('ad-content-frame');
         const timerZone = document.getElementById('modal-timer-zone');
 
-        // নোটিফিকেশন পারমিশন চেক
         if (Notification.permission !== "granted" && Notification.permission !== "denied") {
             Notification.requestPermission();
         }
 
-        // ১. মেইন পেজের বাটনের ইন্টারফেস চেইঞ্জ
         currentBtn.disabled = true;
         currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
         currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... 10s`;
 
         const originalTitle = document.title; 
 
-        // 🚀 অ্যাডটি নতুন ট্যাবে ওপেন করা হলো
+        // 🚀 অ্যাড নতুন ট্যাবে ওপেন করা হলো
         const openWindow = window.open(fetchedLinks[index].url, '_blank');
         
         if (!openWindow) {
@@ -435,7 +433,6 @@
             return;
         }
 
-        // ২. সিকিউর ইন-অ্যাপ লেয়ার ওপেন ও নোটিশ শো করা
         adFrame.style.display = 'none'; 
         let infoNotice = document.getElementById('ad-info-notice');
         if (!infoNotice) {
@@ -455,13 +452,12 @@
         modal.classList.remove('hidden');
 
         let timeLeft = 10;
-        let isTaskValid = true; // টাস্কটি এখনো ভ্যালিড আছে কিনা
+        let isTaskValid = true; 
         timerZone.innerHTML = `<span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-3.5 py-1.5 rounded-full text-[11px] font-bold">${timeLeft}s Remaining</span>`;
 
-        // 🕵️‍♂️ চোর ধরার আসল ফাঁদ: ১০ সেকেন্ড শেষ হওয়ার আগে ইউজার অ্যাপে ফিরে আসলে টাইমার বাতিল ও রিসেট
+        // 🕵️‍♂️ চোর ধরার আসল ফাঁদ: ১০ সেকেন্ড শেষ হওয়ার আগে ইউজার অ্যাপে ফিরে আসলে টাইমার রিসেট
         const checkVisibility = () => {
             if (document.visibilityState === 'visible' && timeLeft > 0) {
-                // ইউজার ১০ সেকেন্ড শেষ হওয়ার আগেই মেইন অ্যাপে ব্যাক করেছে!
                 isTaskValid = false;
                 clearInterval(countdownInterval);
                 document.removeEventListener('visibilitychange', checkVisibility);
@@ -478,12 +474,11 @@
             }
         };
 
-        // লিসেনারটি চালু করা হলো
         document.addEventListener('visibilitychange', checkVisibility);
 
-        // ৩. টাইমার কাউন্টডাউন শুরু
+        // ৩. টাইমার কাউন্টডাউন ট্র্যাকিং
         const countdownInterval = setInterval(() => {
-            if (!isTaskValid) return; // টাস্ক ইনভ্যালিড হলে আর রান করবে না
+            if (!isTaskValid) return; 
 
             timeLeft--;
             currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
@@ -496,7 +491,7 @@
             // ৪. ১০ সেকেন্ড সফলভাবে দেখা সম্পন্ন হলে
             if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
-                document.removeEventListener('visibilitychange', checkVisibility); // সিকিউরিটি লিসেনার রিমুভ (এখন ব্যাক করলে সমস্যা নেই)
+                document.removeEventListener('visibilitychange', checkVisibility); 
 
                 // 🌟 ট্রিকস ১: ব্রাউজার পুশ নোটিফিকেশন পাঠানো
                 if (Notification.permission === "granted") {
@@ -506,7 +501,7 @@
                     });
                 }
 
-                // 🌟 트릭스 ২: ব্রাউজারের ট্যাবের টাইটেল ফ্ল্যাশ করা
+                // 🌟 ট্রিকস ২: ব্রাউজারের ট্যাবের টাইটেল ফ্ল্যাশ করা
                 let isTitleFlipped = false;
                 const titleAnimate = setInterval(() => {
                     if(document.getElementById('ad-secure-modal').classList.contains('hidden')) {
@@ -518,7 +513,7 @@
                     }
                 }, 1000);
 
-                // 🔔 মিষ্টি সাউন্ড অ্যালার্ট
+                // 🔔 মিষ্টি বিপ সাউন্ড অ্যালার্ট
                 try {
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const oscillator = audioCtx.createOscillator();
@@ -534,11 +529,10 @@
                     console.log("Audio notification blocked", audioErr);
                 }
 
-                // মোডালের ভেতরের টেক্সট আপডেট
                 document.getElementById('notice-status-title').innerText = "সময় শেষ! বোনাস ক্লেইম করুন 🎉";
                 document.getElementById('notice-status-desc').innerText = "নিচের 'Claim & Close' বাটনে ক্লিক করে আপনার একাউন্টে পয়েন্ট যোগ করে নিন ভাই।";
                 
-                // ৫. ক্লোজ এবং পয়েন্ট ক্লেইম বাটন তৈরি
+                // ৫. ক্লোজ এবং ক্লেইম বাটন তৈরি
                 timerZone.innerHTML = `
                     <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-green-500/20 flex items-center gap-1 animate-bounce">
                         <i class="fas fa-check-circle"></i> Claim & Close
@@ -554,44 +548,8 @@
             }
         }, 1000);
     }
-                // 🔔 মিষ্টি সাউন্ড অ্যালার্ট (যারা সাউন্ড অন রাখবে তাদের জন্য)
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); 
-                    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                    oscillator.start();
-                    oscillator.stop(audioCtx.currentTime + 0.3); 
-                } catch (audioErr) {
-                    console.log("Audio notification blocked", audioErr);
-                }
 
-                // মোডালের ভেতরের টেক্সট ক্লেইমের জন্য আপডেট
-                document.getElementById('notice-status-title').innerText = "সময় শেষ! বোনাস ক্লেইম করুন 🎉";
-                document.getElementById('notice-status-desc').innerText = "নিচের 'Claim & Close' বাটনে ক্লিক করে আপনার একাউন্টে পয়েন্ট যোগ করে নিন ভাই।";
-                
-                // ৫. ক্লোজ এবং পয়েন্ট ক্লেইম বাটন তৈরি
-                originalTimerZone.innerHTML = `
-                    <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-green-500/20 flex items-center gap-1 animate-bounce">
-                        <i class="fas fa-check-circle"></i> Claim & Close
-                    </button>
-                `;
-
-                // ৬. ক্লেইম বাটনে ক্লিক লজিক
-                document.getElementById('claim-close-btn').addEventListener('click', () => {
-                    clearInterval(titleAnimate);
-                    document.title = originalTitle;
-                    processPointsSubmission(index);
-                });
-            }
-        }, 1000);
-    }
-
-    // 🌟 ব্যাকএন্ডে সাকসেসফুলি ডেটা সাবমিট এবং লেয়ার রিসেট মেথড
+    // 🌟 ডেটা সাবমিশন ও পয়েন্ট প্রসেসিং লজিক
     async function processPointsSubmission(index) {
         const modal = document.getElementById('ad-secure-modal');
         const currentBtn = document.getElementById(`task-btn-${index}`);
@@ -600,30 +558,26 @@
 
         if (user) {
             try {
-                // ১. ভিউয়ারের ব্যালেন্সে ১ পয়েন্ট যোগ করা
                 const viewerRef = doc(db, "users", user.uid);
                 await updateDoc(viewerRef, {
                     points: increment(1),
                     total_clicks: increment(1)
                 });
 
-                // ২. লিংকের আসল মালিকের ব্যালেন্স থেকে ১ পয়েন্ট কাটা (যদি এডমিন লিংক না হয়)
                 const ownerUid = fetchedLinks[index].ownerUid;
                 if (ownerUid !== "system_admin" && ownerUid !== user.uid) {
                     const ownerRef = doc(db, "users", ownerUid);
                     await updateDoc(ownerRef, { points: increment(-1) });
                 }
 
-                // ৩. স্ক্রিনের টপ হেডার ব্যালেন্স লাইভ আপডেট
                 let currentPts = parseInt(document.getElementById('header-points').innerText);
                 document.getElementById('header-points').innerText = currentPts + 1;
 
             } catch (err) {
-                document.getElementById('header-points').innerText = currentPts + 1;
+                console.error("Points calculation issue:", err);
             }
         }
 
-        // ৪. মেইন স্ক্রিনের বাটন কমপ্লিট স্টেটে রূপান্তর
         currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-completed";
         currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Done`;
 
@@ -631,14 +585,12 @@
         document.getElementById('progress-text').innerText = `Visits: ${completedCount}/10`;
         currentActiveIndex++;
 
-        // ৫. পরবর্তী বাটন থাকলে সেটি আনলক করা
         if (index < 9 && nextBtn) {
             nextBtn.disabled = false;
             nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-active";
             nextBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 2}`;
         }
 
-        // ৬. ১০টি টাস্ক কমপ্লিট হলে বোনাস ১০ পয়েন্ট প্রদান
         if (completedCount === 10 && user) {
             const nextTenBtn = document.getElementById('next-ten-btn');
             nextTenBtn.disabled = false;
@@ -647,13 +599,12 @@
             try {
                 const viewerRef = doc(db, "users", user.uid);
                 await updateDoc(viewerRef, { points: increment(10) });
-                alert("১০টি টাস্ক সফলভাবে শেষ করায় আপনার ব্যালেন্সে ১০ বোনাস পয়েন্ট যোগ হয়েছে! 🎉");
+                alert("১০টি টাস্ক সফলভাবে শেষ করায় আপনার ব্যালেন্সে ১০ বোনাসポイント যোগ হয়েছে! 🎉");
             } catch (bonusErr) {
-                console.error("Bonus credit failed:", bonusErr);
+                console.error("Bonus failed:", bonusErr);
             }
         }
 
-        // ৭. মোডাল হাইড ও অবজেক্ট ডেটা ক্লিয়ার
         modal.classList.add('hidden');
         document.getElementById('ad-content-frame').data = "";
         
