@@ -403,26 +403,25 @@
         });
     }
 
-    // 🌟 সম্পূর্ণ আপডেট করা সিকিউর টাস্ক ক্লিক হ্যান্ডলার (রিসেট পলিসি + সাউন্ড + পুশ নোটিফিকেশন + ট্যাব অ্যালার্ট)
+   // 🌟 ফিক্সড সিকিউর টাস্ক ক্লিক হ্যান্ডলার (Visibility API + চোর ধরার নিখুঁত ফাঁদ)
     async function handleTaskClick(index) {
         if (index !== currentActiveIndex) return;
 
         const currentBtn = document.getElementById(`task-btn-${index}`);
         const modal = document.getElementById('ad-secure-modal');
         const adFrame = document.getElementById('ad-content-frame');
-        const timerZone = document.getElementById('modal-countdown');
+        const timerZone = document.getElementById('modal-timer-zone');
 
-        // প্রথমবার ক্লিকের সময় ব্রাউজার থেকে নোটিফিকেশনের পারমিশন চেয়ে নেওয়া
+        // নোটিফিকেশন পারমিশন চেক
         if (Notification.permission !== "granted" && Notification.permission !== "denied") {
             Notification.requestPermission();
         }
 
-        // ১. মেইন পেজের বাটনের ইন্টারফেস চেইঞ্জ (ইন-প্রোগ্রেস স্টেট)
+        // ১. মেইন পেজের বাটনের ইন্টারফেস চেইঞ্জ
         currentBtn.disabled = true;
         currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
         currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... 10s`;
 
-        // অরিজিনাল ট্যাবের নাম সেভ করে রাখা
         const originalTitle = document.title; 
 
         // 🚀 অ্যাডটি নতুন ট্যাবে ওপেন করা হলো
@@ -456,27 +455,36 @@
         modal.classList.remove('hidden');
 
         let timeLeft = 10;
-        let originalTimerZone = document.getElementById('modal-timer-zone');
-        originalTimerZone.innerHTML = `<span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-3.5 py-1.5 rounded-full text-[11px] font-bold">${timeLeft}s Remaining</span>`;
+        let isTaskValid = true; // টাস্কটি এখনো ভ্যালিড আছে কিনা
+        timerZone.innerHTML = `<span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-3.5 py-1.5 rounded-full text-[11px] font-bold">${timeLeft}s Remaining</span>`;
 
-        // 🕵️‍♂️ চোর ধরার রিসেট লজিক: ইউজার মাঝপথে ব্যাক বা ক্লোজ করলে টাইমার বাতিল
-        window.onblur = function() {
-            clearInterval(countdownInterval); 
-            window.onblur = null;
-            document.title = originalTitle; // ট্যাবের নাম আগের মতো করা
-            
-            modal.classList.add('hidden'); 
-            if (infoNotice) infoNotice.remove();
-            
-            currentBtn.disabled = false;
-            currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 link-btn-active";
-            currentBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
-            
-            alert("⚠️ আপনি বিজ্ঞাপনটি মাঝপথে ব্যাক বা ক্লোজ করেছেন ভাই! পয়েন্ট পেতে আপনাকে অবশ্যই একটানা ১০ সেকেন্ড বিজ্ঞাপনটি স্ক্রিনে রাখতে হবে। দয়া করে আবার চেষ্টা করুন।");
+        // 🕵️‍♂️ চোর ধরার আসল ফাঁদ: ১০ সেকেন্ড শেষ হওয়ার আগে ইউজার অ্যাপে ফিরে আসলে টাইমার বাতিল ও রিসেট
+        const checkVisibility = () => {
+            if (document.visibilityState === 'visible' && timeLeft > 0) {
+                // ইউজার ১০ সেকেন্ড শেষ হওয়ার আগেই মেইন অ্যাপে ব্যাক করেছে!
+                isTaskValid = false;
+                clearInterval(countdownInterval);
+                document.removeEventListener('visibilitychange', checkVisibility);
+                document.title = originalTitle;
+                
+                modal.classList.add('hidden');
+                if (infoNotice) infoNotice.remove();
+                
+                currentBtn.disabled = false;
+                currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 link-btn-active";
+                currentBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
+                
+                alert("⚠️ আপনি বিজ্ঞাপনটি পুরো ১০ সেকেন্ড দেখেননি ভাই! পয়েন্ট পেতে আপনাকে অবশ্যই একটানা ১০ সেকেন্ড বিজ্ঞাপনটি স্ক্রিনে রাখতে হবে। দয়া করে আবার চেষ্টা করুন।");
+            }
         };
+
+        // লিসেনারটি চালু করা হলো
+        document.addEventListener('visibilitychange', checkVisibility);
 
         // ৩. টাইমার কাউন্টডাউন শুরু
         const countdownInterval = setInterval(() => {
+            if (!isTaskValid) return; // টাস্ক ইনভ্যালিড হলে আর রান করবে না
+
             timeLeft--;
             currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
             
@@ -485,20 +493,20 @@
                 countdownLabel.innerText = `${timeLeft}s Remaining`;
             }
 
-            // ৪. ১০ সেকেন্ড দেখা সম্পন্ন হলে
+            // ৪. ১০ সেকেন্ড সফলভাবে দেখা সম্পন্ন হলে
             if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
-                window.onblur = null; // রিসেট লজিক বন্ধ করা কারণ কাজ সফল হয়েছে
+                document.removeEventListener('visibilitychange', checkVisibility); // সিকিউরিটি লিসেনার রিমুভ (এখন ব্যাক করলে সমস্যা নেই)
 
-                // 🌟 ট্রিকস ১: সাউন্ড অফ থাকলে যাতে বোঝে - ব্রাউজার পুশ নোটিফিকেশন পাঠানো
+                // 🌟 ট্রিকস ১: ব্রাউজার পুশ নোটিফিকেশন পাঠানো
                 if (Notification.permission === "granted") {
                     new Notification("AdLink Pro - টাস্ক কমপ্লিট! 🎉", {
                         body: "আপনার ১০ সেকেন্ড পূর্ণ হয়েছে ভাই। অ্যাপে ফিরে এসে পয়েন্ট ক্লেইম করুন!",
-                        icon: "favicon.png" // আপনার অ্যাপের লোগো
+                        icon: "favicon.png"
                     });
                 }
 
-                // 🌟 ট্রিকস ২: ব্রাউজারের ট্যাবের টাইটেল ফ্ল্যাশ বা পরিবর্তন করা
+                // 🌟 트릭스 ২: ব্রাউজারের ট্যাবের টাইটেল ফ্ল্যাশ করা
                 let isTitleFlipped = false;
                 const titleAnimate = setInterval(() => {
                     if(document.getElementById('ad-secure-modal').classList.contains('hidden')) {
@@ -510,6 +518,42 @@
                     }
                 }, 1000);
 
+                // 🔔 মিষ্টি সাউন্ড অ্যালার্ট
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); 
+                    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.3); 
+                } catch (audioErr) {
+                    console.log("Audio notification blocked", audioErr);
+                }
+
+                // মোডালের ভেতরের টেক্সট আপডেট
+                document.getElementById('notice-status-title').innerText = "সময় শেষ! বোনাস ক্লেইম করুন 🎉";
+                document.getElementById('notice-status-desc').innerText = "নিচের 'Claim & Close' বাটনে ক্লিক করে আপনার একাউন্টে পয়েন্ট যোগ করে নিন ভাই।";
+                
+                // ৫. ক্লোজ এবং পয়েন্ট ক্লেইম বাটন তৈরি
+                timerZone.innerHTML = `
+                    <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-green-500/20 flex items-center gap-1 animate-bounce">
+                        <i class="fas fa-check-circle"></i> Claim & Close
+                    </button>
+                `;
+
+                // ৬. ক্লেইম বাটনে ক্লিক লজিক
+                document.getElementById('claim-close-btn').addEventListener('click', () => {
+                    clearInterval(titleAnimate);
+                    document.title = originalTitle;
+                    processPointsSubmission(index);
+                });
+            }
+        }, 1000);
+    }
                 // 🔔 মিষ্টি সাউন্ড অ্যালার্ট (যারা সাউন্ড অন রাখবে তাদের জন্য)
                 try {
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
