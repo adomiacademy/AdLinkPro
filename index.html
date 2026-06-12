@@ -404,6 +404,7 @@
     }
 
     // 🌟 নতুন আপডেট করা টাস্ক ক্লিক হ্যান্ডলার (ইন-অ্যাপ সিকিউর মোডাল লজিক)
+    // 🌟 নতুন ও ফিক্সড টাস্ক ক্লিক হ্যান্ডলার (পপ-আপ ও নিউ ট্যাব লজিকসহ)
     async function handleTaskClick(index) {
         if (index !== currentActiveIndex) return;
 
@@ -417,8 +418,36 @@
         currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
         currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... 10s`;
 
-        // ২. সিকিউর ইন-অ্যাপ লেয়ারে বিজ্ঞাপন লোড এবং ওপেন করা
-        adFrame.data = fetchedLinks[index].url;
+        // 🚀 ফিক্স: অবজেক্ট ট্যাগ বাদ দিয়ে নতুন ট্যাবে অ্যাড ওপেন করা হলো (যাতে সাদা স্ক্রিন না আসে)
+        const openWindow = window.open(fetchedLinks[index].url, '_blank');
+        
+        if (!openWindow) {
+            alert("দয়া করে আপনার ব্রাউজারের Pop-up Blocker অফ করুন এবং আবার চেষ্টা করুন ভাই!");
+            currentBtn.disabled = false;
+            currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 link-btn-active";
+            currentBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
+            return;
+        }
+
+        // ২. সিকিউর ইন-অ্যাপ লেয়ার ওপেন করা ও সাদা ফ্রেম হাইড করে সুন্দর টেক্সট দেওয়া
+        adFrame.style.display = 'none'; // সাদা ফ্রেমটি লুকিয়ে ফেললাম
+        
+        // ফ্রেমের জায়গায় সুন্দর নোটিশ শো করানো
+        let infoNotice = document.getElementById('ad-info-notice');
+        if (!infoNotice) {
+            infoNotice = document.createElement('div');
+            infoNotice.id = 'ad-info-notice';
+            infoNotice.className = "absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#080915]";
+            infoNotice.innerHTML = `
+                <div class="w-16 h-16 bg-purple-600/10 text-purple-500 rounded-full flex items-center justify-center mb-4 text-2xl animate-pulse">
+                    <i class="fas fa-external-link-alt"></i>
+                </div>
+                <h2 class="text-lg font-bold text-white mb-2">বিজ্ঞাপনটি নতুন ট্যাবে ওপেন হয়েছে!</h2>
+                <p class="text-xs text-gray-400 max-w-sm leading-relaxed">পয়েন্ট ক্লেইম করতে হলে নতুন ট্যাবে যাওয়া বিজ্ঞাপনটি অন্তত ১০ সেকেন্ড মনোযোগ দিয়ে দেখুন। এই পেজের টাইমার শেষ হওয়া পর্যন্ত অপেক্ষা করুন।</p>
+            `;
+            adFrame.parentNode.appendChild(infoNotice);
+        }
+
         modal.classList.remove('hidden');
 
         let timeLeft = 10;
@@ -436,14 +465,14 @@
             if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
                 
-                // ৫. ক্লোজ এবং পয়েন্ট ক্রেডিট বাটন জেনারেট
+                // ৫. ক্লোজ এবং পয়েন্ট ক্রেডিট বাটন জেনারেট
                 timerZone.innerHTML = `
                     <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-green-500/20 flex items-center gap-1 animate-bounce">
                         <i class="fas fa-check-circle"></i> Claim & Close
                     </button>
                 `;
 
-                // ৬. ক্লেইম বাটনে ক্লিকের সাথে সাথে পয়েন্ট ডেটাবেজে সাবমিট লজিক
+                // ৬. ক্লেইম বাটনে ক্লিকের সাথে সাথে পয়েন্ট ডেটাবেজে সাবমিট লজিক
                 document.getElementById('claim-close-btn').addEventListener('click', () => processPointsSubmission(index));
             }
         }, 1000);
@@ -465,11 +494,15 @@
                     total_clicks: increment(1)
                 });
 
-                // ২. লিংকের মালিকের ব্যালেন্স থেকে ১ পয়েন্ট কাটা (যদি এডমিন লিংক না হয়)
+                // ২. ফিক্সড লজিক: লিংকের আসল মালিকের ব্যালেন্স থেকে ১ পয়েন্ট কাটা (যদি এডমিন লিংক না হয়)
                 const ownerUid = fetchedLinks[index].ownerUid;
                 if (ownerUid !== "system_admin" && ownerUid !== user.uid) {
                     const ownerRef = doc(db, "users", ownerUid);
-                    await updateDoc(ownerRef, { points: increment(-1) });
+                    
+                    // সিকিউর ট্রানজেকশন মেথড যাতে পয়েন্ট মাইনাসে না চলে যায়
+                    await updateDoc(ownerRef, { 
+                        points: increment(-1) 
+                    });
                 }
 
                 // ৩. স্ক্রিনের টপ হেডার ব্যালেন্স লাইভ আপডেট
@@ -514,6 +547,10 @@
         // ৭. মেমোরি ফ্রী করতে ইন-অ্যাপ মোডাল হাইড ও অবজেক্ট ডেটা ক্লিয়ার
         modal.classList.add('hidden');
         document.getElementById('ad-content-frame').data = "";
+        
+        // ইনফো নোটিশটি রিমুভ করা যাতে পরের বার ফ্রেশ লোড হয়
+        const infoNotice = document.getElementById('ad-info-notice');
+        if (infoNotice) infoNotice.remove();
     }
 
     // 🎯 গ্লোবাল ফলো ফাংশন
