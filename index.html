@@ -418,7 +418,7 @@
         currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
         currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... 10s`;
 
-        // 🚀 ফিক্স: অবজেক্ট ট্যাগ বাদ দিয়ে নতুন ট্যাবে অ্যাড ওপেন করা হলো (যাতে সাদা স্ক্রিন না আসে)
+        // 🚀 অ্যাডটি একদম সেফ উপায়ে নতুন ট্যাবে ওপেন করা হলো
         const openWindow = window.open(fetchedLinks[index].url, '_blank');
         
         if (!openWindow) {
@@ -429,21 +429,20 @@
             return;
         }
 
-        // ২. সিকিউর ইন-অ্যাপ লেয়ার ওপেন করা ও সাদা ফ্রেম হাইড করে সুন্দর টেক্সট দেওয়া
-        adFrame.style.display = 'none'; // সাদা ফ্রেমটি লুকিয়ে ফেললাম
+        // ২. সিকিউর ইন-অ্যাপ মোডাল লেয়ার ওপেন করা ও সাদা ফ্রেম হাইড করে সুন্দর টেক্সট ও টাইমার শো করা
+        adFrame.style.display = 'none'; // সাদা ফ্রেমটি চিরতরে হাইড করা হলো
         
-        // ফ্রেমের জায়গায় সুন্দর নোটিশ শো করানো
         let infoNotice = document.getElementById('ad-info-notice');
         if (!infoNotice) {
             infoNotice = document.createElement('div');
             infoNotice.id = 'ad-info-notice';
             infoNotice.className = "absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#080915]";
             infoNotice.innerHTML = `
-                <div class="w-16 h-16 bg-purple-600/10 text-purple-500 rounded-full flex items-center justify-center mb-4 text-2xl animate-pulse">
-                    <i class="fas fa-external-link-alt"></i>
+                <div class="w-16 h-16 bg-purple-600/10 text-purple-500 rounded-full flex items-center justify-center mb-4 text-2xl animate-bounce">
+                    <i class="fas fa-bullhorn text-purple-400"></i>
                 </div>
-                <h2 class="text-lg font-bold text-white mb-2">বিজ্ঞাপনটি নতুন ট্যাবে ওপেন হয়েছে!</h2>
-                <p class="text-xs text-gray-400 max-w-sm leading-relaxed">পয়েন্ট ক্লেইম করতে হলে নতুন ট্যাবে যাওয়া বিজ্ঞাপনটি অন্তত ১০ সেকেন্ড মনোযোগ দিয়ে দেখুন। এই পেজের টাইমার শেষ হওয়া পর্যন্ত অপেক্ষা করুন।</p>
+                <h2 id="notice-status-title" class="text-base lg:text-lg font-bold text-white mb-2">বিজ্ঞাপনটি নতুন ট্যাবে ওপেন হয়েছে!</h2>
+                <p id="notice-status-desc" class="text-xs text-gray-400 max-w-sm leading-relaxed">পয়েন্ট পেতে নতুন ট্যাবে যাওয়া বিজ্ঞাপনটি দেখুন। ১০ সেকেন্ড শেষ হলে একটি সাউন্ড অ্যালার্ট বাজবে, তখন এই ট্যাবে ফিরে আসুন।</p>
             `;
             adFrame.parentNode.appendChild(infoNotice);
         }
@@ -464,6 +463,30 @@
             // ৪. বাধ্যতামূলক ১০ সেকেন্ড দেখা সম্পন্ন হলে
             if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
+
+                // 🔔 ম্যাজিক ট্রিকস: ব্রাউজারের ডিফল্ট নোটিফিকেশন সাউন্ড প্লে করা (ইউজার অন্য ট্যাবে থাকলেও শুনতে পাবে)
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    oscillator.type = 'sine'; // মিষ্টি সাউন্ডের জন্য sine wave
+                    oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 নোট (মিষ্টি টিউন)
+                    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                    
+                    oscillator.start();
+                    // ০.৩ সেকেন্ড পর সাউন্ড বন্ধ হবে
+                    oscillator.stop(audioCtx.currentTime + 0.3); 
+                } catch (audioErr) {
+                    console.log("Audio alert not supported or blocked by browser restriction", audioErr);
+                }
+
+                // মোডালের ভেতরের টেক্সট আপডেট করে দেওয়া যাতে ফিরে এসে দেখতে সুবিধা হয়
+                document.getElementById('notice-status-title').innerText = "সময় শেষ! বোনাস ক্লেইম করুন 🎉";
+                document.getElementById('notice-status-desc').innerText = "নিচের 'Claim & Close' বাটনে ক্লিক করে আপনার একাউন্টে পয়েন্ট যোগ করে নিন ভাই।";
                 
                 // ৫. ক্লোজ এবং পয়েন্ট ক্রেডিট বাটন জেনারেট
                 timerZone.innerHTML = `
@@ -476,7 +499,6 @@
                 document.getElementById('claim-close-btn').addEventListener('click', () => processPointsSubmission(index));
             }
         }, 1000);
-    }
 
     // 🌟 নতুন ডায়নামিক মেথড: ব্যাকএন্ডে সাকসেসফুলি ডেটা সাবমিট এবং লেয়ার রিসেট
     async function processPointsSubmission(index) {
