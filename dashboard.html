@@ -248,7 +248,7 @@
     import { db, auth } from './firebase-config.js';
     import { collection, query, limit, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // মোবাইল মেনু কন্ট্রোল করার লজিক
+    // মোবাইল মেনু (Sidebar) কন্ট্রোল করার লজিক
     const openSidebar = document.getElementById('open-sidebar');
     const closeSidebar = document.getElementById('close-sidebar');
     const sidebarMenu = document.getElementById('sidebar-menu');
@@ -263,7 +263,7 @@
     if(closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
     if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
 
-    // প্রোগ্রেস ডট বা লক আপডেট করার ফাংশন
+    // প্রোগ্রেস ডট (Progress Dots) এবং লক আপডেট করার ফাংশন
     function updateProgressUI(clicks) {
         let currentProgress = clicks % 10;
         document.getElementById('progress-text').innerText = `Visits Progress: ${currentProgress}/10`;
@@ -289,7 +289,7 @@
         }
     }
 
-    // ১. পেজ লোড হলে ইউজারের ডাটাবেস ডাটা রেন্ডার করা
+    // ১. পেজ লোড হলে লগইন থাকা ইউজারের প্রোফাইল ডাটা রেন্ডার করা
     auth.onAuthStateChanged(async (user) => {
         if (!user) {
             window.location.href = "index.html";
@@ -322,7 +322,7 @@
         loadAdFeed(user.uid);
     });
 
-    // ২. লাইভ নেটওয়ার্ক লিঙ্ক ফিড লোড করা
+    // ২. লাইভ নেটওয়ার্ক লিঙ্ক ফিড লোড করা (মালিক ট্র্যাকিং আইডি সহ)
     async function loadAdFeed(currentUid) {
         try {
             const querySnapshot = await getDocs(query(collection(db, "users"), limit(15)));
@@ -334,13 +334,16 @@
 
             querySnapshot.forEach((userDoc) => {
                 const userData = userDoc.data();
-                if (userDoc.id !== currentUid && userData.links && userData.links.length > 0) {
+                
+                // নিজের লিংক নিজে এক্সচেঞ্জ করা যাবে না এবং ওই ইউজারের পয়েন্ট ০ এর বেশি থাকতে হবে
+                if (userDoc.id !== currentUid && userData.links && userData.links.length > 0 && (userData.points || 0) > 0) {
                     const validLinks = userData.links.filter(link => link && link.trim() !== "");
                     
                     if(validLinks.length > 0) {
                         hasLinks = true;
                         const randomLink = validLinks[Math.floor(Math.random() * validLinks.length)];
                         
+                        // বাটনে data-owner="${userDoc.id}" সেট করা হয়েছে যাতে সঠিক মালিকের অ্যাকাউন্টে ক্লিক কাউন্ট হয় 🎯
                         const postHtml = `
                             <div class="card p-5 rounded-2xl space-y-4">
                                 <div class="flex justify-between items-center">
@@ -360,7 +363,7 @@
                                 </div>
                                 <div class="flex justify-between items-center pt-2 border-t border-gray-900">
                                     <span class="text-xs text-gray-500"><i class="far fa-eye mr-1"></i> Active Link</span>
-                                    <button data-link="${randomLink}" class="visit-btn bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-8 py-2.5 rounded-xl font-bold transition tracking-wide shadow-md shadow-indigo-600/10">
+                                    <button data-link="${randomLink}" data-owner="${userDoc.id}" class="visit-btn bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-8 py-2.5 rounded-xl font-bold transition tracking-wide shadow-md shadow-indigo-600/10">
                                         Visit
                                     </button>
                                 </div>
@@ -375,11 +378,12 @@
                 feedContainer.insertAdjacentHTML('beforeend', '<div class="text-center py-6 text-gray-500 card rounded-2xl">No active links in network yet. Go to Profile to add yours!</div>');
             }
 
-            // ভিজিট বাটনের ইভেন্ট লিসেনার সেটআপ
+            // প্রতিটি ভিজিট বাটনে ইভেন্ট লিসেনার অ্যাড করা
             document.querySelectorAll('.visit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const adLink = this.getAttribute('data-link');
-                    startAdVisit(this, adLink);
+                    const ownerUid = this.getAttribute('data-owner');
+                    startAdVisit(this, adLink, ownerUid);
                 });
             });
 
@@ -388,16 +392,17 @@
         }
     }
 
-    // ৩. কাউন্টডাউন এবং লাইভ পয়েন্ট অ্যাড মেকানিজম
-    function startAdVisit(element, adLink) {
+    // ৩. ১০ সেকেন্ডের কাউন্টডাউন টাইমার এবং লাইভ পয়েন্ট এক্সচেঞ্জ মেকানিজম ⏰
+    function startAdVisit(element, adLink, ownerUid) {
         if(!adLink) {
             alert("ভ্যালিড কোনো লিঙ্ক পাওয়া যায়নি!");
             return;
         }
 
+        // নতুন উইন্ডোতে লিংকটি ওপেন করা
         window.open(adLink, '_blank', 'width=450,height=600,top=100,left=100');
 
-        let timeLeft = 6;
+        let timeLeft = 10; // ঠিক ১০ সেকেন্ডের কাউন্টডাউন টাইমার 🎯
         element.disabled = true;
         element.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
         element.classList.add('bg-gray-700', 'cursor-not-allowed');
@@ -416,12 +421,23 @@
                 const user = auth.currentUser;
                 if (user) {
                     try {
+                        // 🅰️ ১. যে ক্লিক করলো (Viewer): তার একাউন্টে ১০ পয়েন্ট যোগ এবং ক্লিক সংখ্যা +১
                         const userDocRef = doc(db, "users", user.uid);
                         await updateDoc(userDocRef, {
                             points: increment(10),
                             total_clicks: increment(1)
                         });
                         
+                        // 🅱️ ২. যার লিংক (Owner): তার received_clicks ১ বাড়বে এবং ব্যালেন্স থেকে ১ পয়েন্ট কাটবে 🎯
+                        if (ownerUid && ownerUid !== user.uid) {
+                            const ownerDocRef = doc(db, "users", ownerUid);
+                            await updateDoc(ownerDocRef, {
+                                received_clicks: increment(1),
+                                points: increment(-1)
+                            });
+                        }
+                        
+                        // ৩. ইউজার ইন্টারফেস (UI) লাইভ আপডেট করা
                         const pointsText = document.getElementById('user-points');
                         const totalClicksText = document.getElementById('stat-clicks');
                         let currentClicks = 0;
@@ -439,14 +455,14 @@
                         updateProgressUI(currentClicks);
                         alert("অভিনন্দন! আপনি ১০ পয়েন্ট বোনাস পেয়েছেন।");
                     } catch (err) {
-                        console.error("Error updating points:", err);
+                        console.error("Error updating points network wide:", err);
                     }
                 }
             }
         }, 1000);
     }
 
-    // ৪. লগআউট মেকানিজম
+    // ৪. লগআউট (Logout) মেকানিজম
     document.getElementById('logout-btn').addEventListener('click', () => {
         if(confirm("আপনি কি লগআউট করতে চান?")) {
             auth.signOut().then(() => {
