@@ -118,7 +118,7 @@
     import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // ১. ইমেইল ও পাসওয়ার্ড দিয়ে লগইন লজিক + প্রোফাইল ব্যাকআপ জেনারেটর
+    // ১. ইমেইল ও পাসওয়ার্ড দিয়ে লগইন লজিক
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
@@ -128,10 +128,10 @@
             const result = await signInWithEmailAndPassword(auth, email, password);
             const user = result.user;
 
-            // যদি এই ইউজারের ডাটাবেজ ডকুমেন্ট তৈরি করা না থাকে, তবে অটোমেটিক ব্যাকআপ জেনারেট হবে
             const userDocRef = doc(db, "users", user.uid);
             const docSnap = await getDoc(userDocRef);
 
+            // ইউজার ডাটা না থাকলে তৈরি হবে, আর থাকলে আপডেট চেক করবে
             if (!docSnap.exists()) {
                 await setDoc(userDocRef, {
                     displayName: user.displayName || email.split('@')[0],
@@ -139,10 +139,14 @@
                     photoURL: user.photoURL || `https://i.pravatar.cc/100?u=${user.uid}`,
                     points: 10,
                     total_clicks: 0,
+                    received_clicks: 0, // নতুন ফিল্ড
                     referrals_count: 0,
-                    createdAt: new Date().getTime(), // অ্যাডমিন প্যানেলের জন্য লাইভ টাইমস্ট্যাম্প
+                    createdAt: new Date().getTime(),
                     links: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
                 });
+            } else if (!docSnap.data().hasOwnProperty('received_clicks')) {
+                // পুরাতন ইউজারদের জন্য যদি ফিল্ডটি না থাকে, তবে যোগ করে দেবে
+                await setDoc(userDocRef, { received_clicks: 0 }, { merge: true });
             }
 
             window.location.href = "index.html"; 
@@ -152,7 +156,7 @@
         }
     });
 
-    // ২. গুগল দিয়ে লগইন ও ফায়ারস্টোরে নিখুঁত মেম্বার ডাটা স্ট্রাকচার সেভ
+    // ২. গুগল দিয়ে লগইন লজিক
     document.getElementById('google-login-btn').addEventListener('click', async () => {
         const provider = new GoogleAuthProvider();
         try {
@@ -162,25 +166,21 @@
             const userDocRef = doc(db, "users", user.uid);
             const docSnap = await getDoc(userDocRef);
 
-            // যদি ইউজার একদম নতুন হয়, তবেই কেবল ডাটা পুশ হবে (পুরোনোদের পয়েন্ট ডিলিট হবে না)
             if (!docSnap.exists()) {
                 await setDoc(userDocRef, {
                     displayName: user.displayName,
                     email: user.email,
                     photoURL: user.photoURL,
-                    points: 10,          // নতুন সাইন-আপ বোনাস ১০ পয়েন্ট
+                    points: 10,
                     total_clicks: 0,
+                    received_clicks: 0, // নতুন ফিল্ড
                     referrals_count: 0,
-                    createdAt: new Date().getTime(), // 🗓️ জয়েনিং ডেট লজিক (যা অ্যাডমিন ট্র্যাক করতে পারবে)
+                    createdAt: new Date().getTime(),
                     links: ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""] 
                 });
-            } else {
-                // ইউজার যদি পুরোনো হয় কিন্তু তার createdAt ফিল্ডটি আগে না থেকে থাকে, তবে সেটি মার্জ করে দেওয়া হবে
-                if (!docSnap.data().createdAt) {
-                    await setDoc(userDocRef, {
-                        createdAt: new Date().getTime()
-                    }, { merge: true });
-                }
+            } else if (!docSnap.data().hasOwnProperty('received_clicks')) {
+                // পুরাতন ইউজারদের জন্য যদি ফিল্ডটি না থাকে, তবে যোগ করে দেবে
+                await setDoc(userDocRef, { received_clicks: 0 }, { merge: true });
             }
 
             window.location.href = "index.html"; 
@@ -190,6 +190,5 @@
         }
     });
 </script>
-
 </body>
 </html>
