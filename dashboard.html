@@ -3,160 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdLinkX - Dashboard</title>
+    <title>AdLinkX - Dashboard Feed</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #080915; color: white; font-family: sans-serif; }
-        .sidebar { background-color: #0d0e1b; transition: transform 0.3s ease-in-out; }
+        body { background-color: #080915; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .sidebar { background-color: #0d0e1b; border-right: 1px solid #1f2937; }
         .card { background-color: #111223; border: 1px solid rgba(255,255,255,0.05); }
-        .active-tab { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-left: 4px solid #a855f7; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #080915; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
     </style>
-
-    /* আপনার বর্তমান ১৩ নম্বর লাইনের .active-tab স্টাইল এর নিচে */
-        .active-tab { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-left: 4px solid #a855f7; }
-    </style>
-
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-          .then(() => console.log("Service Worker Registered"))
-          .catch((err) => console.log("Service Worker Failed", err));
-      }
-    </script>
-
-</head> <body class="flex min-h-screen relative overflow-x-hidden"> ```
-
-### ছোট একটি বোনাস টিপস (ফ্যাভিকন আইকন):
-আপনার বাম পাশের ফাইল লিস্টে দেখতে পাচ্ছি **`favicon.png`** ফাইলটি অলরেডি আছে। আপনি চাইলে এই কোডটুকুর সাথেই আপনার ফ্যাভিকন বা ফেব আইকনের লাইনটিও একবারে বসিয়ে দিতে পারেন। অর্থাৎ এই লাইনটি:
-```html
-<link rel="icon" type="image/png" href="favicon.png">
-    
-
 </head>
-<body class="flex min-h-screen relative overflow-x-hidden">
+<body class="flex min-h-screen">
 
-    <aside id="sidebar-menu" class="w-64 sidebar h-screen fixed top-0 left-0 z-50 -translate-x-full lg:translate-x-0 border-r border-gray-800 lg:block bg-[#0d0e1b]">
+    <aside id="sidebar-menu" class="w-64 sidebar h-screen fixed top-0 left-0 z-50 -translate-x-full lg:translate-x-0 lg:flex flex-col transition-transform duration-300 ease-in-out">
         <div class="p-6 flex items-center justify-between">
             <div class="flex items-center">
-                <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-2">
-                    <i class="fas fa-link text-white text-sm"></i>
+                <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center mr-3 shadow-lg shadow-purple-600/20">
+                    <i class="fas fa-link text-white text-xs"></i>
                 </div>
-                <span class="text-xl font-bold tracking-wide">AdLinkX</span>
+                <span class="text-xl font-bold tracking-tight text-white">AdLinkX</span>
             </div>
-            <button id="close-sidebar" class="lg:hidden text-gray-400 hover:text-white text-xl">
-                <i class="fas fa-times"></i>
+            <button id="close-sidebar" class="lg:hidden text-gray-400 hover:text-white">
+                <i class="fas fa-times text-lg"></i>
             </button>
         </div>
-        
-        <nav class="mt-4 px-4 space-y-2">
-            <a href="dashboard.html" class="flex items-center p-3 active-tab rounded-lg transition">
-                <i class="fas fa-home mr-3 w-5 text-center"></i> Home
+        <nav class="flex-1 px-4 space-y-1 mt-4">
+            <a href="index.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-xl transition">
+                <i class="fas fa-home mr-3 w-5 text-center text-sm"></i> Home
             </a>
-            <a href="#" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
-                <i class="fas fa-th-large mr-3 w-5 text-center"></i> Dashboard
+            <a href="dashboard.html" class="flex items-center p-3 bg-purple-600/10 text-purple-400 border-l-4 border-purple-500 rounded-r-xl transition font-medium">
+                <i class="fas fa-th-large mr-3 w-5 text-center text-sm"></i> Dashboard
             </a>
-            <a href="profile.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
-                <i class="fas fa-link mr-3 w-5 text-center"></i> My Links (25)
-            </a>
-            <a href="#" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
-                <i class="fas fa-users mr-3 w-5 text-center"></i> My Network
-            </a>
-            <a href="#" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
-                <i class="fas fa-wallet mr-3 w-5 text-center"></i> Earnings
-            </a>
-            <a href="#" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg transition">
-                <i class="fas fa-cog mr-3 w-5 text-center"></i> Settings
+            <a href="profile.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-xl transition">
+                <i class="fas fa-user mr-3 w-5 text-center text-sm"></i> My Profile
             </a>
         </nav>
-
-        <div class="absolute bottom-6 left-6 text-xs text-gray-600">
-            <p>&copy; 2026 AdLinkX</p>
-            <p>All rights reserved.</p>
-        </div>
+        <div class="p-6 text-[10px] text-gray-600 border-t border-gray-900">© 2026 AdLinkX &bull; v1.2</div>
     </aside>
 
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
 
-    <main class="lg:ml-64 w-full flex flex-col min-h-screen pb-24 lg:pb-0">
+    <main class="lg:ml-64 w-full flex flex-col min-h-screen">
         
-        <header class="card h-16 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30">
-            <div id="open-sidebar" class="flex items-center lg:hidden cursor-pointer p-2 hover:bg-gray-800 rounded-lg transition">
-                <i class="fas fa-bars text-xl text-gray-300"></i>
-                <span class="text-lg font-bold ml-3 tracking-wide">AdLinkX</span>
+        <header class="h-16 flex items-center justify-between px-6 lg:px-8 bg-[#080915]/80 backdrop-blur-md sticky top-0 z-40 border-b border-b-gray-800/30">
+            <div class="flex items-center">
+                <button id="open-sidebar" class="lg:hidden text-gray-400 hover:text-white mr-4">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest hidden sm:block">Exchange Engine</h2>
             </div>
-            
-            <div class="hidden lg:flex space-x-6 text-sm text-gray-400">
-                <a href="#" class="hover:text-white transition">How It Works</a>
-                <a href="#" class="hover:text-white transition">Leaderboard</a>
-            </div>
-            
-            <div class="flex items-center space-x-3 sm:space-x-4">
-                <a href="profile.html" class="bg-purple-600 hover:bg-purple-700 px-3 py-2 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition whitespace-nowrap">
-                    + Add Link
-                </a>
-                <div class="bg-gray-900 px-2.5 py-1.5 rounded-full flex items-center border border-yellow-500/20 text-xs sm:text-sm">
-                    <span class="mr-1">💰</span> <span id="user-points" class="font-bold text-yellow-500">0</span>
+            <div class="flex items-center space-x-4">
+                <div class="bg-gray-900 px-3 py-1.5 rounded-full flex items-center border border-yellow-500/10 text-xs">
+                    <span class="mr-2">💰</span> <span id="user-points" class="font-bold text-yellow-500">0</span>
                 </div>
-                <div class="flex items-center space-x-2 cursor-pointer p-1 hover:bg-gray-800 rounded-xl transition" id="logout-btn">
-                    <img id="user-avatar" src="https://i.pravatar.cc/100?img=33" class="w-8 h-8 rounded-full border-2 border-purple-500" alt="User">
-                    <span class="text-sm font-medium hidden sm:inline-block text-gray-300">
-                        <span id="user-name">Loading...</span> 
-                        <i class="fas fa-sign-out-alt text-xs ml-1 text-red-400"></i>
-                    </span>
+                <div class="flex items-center space-x-2 bg-gray-900/50 pr-4 pl-1 py-1 rounded-full border border-gray-800/60">
+                    <img id="user-avatar" src="https://via.placeholder.com/32" class="w-8 h-8 rounded-full border border-purple-500 object-cover">
+                    <span id="user-name" class="text-[11px] font-bold uppercase tracking-wider text-gray-300">Loading...</span>
                 </div>
             </div>
         </header>
 
-        <div class="p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
             
-            <div class="lg:col-span-8 space-y-5" id="feed-container">
-                
-                <div class="card p-5 rounded-2xl">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
-                        <p class="text-xs lg:text-sm text-gray-400">Complete 10 visits and earn bonus <span class="text-purple-400 font-bold">10 points!</span></p>
-                        <span id="progress-text" class="text-xs text-green-400 bg-green-500/10 px-2.5 py-1 rounded-md font-bold self-start sm:self-auto">Visits Progress: 0/10</span>
+            <div class="lg:col-span-8 space-y-6">
+                <div class="card p-6 rounded-2xl bg-[#0d0e1b] flex flex-col sm:flex-row items-center justify-between gap-4 border border-gray-800/40">
+                    <div>
+                        <h2 class="text-base font-bold text-gray-100">Live Traffic Active Pool</h2>
+                        <p class="text-xs text-gray-500 mt-0.5">Visit other member links for 10 seconds to generate traffic balance.</p>
                     </div>
-                    
-                    <div class="flex flex-wrap items-center gap-2">
-                        <div id="progress-dots" class="flex flex-wrap gap-2">
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                            <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
-                        </div>
-                        
-                        <button id="next-links-btn" disabled class="ml-auto w-full sm:w-auto bg-gray-900 border border-gray-800/80 px-4 py-2 rounded-xl text-xs text-gray-600 font-bold cursor-not-allowed mt-2 sm:mt-0">
-                            Next 10 Links
+                    <div class="flex items-center space-x-3 w-full sm:w-auto">
+                        <span id="progress-text" class="text-[11px] font-bold text-gray-400 whitespace-nowrap">Visits Progress: 0/10</span>
+                        <button id="next-links-btn" disabled class="ml-auto w-full sm:w-auto bg-gray-900 border border-gray-800/80 px-4 py-2 rounded-xl text-xs text-gray-600 font-bold cursor-not-allowed">
+                            Next Batch
                         </button>
                     </div>
                 </div>
 
-                <div id="loading-posts" class="text-center py-8 text-gray-500 text-sm card rounded-2xl">
-                    <i class="fas fa-spinner fa-spin mr-2 text-purple-500"></i>Loading live network links...
+                <div class="card p-4 rounded-2xl flex items-center justify-between gap-2 overflow-x-auto custom-scrollbar">
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
+                    <div class="progress-dot w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-xs font-bold text-gray-600"><i class="fas fa-lock text-[9px]"></i></div>
                 </div>
 
+                <div id="feed-container" class="space-y-4">
+                    <div id="loading-posts" class="text-center py-12 text-gray-500 card rounded-2xl border border-gray-900">
+                        <i class="fas fa-circle-notch fa-spin text-purple-500 text-xl mb-2"></i>
+                        <p class="text-xs">Mapping network link nodes...</p>
+                    </div>
+                </div>
             </div>
 
             <div class="lg:col-span-4 space-y-6">
-                
-                <div class="card p-6 rounded-2xl text-center relative overflow-hidden">
-                    <div class="relative inline-block mt-2">
-                        <img id="card-avatar" src="https://i.pravatar.cc/100?img=33" class="w-20 h-20 rounded-full mx-auto border-4 border-purple-500/20">
-                        <span class="absolute bottom-1 right-1 bg-green-500 w-3.5 h-3.5 rounded-full border-4 border-[#111223]"></span>
-                    </div>
-                    <h3 id="card-name" class="text-lg font-bold mt-3">Loading...</h3>
-                    <p class="text-xs text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full inline-block mt-1 font-medium scale-90">Active Member</p>
-                    
+                <div class="card p-6 rounded-2xl text-center relative overflow-hidden bg-gradient-to-br from-[#111223] to-[#070814]">
+                    <div class="absolute top-3 right-3 bg-green-500/10 border border-green-500/20 text-green-400 font-bold text-[9px] px-2 py-0.5 rounded-full tracking-wider">LIVE NODE</div>
+                    <img id="card-avatar" src="https://via.placeholder.com/80" class="w-20 h-20 rounded-2xl mx-auto border-2 border-purple-500/30 object-cover shadow-lg">
+                    <h3 id="card-name" class="font-bold text-base mt-4 text-gray-200 tracking-wide uppercase">Loading...</h3>
+                    <p class="text-xs text-gray-500">AdLinkX Verified Publisher</p>
+
                     <div class="grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-gray-800/60">
                         <div>
                             <p id="stat-links" class="text-base font-bold text-gray-200">0</p>
@@ -167,88 +119,23 @@
                             <p class="text-[9px] text-gray-500 uppercase tracking-wider font-bold">Total Visits</p>
                         </div>
                         <div>
-                            <p class="text-base font-bold text-gray-200">0</p>
-                            <p class="text-[9px] text-gray-500 uppercase tracking-wider font-bold">Referrals</p>
+                            <p id="stat-received" class="text-base font-bold text-green-400">0</p>
+                            <p class="text-[9px] text-gray-500 uppercase tracking-wider font-bold">Return Clicks</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="card p-5 rounded-2xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <h4 class="font-bold text-sm tracking-wide">Who to Follow</h4>
-                        <a href="#" class="text-purple-400 text-xs font-semibold hover:underline">View All</a>
-                    </div>
-                    <div class="space-y-3.5">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://i.pravatar.cc/100?img=60" class="w-8 h-8 rounded-lg mr-2.5">
-                                <div>
-                                    <p class="text-xs font-bold text-gray-300">Al Amin</p>
-                                    <p class="text-[10px] text-gray-500">@al_amin</p>
-                                </div>
-                            </div>
-                            <button class="bg-gray-900 border border-gray-800 text-[10px] font-bold text-purple-400 px-3 py-1 rounded-full hover:bg-purple-600 hover:text-white transition">Follow</button>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img src="https://i.pravatar.cc/100?img=68" class="w-8 h-8 rounded-lg mr-2.5">
-                                <div>
-                                    <p class="text-xs font-bold text-gray-300">Tawhid Islam</p>
-                                    <p class="text-[10px] text-gray-500">@tawhid_seo</p>
-                                </div>
-                            </div>
-                            <button class="bg-gray-900 border border-gray-800 text-[10px] font-bold text-purple-400 px-3 py-1 rounded-full hover:bg-purple-600 hover:text-white transition">Follow</button>
-                        </div>
-                    </div>
+                    <button id="logout-btn" class="w-full mt-6 bg-gray-950 hover:bg-red-950/30 border border-gray-800 hover:border-red-500/20 text-xs text-gray-400 hover:text-red-400 py-2.5 rounded-xl font-bold transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Terminate Session
+                    </button>
                 </div>
-
-                <div class="card p-5 rounded-2xl">
-                    <h4 class="font-bold text-sm tracking-wide mb-4"><i class="fas fa-trophy text-yellow-500 mr-1.5"></i> Top Earners</h4>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between text-xs bg-gray-950/40 p-2 rounded-xl">
-                            <span class="font-bold text-yellow-500 w-4">1</span>
-                            <img src="https://i.pravatar.cc/100?img=3" class="w-6 h-6 rounded-full mx-2">
-                            <span class="text-gray-300 font-medium flex-1">Al Amin</span>
-                            <span class="text-gray-400 font-bold">1,250 <span class="text-[10px] text-gray-500">Pts</span></span>
-                        </div>
-                        <div class="flex items-center justify-between text-xs bg-gray-950/40 p-2 rounded-xl">
-                            <span class="font-bold text-gray-400 w-4">2</span>
-                            <img src="https://i.pravatar.cc/100?img=47" class="w-6 h-6 rounded-full mx-2">
-                            <span class="text-gray-300 font-medium flex-1">Jannatul Islam</span>
-                            <span class="text-gray-400 font-bold">980 <span class="text-[10px] text-gray-500">Pts</span></span>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-
         </div>
-
     </main>
-
-    <div class="lg:hidden fixed bottom-0 left-0 w-full bg-[#0d0e1b] border-t border-gray-800/80 flex justify-around items-center py-3 z-40">
-        <a href="dashboard.html" class="flex flex-col items-center text-purple-500 text-xs">
-            <i class="fas fa-home text-lg mb-0.5"></i> Home
-        </a>
-        <a href="#" class="flex flex-col items-center text-gray-500 text-xs">
-            <i class="fas fa-th-large text-lg mb-0.5"></i> Dash
-        </a>
-        <div class="bg-purple-600 w-12 h-12 rounded-full -mt-7 flex items-center justify-center border-4 border-[#080915] shadow-lg shadow-purple-500/30 cursor-pointer">
-            <i class="fas fa-paper-plane text-white text-sm"></i>
-        </div>
-        <a href="#" class="flex flex-col items-center text-gray-500 text-xs">
-            <i class="fas fa-users text-lg mb-0.5"></i> Network
-        </a>
-        <a href="profile.html" class="flex flex-col items-center text-gray-500 text-xs">
-            <i class="fas fa-user text-lg mb-0.5"></i> Profile
-        </a>
-    </div>
 
 <script type="module">
     import { db, auth } from './firebase-config.js';
     import { collection, query, limit, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // মোবাইল মেনু (Sidebar) কন্ট্রোল করার লজিক
     const openSidebar = document.getElementById('open-sidebar');
     const closeSidebar = document.getElementById('close-sidebar');
     const sidebarMenu = document.getElementById('sidebar-menu');
@@ -263,7 +150,6 @@
     if(closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
     if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
 
-    // প্রোগ্রেস ডট (Progress Dots) এবং লক আপডেট করার ফাংশন
     function updateProgressUI(clicks) {
         let currentProgress = clicks % 10;
         document.getElementById('progress-text').innerText = `Visits Progress: ${currentProgress}/10`;
@@ -282,14 +168,13 @@
         const nextBtn = document.getElementById('next-links-btn');
         if(currentProgress === 0 && clicks > 0) {
             nextBtn.removeAttribute('disabled');
-            nextBtn.className = "ml-auto w-full sm:w-auto bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl text-xs text-white font-bold cursor-pointer mt-2 sm:mt-0 transition";
+            nextBtn.className = "ml-auto w-full sm:w-auto bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl text-xs text-white font-bold cursor-pointer mt-2 sm:mt-0 transition shadow-md shadow-purple-600/10";
         } else {
             nextBtn.setAttribute('disabled', 'true');
             nextBtn.className = "ml-auto w-full sm:w-auto bg-gray-900 border border-gray-800/80 px-4 py-2 rounded-xl text-xs text-gray-600 font-bold cursor-not-allowed mt-2 sm:mt-0";
         }
     }
 
-    // ১. পেজ লোড হলে লগইন থাকা ইউজারের প্রোফাইল ডাটা রেন্ডার করা
     auth.onAuthStateChanged(async (user) => {
         if (!user) {
             window.location.href = "index.html";
@@ -311,18 +196,18 @@
                 const userData = userDocSnap.data();
                 document.getElementById('user-points').innerText = userData.points || 0;
                 document.getElementById('stat-clicks').innerText = userData.total_clicks || 0;
+                document.getElementById('stat-received').innerText = userData.received_clicks || 0; // লাইভ রিটার্ন ক্লিক রেন্ডার 🎯
                 document.getElementById('stat-links').innerText = userData.links ? userData.links.filter(l => l !== "").length : 0;
                 
                 updateProgressUI(userData.total_clicks || 0);
             }
         } catch (error) {
-            console.error("Error loading user points:", error);
+            console.error("Error loading user profile analytics:", error);
         }
 
         loadAdFeed(user.uid);
     });
 
-    // ২. লাইভ নেটওয়ার্ক লিঙ্ক ফিড লোড করা (মালিক ট্র্যাকিং আইডি সহ)
     async function loadAdFeed(currentUid) {
         try {
             const querySnapshot = await getDocs(query(collection(db, "users"), limit(15)));
@@ -335,7 +220,7 @@
             querySnapshot.forEach((userDoc) => {
                 const userData = userDoc.data();
                 
-                // নিজের লিংক নিজে এক্সচেঞ্জ করা যাবে না এবং ওই ইউজারের পয়েন্ট ০ এর বেশি থাকতে হবে
+                // সিকিউরিটি ফিল্টার: নিজের আইডি বাদ এবং ইউজারের ওয়ালেটে পয়েন্ট থাকতে হবে 🔒
                 if (userDoc.id !== currentUid && userData.links && userData.links.length > 0 && (userData.points || 0) > 0) {
                     const validLinks = userData.links.filter(link => link && link.trim() !== "");
                     
@@ -343,15 +228,14 @@
                         hasLinks = true;
                         const randomLink = validLinks[Math.floor(Math.random() * validLinks.length)];
                         
-                        // বাটনে data-owner="${userDoc.id}" সেট করা হয়েছে যাতে সঠিক মালিকের অ্যাকাউন্টে ক্লিক কাউন্ট হয় 🎯
                         const postHtml = `
-                            <div class="card p-5 rounded-2xl space-y-4">
+                            <div class="card p-5 rounded-2xl space-y-4 bg-[#111223] border border-gray-800/40">
                                 <div class="flex justify-between items-center">
                                     <div class="flex items-center">
-                                        <img src="${userData.photoURL || 'https://i.pravatar.cc/100'}" class="w-10 h-10 rounded-xl mr-3" alt="User">
+                                        <img src="${userData.photoURL || 'https://i.pravatar.cc/100'}" class="w-10 h-10 rounded-xl mr-3 object-cover" alt="User">
                                         <div>
-                                            <h4 class="font-bold text-sm">${userData.displayName || 'Active Networker'}</h4>
-                                            <p class="text-[11px] text-gray-500">@member &bull; Live</p>
+                                            <h4 class="font-bold text-sm text-gray-200">${userData.displayName || 'Active Networker'}</h4>
+                                            <p class="text-[11px] text-gray-500">@member &bull; Live Node</p>
                                         </div>
                                     </div>
                                     <button class="text-xs font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-4 py-1.5 rounded-full hover:bg-purple-600 hover:text-white transition">Follow</button>
@@ -362,7 +246,7 @@
                                     <p class="text-xs text-gray-500 mt-0.5 break-all">${randomLink.substring(0, 50)}...</p>
                                 </div>
                                 <div class="flex justify-between items-center pt-2 border-t border-gray-900">
-                                    <span class="text-xs text-gray-500"><i class="far fa-eye mr-1"></i> Active Link</span>
+                                    <span class="text-xs text-gray-500"><i class="far fa-eye mr-1"></i> Active Link Pool</span>
                                     <button data-link="${randomLink}" data-owner="${userDoc.id}" class="visit-btn bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-8 py-2.5 rounded-xl font-bold transition tracking-wide shadow-md shadow-indigo-600/10">
                                         Visit
                                     </button>
@@ -375,10 +259,9 @@
             });
 
             if (!hasLinks) {
-                feedContainer.insertAdjacentHTML('beforeend', '<div class="text-center py-6 text-gray-500 card rounded-2xl">No active links in network yet. Go to Profile to add yours!</div>');
+                feedContainer.insertAdjacentHTML('beforeend', '<div class="text-center py-6 text-gray-500 card rounded-2xl border border-gray-800/30">No active links in network yet. Go to Profile to add yours!</div>');
             }
 
-            // প্রতিটি ভিজিট বাটনে ইভেন্ট লিসেনার অ্যাড করা
             document.querySelectorAll('.visit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const adLink = this.getAttribute('data-link');
@@ -388,21 +271,19 @@
             });
 
         } catch (error) {
-            console.error("Error loading network feed:", error);
+            console.error("Error parsing live exchange database nodes:", error);
         }
     }
 
-    // ৩. ১০ সেকেন্ডের কাউন্টডাউন টাইমার এবং লাইভ পয়েন্ট এক্সচেঞ্জ মেকানিজম ⏰
     function startAdVisit(element, adLink, ownerUid) {
         if(!adLink) {
             alert("ভ্যালিড কোনো লিঙ্ক পাওয়া যায়নি!");
             return;
         }
 
-        // নতুন উইন্ডোতে লিংকটি ওপেন করা
         window.open(adLink, '_blank', 'width=450,height=600,top=100,left=100');
 
-        let timeLeft = 10; // ঠিক ১০ সেকেন্ডের কাউন্টডাউন টাইমার 🎯
+        let timeLeft = 10; // ফিক্সড ১০ সেকেন্ড কাউন্টডাউন ⏰
         element.disabled = true;
         element.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
         element.classList.add('bg-gray-700', 'cursor-not-allowed');
@@ -421,23 +302,23 @@
                 const user = auth.currentUser;
                 if (user) {
                     try {
-                        // 🅰️ ১. যে ক্লিক করলো (Viewer): তার একাউন্টে ১০ পয়েন্ট যোগ এবং ক্লিক সংখ্যা +১
+                        // ১. ভিজিটর (Viewer) এর ব্যালেন্স আপডেট
                         const userDocRef = doc(db, "users", user.uid);
                         await updateDoc(userDocRef, {
                             points: increment(10),
                             total_clicks: increment(1)
                         });
                         
-                        // 🅱️ ২. যার লিংক (Owner): তার received_clicks ১ বাড়বে এবং ব্যালেন্স থেকে ১ পয়েন্ট কাটবে 🎯
+                        // ২. লিংকের আসল মালিক (Owner) এর অ্যাকাউন্টে ডাটা রাইট 🎯
                         if (ownerUid && ownerUid !== user.uid) {
                             const ownerDocRef = doc(db, "users", ownerUid);
                             await updateDoc(ownerDocRef, {
-                                received_clicks: increment(1),
-                                points: increment(-1)
+                                received_clicks: increment(1), // রিটার্ন ক্লিক কালেকশন +১
+                                points: increment(-1) // ট্রাফিক চার্জ -১ পয়েন্ট
                             });
                         }
                         
-                        // ৩. ইউজার ইন্টারফেস (UI) লাইভ আপডেট করা
+                        // UI লাইভ রেন্ডারিং নোড
                         const pointsText = document.getElementById('user-points');
                         const totalClicksText = document.getElementById('stat-clicks');
                         let currentClicks = 0;
@@ -455,14 +336,13 @@
                         updateProgressUI(currentClicks);
                         alert("অভিনন্দন! আপনি ১০ পয়েন্ট বোনাস পেয়েছেন।");
                     } catch (err) {
-                        console.error("Error updating points network wide:", err);
+                        console.error("Network synchronization payload error:", err);
                     }
                 }
             }
         }, 1000);
     }
 
-    // ৪. লগআউট (Logout) মেকানিজম
     document.getElementById('logout-btn').addEventListener('click', () => {
         if(confirm("আপনি কি লগআউট করতে চান?")) {
             auth.signOut().then(() => {
@@ -470,7 +350,10 @@
             });
         }
     });
+
+    document.getElementById('next-links-btn').addEventListener('click', () => {
+        location.reload();
+    });
 </script>
-    
 </body>
 </html>
