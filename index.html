@@ -403,21 +403,29 @@
         });
     }
 
-    // 🌟 নতুন আপডেট করা টাস্ক ক্লিক হ্যান্ডলার (ইন-অ্যাপ সিকিউর মোডাল ও সেফ পপ-আপ লজিক)
+    // 🌟 সম্পূর্ণ আপডেট করা সিকিউর টাস্ক ক্লিক হ্যান্ডলার (রিসেট পলিসি + সাউন্ড + পুশ নোটিফিকেশন + ট্যাব অ্যালার্ট)
     async function handleTaskClick(index) {
         if (index !== currentActiveIndex) return;
 
         const currentBtn = document.getElementById(`task-btn-${index}`);
         const modal = document.getElementById('ad-secure-modal');
         const adFrame = document.getElementById('ad-content-frame');
-        const timerZone = document.getElementById('modal-timer-zone');
+        const timerZone = document.getElementById('modal-countdown');
+
+        // প্রথমবার ক্লিকের সময় ব্রাউজার থেকে নোটিফিকেশনের পারমিশন চেয়ে নেওয়া
+        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
 
         // ১. মেইন পেজের বাটনের ইন্টারফেস চেইঞ্জ (ইন-প্রোগ্রেস স্টেট)
         currentBtn.disabled = true;
         currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
         currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... 10s`;
 
-        // 🚀 অ্যাডটি সেফ উপায়ে নতুন ট্যাবে ওপেন করা হলো (যাতে সাদা স্ক্রিন না আসে)
+        // অরিজিনাল ট্যাবের নাম সেভ করে রাখা
+        const originalTitle = document.title; 
+
+        // 🚀 অ্যাডটি নতুন ট্যাবে ওপেন করা হলো
         const openWindow = window.open(fetchedLinks[index].url, '_blank');
         
         if (!openWindow) {
@@ -428,9 +436,8 @@
             return;
         }
 
-        // ২. সিকিউর ইন-অ্যাপ লেয়ার ওপেন ও অবজেক্ট ফ্রেম হাইড করে ইনফো নোটিশ দেওয়া
+        // ২. সিকিউর ইন-অ্যাপ লেয়ার ওপেন ও নোটিশ শো করা
         adFrame.style.display = 'none'; 
-        
         let infoNotice = document.getElementById('ad-info-notice');
         if (!infoNotice) {
             infoNotice = document.createElement('div');
@@ -441,7 +448,7 @@
                     <i class="fas fa-bullhorn text-purple-400"></i>
                 </div>
                 <h2 id="notice-status-title" class="text-base lg:text-lg font-bold text-white mb-2">বিজ্ঞাপনটি নতুন ট্যাবে ওপেন হয়েছে!</h2>
-                <p id="notice-status-desc" class="text-xs text-gray-400 max-w-sm leading-relaxed">পয়েন্ট পেতে নতুন ট্যাবে যাওয়া বিজ্ঞাপনটি দেখুন। ১০ সেকেন্ড শেষ হলে একটি সাউন্ড অ্যালার্ট বাজবে, তখন এই ট্যাবে ফিরে আসুন।</p>
+                <p id="notice-status-desc" class="text-xs text-gray-400 max-w-sm leading-relaxed">পয়েন্ট পেতে নতুন ট্যাবে যাওয়া বিজ্ঞাপনটি দেখুন। ১০ সেকেন্ড শেষ হলে আপনার ফোনে নোটিফিকেশন ও সাউন্ড অ্যালার্ট যাবে, তখন এই ট্যাবে ফিরে আসুন।</p>
             `;
             adFrame.parentNode.appendChild(infoNotice);
         }
@@ -449,52 +456,93 @@
         modal.classList.remove('hidden');
 
         let timeLeft = 10;
-        timerZone.innerHTML = `<span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-3.5 py-1.5 rounded-full text-[11px] font-bold">${timeLeft}s Remaining</span>`;
+        let originalTimerZone = document.getElementById('modal-timer-zone');
+        originalTimerZone.innerHTML = `<span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-3.5 py-1.5 rounded-full text-[11px] font-bold">${timeLeft}s Remaining</span>`;
 
-        // ৩. রিয়েল-টাইম ইন-অ্যাপ টাইমার ইন্টারভাল ট্র্যাকিং
+        // 🕵️‍♂️ চোর ধরার রিসেট লজিক: ইউজার মাঝপথে ব্যাক বা ক্লোজ করলে টাইমার বাতিল
+        window.onblur = function() {
+            clearInterval(countdownInterval); 
+            window.onblur = null;
+            document.title = originalTitle; // ট্যাবের নাম আগের মতো করা
+            
+            modal.classList.add('hidden'); 
+            if (infoNotice) infoNotice.remove();
+            
+            currentBtn.disabled = false;
+            currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 link-btn-active";
+            currentBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
+            
+            alert("⚠️ আপনি বিজ্ঞাপনটি মাঝপথে ব্যাক বা ক্লোজ করেছেন ভাই! পয়েন্ট পেতে আপনাকে অবশ্যই একটানা ১০ সেকেন্ড বিজ্ঞাপনটি স্ক্রিনে রাখতে হবে। দয়া করে আবার চেষ্টা করুন।");
+        };
+
+        // ৩. টাইমার কাউন্টডাউন শুরু
         const countdownInterval = setInterval(() => {
             timeLeft--;
+            currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
+            
             const countdownLabel = document.getElementById('modal-countdown');
             if (countdownLabel) {
                 countdownLabel.innerText = `${timeLeft}s Remaining`;
             }
 
-            // ৪. বাধ্যতামূলক ১০ সেকেন্ড দেখা সম্পন্ন হলে
+            // ৪. ১০ সেকেন্ড দেখা সম্পন্ন হলে
             if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
+                window.onblur = null; // রিসেট লজিক বন্ধ করা কারণ কাজ সফল হয়েছে
 
-                // 🔔 ব্রাউজারের নিজস্ব অডিও কনটেক্সট দিয়ে সাউন্ড বাজানো (ইউজার অন্য ট্যাবে থাকলেও শুনতে পাবে)
+                // 🌟 ট্রিকস ১: সাউন্ড অফ থাকলে যাতে বোঝে - ব্রাউজার পুশ নোটিফিকেশন পাঠানো
+                if (Notification.permission === "granted") {
+                    new Notification("AdLink Pro - টাস্ক কমপ্লিট! 🎉", {
+                        body: "আপনার ১০ সেকেন্ড পূর্ণ হয়েছে ভাই। অ্যাপে ফিরে এসে পয়েন্ট ক্লেইম করুন!",
+                        icon: "favicon.png" // আপনার অ্যাপের লোগো
+                    });
+                }
+
+                // 🌟 ট্রিকস ২: ব্রাউজারের ট্যাবের টাইটেল ফ্ল্যাশ বা পরিবর্তন করা
+                let isTitleFlipped = false;
+                const titleAnimate = setInterval(() => {
+                    if(document.getElementById('ad-secure-modal').classList.contains('hidden')) {
+                        clearInterval(titleAnimate);
+                        document.title = originalTitle;
+                    } else {
+                        document.title = isTitleFlipped ? "🔔 সময় শেষ! ব্যাক করুন..." : "🎉 ক্লেইম করুন ভাই...";
+                        isTitleFlipped = !isTitleFlipped;
+                    }
+                }, 1000);
+
+                // 🔔 মিষ্টি সাউন্ড অ্যালার্ট (যারা সাউন্ড অন রাখবে তাদের জন্য)
                 try {
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const oscillator = audioCtx.createOscillator();
                     const gainNode = audioCtx.createGain();
-                    
                     oscillator.connect(gainNode);
                     gainNode.connect(audioCtx.destination);
-                    
                     oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 নোট (মিষ্টি টিউন)
+                    oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); 
                     gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                    
                     oscillator.start();
                     oscillator.stop(audioCtx.currentTime + 0.3); 
                 } catch (audioErr) {
-                    console.log("Audio notification blocked or not supported", audioErr);
+                    console.log("Audio notification blocked", audioErr);
                 }
 
                 // মোডালের ভেতরের টেক্সট ক্লেইমের জন্য আপডেট
                 document.getElementById('notice-status-title').innerText = "সময় শেষ! বোনাস ক্লেইম করুন 🎉";
                 document.getElementById('notice-status-desc').innerText = "নিচের 'Claim & Close' বাটনে ক্লিক করে আপনার একাউন্টে পয়েন্ট যোগ করে নিন ভাই।";
                 
-                // ৫. ক্লোজ এবং পয়েন্ট ক্রেডিট বাটন জেনারেট
-                timerZone.innerHTML = `
+                // ৫. ক্লোজ এবং পয়েন্ট ক্লেইম বাটন তৈরি
+                originalTimerZone.innerHTML = `
                     <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-green-500/20 flex items-center gap-1 animate-bounce">
                         <i class="fas fa-check-circle"></i> Claim & Close
                     </button>
                 `;
 
-                // ৬. ক্লেইম বাটনে ক্লিকের সাথে সাথে পয়েন্ট ডেটাবেজে সাবমিট লজিক
-                document.getElementById('claim-close-btn').addEventListener('click', () => processPointsSubmission(index));
+                // ৬. ক্লেইম বাটনে ক্লিক লজিক
+                document.getElementById('claim-close-btn').addEventListener('click', () => {
+                    clearInterval(titleAnimate);
+                    document.title = originalTitle;
+                    processPointsSubmission(index);
+                });
             }
         }, 1000);
     }
