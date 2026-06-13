@@ -201,6 +201,7 @@
     let fetchedLinks = [];       
     let completedCount = 0;
 
+    // 🔗 আপনার আপডেট করা নতুন লিংকগুলো এখানে একদম ঠিক আছে ভাই
     const adminSecretLinks = [
         "https://www.effectivecpmnetwork.com/juys75wgj?key=4f2943170b5a5f74437786ec7f202a6f",
         "https://omg10.com/4/11138621",
@@ -416,6 +417,7 @@
         }
     }
 
+    // 🛠️ এখানে মোবাইলের টাইমার ফ্রিজিং বাগ এবং ক্লেইম বাটন ফিক্স করা হয়েছে ভাই
     async function handleTaskClick(index) {
         if (index !== currentActiveIndex) return;
 
@@ -423,7 +425,6 @@
         const modal = document.getElementById('ad-secure-modal');
         const timerZone = document.getElementById('modal-timer-zone');
 
-        // 📱 মোবাইল ব্রাউজার অডিও সাপোর্ট লাইফলাইন
         let audioCtx = null;
         try {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -434,8 +435,7 @@
             Notification.requestPermission();
         }
 
-        // 🚀 পপ-আপ ব্লকার বাইপাস করার জন্য ইনস্ট্যান্ট উইন্ডো ওপেন
-        window.open(fetchedLinks[index].url, '_blank');
+        const adWindow = window.open(fetchedLinks[index].url, '_blank');
 
         currentBtn.disabled = true;
         currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
@@ -444,84 +444,108 @@
         modal.classList.remove('hidden');
         window.history.pushState({ inModal: true }, "");
 
-        // ⏱️ মোবাইল ব্যাকগ্রাউন্ড সেফ কাউন্টডাউন লজিক (রিয়েল-টাইম ক্লক ভিত্তিক)
-        const duration = 10; // ১০ সেকেন্ড
+        const duration = 10; 
         const startTime = Date.now();
         const targetTime = startTime + (duration * 1000);
+        let isFinished = false; 
+
+        const showClaimButton = () => {
+            if (isFinished) return;
+            isFinished = true;
+
+            clearInterval(countdownInterval);
+            window.removeEventListener('focus', handleWindowFocus);
+            window.removeEventListener('visibilitychange', handleWindowFocus);
+            window.removeEventListener('popstate', handlePhysicalBack);
+
+            if (audioCtx) {
+                try {
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(650, audioCtx.currentTime); 
+                    gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.35); 
+                } catch (e) { console.log(e); }
+            }
+
+            if (Notification.permission === "granted") {
+                new Notification("AdLink Pro", { body: "১০ সেকেন্ড শেষ ভাই! বোনাস ক্লেইম করুন। 🎉" });
+            }
+
+            document.title = "🎉 সময় শেষ! ক্লেইম করুন...";
+
+            if (document.getElementById(`task-btn-${index}`)) {
+                document.getElementById(`task-btn-${index}`).innerHTML = `<i class="fas fa-check-circle mr-1"></i> Ready`;
+            }
+
+            timerZone.innerHTML = `
+                <div class="text-center py-2">
+                    <p class="text-green-400 text-xs font-bold mb-2 animate-pulse">🎉 টাস্ক সফলভাবে সম্পন্ন হয়েছে!</p>
+                    <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-green-500/20 flex items-center justify-center gap-1.5 mx-auto animate-bounce">
+                        <i class="fas fa-check-circle"></i> Claim Points & Dashboard
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('claim-close-btn').addEventListener('click', () => {
+                if (window.history.state && window.history.state.inModal) {
+                    window.history.back(); 
+                }
+                document.title = originalTitle;
+                if (adWindow && !adWindow.closed) {
+                    adWindow.close();
+                }
+                processPointsSubmission(index);
+            });
+        };
 
         const updateTimer = () => {
+            if (isFinished) return;
+            
             const now = Date.now();
             let timeLeft = Math.ceil((targetTime - now) / 1000);
 
-            if (timeLeft < 0) timeLeft = 0;
+            if (timeLeft <= 0) {
+                showClaimButton();
+                return;
+            }
 
             if (document.getElementById(`task-btn-${index}`)) {
                 document.getElementById(`task-btn-${index}`).innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
             }
             
-            const countdownLabel = document.getElementById('modal-countdown');
-            if (countdownLabel) countdownLabel.innerText = `${timeLeft}s Remaining`;
+            timerZone.innerHTML = `
+                <div class="text-center">
+                    <p class="text-gray-400 text-[11px] mb-1.5">দয়া করে ১০ সেকেন্ড অপেক্ষা করুন...</p>
+                    <span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-4 py-1.5 rounded-full text-xs font-bold">${timeLeft}s Remaining</span>
+                </div>
+            `;
+        };
 
-            // যখন সময় শেষ হবে
-            if (timeLeft <= 0) {
-                clearInterval(countdownInterval);
-                window.removeEventListener('popstate', handlePhysicalBack);
-                window.removeEventListener('focus', handleWindowFocus);
+        updateTimer();
+        const countdownInterval = setInterval(updateTimer, 1000);
 
-                // 🎉 ১০০% গ্যারান্টিড বিপ সাউন্ড
-                if (audioCtx) {
-                    try {
-                        const oscillator = audioCtx.createOscillator();
-                        const gainNode = audioCtx.createGain();
-                        oscillator.connect(gainNode);
-                        gainNode.connect(audioCtx.destination);
-                        oscillator.type = 'sine';
-                        oscillator.frequency.setValueAtTime(650, audioCtx.currentTime); 
-                        gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
-                        oscillator.start();
-                        oscillator.stop(audioCtx.currentTime + 0.35); 
-                    } catch (e) { console.log(e); }
-                }
-
-                if (Notification.permission === "granted") {
-                    new Notification("AdLink Pro", { body: "১০ সেকেন্ড শেষ ভাই! ক্লেইম বোতামে চাপুন। 🎉" });
-                }
-
-                document.title = "🔔 সময় শেষ! ক্লেইম করুন...";
-
-                // ডাইরেক্ট ক্লেইম বাটন জেনারেট
-                timerZone.innerHTML = `
-                    <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-green-500/20 flex items-center gap-1 animate-bounce">
-                        <i class="fas fa-check-circle"></i> Claim & Close
-                    </button>
-                `;
-
-                document.getElementById('claim-close-btn').addEventListener('click', () => {
-                    if (window.history.state && window.history.state.inModal) {
-                        window.history.back(); 
-                    }
-                    document.title = originalTitle;
-                    processPointsSubmission(index);
-                });
+        const handleWindowFocus = () => {
+            const now = Date.now();
+            if (now >= targetTime) {
+                showClaimButton(); 
+            } else {
+                updateTimer();
             }
         };
 
-        // শুরুর প্রথম রেন্ডার
-        timerZone.innerHTML = `<span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-3.5 py-1.5 rounded-full text-[11px] font-bold">10s Remaining</span>`;
-        
-        // ১ সেকেন্ড পর পর আপডেট করার ইন্টারভাল
-        const countdownInterval = setInterval(updateTimer, 1000);
-
-        // 📱 মোবাইল সেফটি ট্রিক: ইউজার অন্য ট্যাব থেকে এই ট্যাবে ফিরে আসলে সাথে সাথে রি-চেক করা
-        const handleWindowFocus = () => {
-            updateTimer();
-        };
         window.addEventListener('focus', handleWindowFocus);
+        window.addEventListener('visibilitychange', handleWindowFocus);
 
-        // মোবাইলের ফিজিক্যাল ব্যাক বাটন হ্যান্ডলার
         const handlePhysicalBack = (e) => {
+            if (isFinished) return;
             clearInterval(countdownInterval);
             window.removeEventListener('focus', handleWindowFocus);
+            window.removeEventListener('visibilitychange', handleWindowFocus);
             modal.classList.add('hidden');
             document.title = originalTitle;
             setupActiveButtonListener(); 
