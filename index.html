@@ -417,7 +417,7 @@
         }
     }
 
-    // 🛠️ এখানে মোবাইলের টাইমার ফ্রিজিং বাগ এবং ক্লেইম বাটন ফিক্স করা হয়েছে ভাই
+ // 🛠️ টাইমার ১ সেকেন্ডে আটকে থাকা এবং বাটন না আসার ফিক্সড লজিক
     async function handleTaskClick(index) {
         if (index !== currentActiveIndex) return;
 
@@ -482,6 +482,7 @@
                 document.getElementById(`task-btn-${index}`).innerHTML = `<i class="fas fa-check-circle mr-1"></i> Ready`;
             }
 
+            // এখানে বাটন রেন্ডার নিশ্চিত করা হয়েছে
             timerZone.innerHTML = `
                 <div class="text-center py-2">
                     <p class="text-green-400 text-xs font-bold mb-2 animate-pulse">🎉 টাস্ক সফলভাবে সম্পন্ন হয়েছে!</p>
@@ -507,6 +508,13 @@
             if (isFinished) return;
             
             const now = Date.now();
+            
+            // 🚨 মেইন ফিক্স: সময় পার হয়ে গেলে বা ১ সেকেন্ডের কম বাকি থাকলে সরাসরি বাটন দেখাবে
+            if (now >= targetTime) {
+                showClaimButton();
+                return;
+            }
+
             let timeLeft = Math.ceil((targetTime - now) / 1000);
 
             if (timeLeft <= 0) {
@@ -527,7 +535,7 @@
         };
 
         updateTimer();
-        const countdownInterval = setInterval(updateTimer, 1000);
+        const countdownInterval = setInterval(updateTimer, 500); // আরও দ্রুত চেকিংয়ের জন্য ১ সেকেন্ডের বদলে ৫০০ms করা হলো
 
         const handleWindowFocus = () => {
             const now = Date.now();
