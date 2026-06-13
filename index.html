@@ -417,151 +417,232 @@
         }
     }
 
- // 📱 মোবাইল ওয়েব অ্যাপ (WebView/PWA) স্পেশাল ফিক্সড ফাংশন
-    async function handleTaskClick(index) {
-        if (index !== currentActiveIndex) return;
+ // 🔐 Adsterra সেফ ও মোবাইল অ্যাপ ফ্রেন্ডলি - প্রিমিয়াম কাউন্টডাউন লজিক
+async function handleTaskClick(index) {
+    if (index !== currentActiveIndex) return;
 
-        const currentBtn = document.getElementById(`task-btn-${index}`);
-        const modal = document.getElementById('ad-secure-modal');
-        const timerZone = document.getElementById('modal-timer-zone');
+    const currentBtn = document.getElementById(`task-btn-${index}`);
+    const modal = document.getElementById('ad-secure-modal');
+    const timerZone = document.getElementById('modal-timer-zone');
 
-        let audioCtx = null;
+    // ১. অডিও সেটআপ (বিপ সাউন্ডের জন্য)
+    let audioCtx = null;
+    try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    } catch (e) { console.log("Audio Error:", e); }
+
+    // বাটন স্টেট পরিবর্তন
+    currentBtn.disabled = true;
+    currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
+    
+    const originalTitle = document.title; 
+    
+    // মডাল ওপেন এবং ব্যাক বাটন প্রোটেকশন
+    modal.classList.remove('hidden');
+    window.history.pushState({ inModal: true }, "");
+
+    // 🛡️ ADSTERRA SPECIAL SECURITY FIX: 
+    // rel=noopener এবং rel=noreferrer এর আচরণ জাভাস্ক্রিপ্ট উইন্ডোতে নিশ্চিত করা হলো
+    // যাতে বিজ্ঞাপনের লিংক আপনার মেইন অ্যাপের উইন্ডো বা ইউজার সেশন হাইজ্যাক (Redirect) করতে না পারে।
+    const adWindow = window.open(fetchedLinks[index].url, '_blank', 'noopener=yes,noreferrer=yes,noopener,noreferrer');
+
+    // টাইম ট্র্যাকিং (১০ সেকেন্ড)
+    const duration = 10; 
+    const startTime = Date.now();
+    const targetTime = startTime + (duration * 1000);
+    let isFinished = false; 
+
+    // বিপ সাউন্ড ফাংশন
+    const playBeepSound = () => {
+        if (audioCtx) {
+            try {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(650, audioCtx.currentTime); 
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.35); 
+            } catch (e) { console.log(e); }
+        }
+    };
+
+    // সফলভাবে অ্যাড দেখার পর সুন্দর UI ডিজাইন
+    const showSuccessUI = () => {
+        if (isFinished) return;
+        isFinished = true;
+
+        clearInterval(countdownInterval);
+        removeGlobalListeners();
+
+        // বিপ সাউন্ড প্লে হবে
+        playBeepSound();
+
+        // 🛡️ Adsterra উইন্ডো ফোর্স ক্লোজ করার চেষ্টা
         try {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        } catch (e) { console.log(e); }
+            if (adWindow && !adWindow.closed) {
+                adWindow.close();
+            }
+        } catch (e) { console.log("Window close restricted:", e); }
 
-        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-            Notification.requestPermission();
+        document.title = "🎉 সফল হয়েছে!";
+        if (document.getElementById(`task-btn-${index}`)) {
+            document.getElementById(`task-btn-${index}`).innerHTML = `<i class="fas fa-check-circle mr-1"></i> Completed`;
         }
 
-        // অ্যাড ওপেন করা হলো
-        const adWindow = window.open(fetchedLinks[index].url, '_blank');
-
-        currentBtn.disabled = true;
-        currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
-        
-        const originalTitle = document.title; 
-        modal.classList.remove('hidden');
-        window.history.pushState({ inModal: true }, "");
-
-        const duration = 10; 
-        const startTime = Date.now();
-        const targetTime = startTime + (duration * 1000);
-        let isFinished = false; 
-
-        // ক্লেইম বাটন দেখানোর মেইন লজিক
-        const showClaimButton = () => {
-            if (isFinished) return;
-            isFinished = true;
-
-            clearInterval(countdownInterval);
-            
-            // সব ইভেন্ট লিসেনার রিমুভ করা
-            window.removeEventListener('focus', forceCheckTime);
-            window.removeEventListener('visibilitychange', forceCheckTime);
-            document.removeEventListener('touchend', forceCheckTime);
-            document.removeEventListener('click', forceCheckTime);
-            window.removeEventListener('popstate', handlePhysicalBack);
-
-            if (audioCtx) {
-                try {
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(650, audioCtx.currentTime); 
-                    gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
-                    oscillator.start();
-                    oscillator.stop(audioCtx.currentTime + 0.35); 
-                } catch (e) { console.log(e); }
-            }
-
-            if (Notification.permission === "granted") {
-                new Notification("AdLink Pro", { body: "১০ সেকেন্ড শেষ ভাই! বোনাস ক্লেইম করুন। 🎉" });
-            }
-
-            document.title = "🎉 সময় শেষ! ক্লেইম করুন...";
-
-            if (document.getElementById(`task-btn-${index}`)) {
-                document.getElementById(`task-btn-${index}`).innerHTML = `<i class="fas fa-check-circle mr-1"></i> Ready`;
-            }
-
-            timerZone.innerHTML = `
-                <div class="text-center py-2">
-                    <p class="text-green-400 text-xs font-bold mb-2 animate-pulse">🎉 টাস্ক সফলভাবে সম্পন্ন হয়েছে!</p>
-                    <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-lg shadow-green-500/20 flex items-center justify-center gap-1.5 mx-auto animate-bounce">
-                        <i class="fas fa-check-circle"></i> Claim Points & Dashboard
-                    </button>
+        // আকর্ষণীয় সাকসেস ইন্টারফেস ডিজাইন
+        timerZone.innerHTML = `
+            <div class="text-center py-4 px-2 animate-fade-in">
+                <div class="w-16 h-16 bg-green-500/10 text-green-500 border border-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 animate-bounce">
+                    <i class="fas fa-gift text-2xl"></i>
                 </div>
-            `;
+                <h3 class="text-green-400 text-sm font-extrabold mb-1">🎉 চমৎকার ভাই! 🎉</h3>
+                <p class="text-gray-300 text-[11px] mb-4 leading-relaxed">আপনি অ্যাডটি সম্পূর্ণ দেখেছেন। আপনাকে অসংখ্য ধন্যবাদ!</p>
+                
+                <button id="claim-close-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2 mx-auto transition-all transform active:scale-95">
+                    Claim Points & Next Task <i class="fas fa-arrow-right text-[10px]"></i>
+                </button>
+            </div>
+        `;
 
-            document.getElementById('claim-close-btn').addEventListener('click', () => {
-                if (window.history.state && window.history.state.inModal) {
-                    window.history.back(); 
-                }
-                document.title = originalTitle;
-                if (adWindow && !adWindow.closed) {
-                    adWindow.close();
-                }
-                processPointsSubmission(index);
-            });
-        };
-
-        // সময় চেক করার আলটিমেট লজিক (যা অ্যাপ ব্যাকগ্রাউন্ড থেকে ফিরলে কাজ করবেই)
-        const forceCheckTime = () => {
-            const now = Date.now();
-            if (now >= targetTime) {
-                showClaimButton();
-                return true;
+        document.getElementById('claim-close-btn').addEventListener('click', () => {
+            if (window.history.state && window.history.state.inModal) {
+                window.history.back(); 
             }
-            
-            let timeLeft = Math.ceil((targetTime - now) / 1000);
-            if (timeLeft <= 0) {
-                showClaimButton();
-                return true;
-            }
-
-            if (document.getElementById(`task-btn-${index}`)) {
-                document.getElementById(`task-btn-${index}`).innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
-            }
-            
-            timerZone.innerHTML = `
-                <div class="text-center">
-                    <p class="text-gray-400 text-[11px] mb-1.5">দয়া করে ১০ সেকেন্ড অপেক্ষা করুন...</p>
-                    <span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-4 py-1.5 rounded-full text-xs font-bold">${timeLeft}s Remaining</span>
-                </div>
-            `;
-            return false;
-        };
-
-        // প্রথম রান
-        forceCheckTime();
-        
-        // ব্যাকগ্রাউন্ড সেফ ইন্টারভাল (৫০০ms পর পর চেক)
-        const countdownInterval = setInterval(forceCheckTime, 500);
-
-        // 🚨 মোবাইল অ্যাপ লাইফলাইন: ইউজার অ্যাপে ফিরে স্ক্রিনে যেকোনো জায়গায় টাচ বা ক্লিক করলেই সাথে সাথে চেক হবে
-        window.addEventListener('focus', forceCheckTime);
-        window.addEventListener('visibilitychange', forceCheckTime);
-        document.addEventListener('touchend', forceCheckTime); // মোবাইলের জন্য টাচ এ্যান্ড ইভেন্ট
-        document.addEventListener('click', forceCheckTime);    // ক্লিক ইভেন্ট
-
-        const handlePhysicalBack = (e) => {
-            if (isFinished) return;
-            clearInterval(countdownInterval);
-            window.removeEventListener('focus', forceCheckTime);
-            window.removeEventListener('visibilitychange', forceCheckTime);
-            document.removeEventListener('touchend', forceCheckTime);
-            document.removeEventListener('click', forceCheckTime);
-            modal.classList.add('hidden');
             document.title = originalTitle;
-            setupActiveButtonListener(); 
-            window.removeEventListener('popstate', handlePhysicalBack);
-        };
-        window.addEventListener('popstate', handlePhysicalBack);
-    }
+            modal.classList.add('hidden');
+            processPointsSubmission(index); // ডাটাবেজে পয়েন্ট সিকিউরলি সাবমিট হবে
+        });
+    };
+
+    // ১০ সেকেন্ডের আগে ব্যাক করলে শাস্তিস্বরূপ ফেইলর UI ডিজাইন
+    const showFailureUI = () => {
+        if (isFinished) return;
+        isFinished = true;
+
+        clearInterval(countdownInterval);
+        removeGlobalListeners();
+
+        // অ্যাড উইন্ডো বন্ধ করা
+        try {
+            if (adWindow && !adWindow.closed) {
+                adWindow.close();
+            }
+        } catch (e) { console.log(e); }
+
+        document.title = "❌ টাস্ক বাতিল";
+        
+        // মেইন বাটন আবার অ্যাক্টিভ ও আগের ডিজাইনে রিসেট
+        if (document.getElementById(`task-btn-${index}`)) {
+            currentBtn.disabled = false;
+            currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-md cursor-pointer";
+            currentBtn.innerHTML = `<i class="fas fa-play mr-1"></i> Visit #${index + 1}`;
+        }
+
+        // লাল রঙের ওয়ার্নিং মেসেজ
+        timerZone.innerHTML = `
+            <div class="text-center py-4 px-2">
+                <div class="w-14 h-14 bg-red-500/10 text-red-500 border border-red-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-exclamation-triangle text-xl animate-pulse"></i>
+                </div>
+                <h3 class="text-red-400 text-xs font-bold mb-1">আপনি অ্যাড এখনো সম্পূর্ণ দেখেন নাই!</h3>
+                <p class="text-gray-400 text-[10px] mb-4">নিয়ম অনুযায়ী ১০ সেকেন্ড অপেক্ষা করতে হবে ভাই। আবার প্রথম থেকে চেষ্টা করুন।</p>
+                
+                <button id="retry-close-btn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 px-5 py-2 rounded-xl text-xs font-bold mx-auto flex items-center gap-1.5">
+                    <i class="fas fa-redo text-[10px]"></i> আবার দেখুন
+                </button>
+            </div>
+        `;
+
+        document.getElementById('retry-close-btn').addEventListener('click', () => {
+            if (window.history.state && window.history.state.inModal) {
+                window.history.back(); 
+            }
+            document.title = originalTitle;
+            modal.classList.add('hidden');
+        });
+    };
+
+    // রিয়েল-টাইম ক্লক চেকিং লজিক
+    const checkTimerProgress = () => {
+        if (isFinished) return;
+
+        const now = Date.now();
+        
+        if (now >= targetTime) {
+            showSuccessUI();
+            return;
+        }
+
+        let timeLeft = Math.ceil((targetTime - now) / 1000);
+        
+        if (timeLeft <= 0) {
+            showSuccessUI();
+            return;
+        }
+
+        if (document.getElementById(`task-btn-${index}`)) {
+            document.getElementById(`task-btn-${index}`).innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> ${timeLeft}s`;
+        }
+        
+        // কাউন্টডাউন স্ক্রিন ডিজাইন
+        timerZone.innerHTML = `
+            <div class="text-center py-2">
+                <p class="text-gray-400 text-[11px] mb-2">দয়া করে ১০ সেকেন্ড অপেক্ষা করুন...</p>
+                <div class="inline-flex items-center gap-2 bg-purple-950/80 border border-purple-500/30 px-4 py-1.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-purple-500 animate-ping"></span>
+                    <span id="modal-countdown" class="text-purple-400 text-xs font-bold">${timeLeft}s Remaining</span>
+                </div>
+            </div>
+        `;
+    };
+
+    // অ্যাপ সেফটি ট্র্যাকার (ইউজার ব্যাকগ্রাউন্ড থেকে ফিরে যেকোনো টাচ করলেই সজাগ হবে)
+    const forceCheckStatus = () => {
+        const now = Date.now();
+        if (now >= targetTime) {
+            showSuccessUI();
+        } else {
+            checkTimerProgress();
+        }
+    };
+
+    const removeGlobalListeners = () => {
+        window.removeEventListener('focus', forceCheckStatus);
+        window.removeEventListener('visibilitychange', forceCheckStatus);
+        document.removeEventListener('touchend', forceCheckStatus);
+        document.removeEventListener('click', forceCheckStatus);
+        window.removeEventListener('popstate', handlePhysicalBack);
+    };
+
+    // প্রথমবার রান
+    checkTimerProgress();
+    
+    // প্রতি ৩০০ms পর পর ব্যাকগ্রাউন্ড সেফ ট্র্যাকিং
+    const countdownInterval = setInterval(checkTimerProgress, 300);
+
+    // অ্যাপ ইভেন্ট লিসেনার চালু করা হলো
+    window.addEventListener('focus', forceCheckStatus);
+    window.addEventListener('visibilitychange', forceCheckStatus);
+    document.addEventListener('touchend', forceCheckStatus); 
+    document.addEventListener('click', forceCheckStatus);    
+
+    // ফোনের ফিজিক্যাল ব্যাক বাটন প্রোটেকশন লজিক
+    const handlePhysicalBack = (e) => {
+        if (isFinished) return;
+        
+        const now = Date.now();
+        if (now < targetTime) {
+            showFailureUI(); // ১০ সেকেন্ড পূর্ণ হওয়ার আগেই ব্যাক করেছে
+        } else {
+            showSuccessUI(); // ১০ সেকেন্ড হয়ে গেছে, তাই সেফলি সাকসেস UI দেখাবে
+        }
+    };
+    window.addEventListener('popstate', handlePhysicalBack);
+}
 
     async function processPointsSubmission(index) {
         const modal = document.getElementById('ad-secure-modal');
