@@ -1,191 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdLink Pro - Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body { background-color: #080915; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; padding-bottom: 70px; }
-        @media (min-width: 1024px) { body { padding-bottom: 0; } }
-        .sidebar { background-color: #0d0e1b; border-right: 1px solid #1f2937; }
-        .card { background-color: #111223; border: 1px solid rgba(255,255,255,0.05); border-radius: 1.5rem; }
-        .active-nav { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-left: 4px solid #a855f7; }
-        .active-bottom-nav { color: #a855f7; }
-        .progress-slot { background: #1a1b2e; border: 1px solid #2d2e45; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
-        
-        /* বাটন স্টেট স্টাইল */
-        .link-btn-locked { background: #1a1b2e; color: #4b5563; border: 1px solid #2d2e45; cursor: not-allowed; }
-        .link-btn-active { background: linear-gradient(135deg, #a855f7, #6366f1); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2); }
-        .link-btn-active:hover { transform: translateY(-1px); }
-        .link-btn-completed { background: #065f46; color: #34d399; border: 1px solid #047857; cursor: default; }
-    </style>
-</head>
-<body class="flex flex-col min-h-screen">
-
-    <div id="notice-bar" class="bg-gradient-to-r from-purple-950 via-indigo-950 to-purple-950 text-white text-xs py-3 px-4 text-center font-medium border-b border-purple-500/20 hidden sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex items-center justify-center gap-2">
-            <i class="fas fa-bullhorn text-yellow-400 animate-bounce"></i>
-            <span id="notice-text" class="tracking-wide">লোড হচ্ছে...</span>
-        </div>
-    </div>
-
-    <div class="flex flex-1 w-full">
-        <aside class="w-64 sidebar hidden lg:flex flex-col fixed h-screen">
-            <div class="p-6 flex items-center mb-4">
-                <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-link text-white text-xs"></i>
-                </div>
-                <span class="text-xl font-bold tracking-tight text-white">AdLink Pro</span>
-            </div>
-            <nav class="flex-1 px-4 space-y-1">
-                <a href="#" class="flex items-center p-3 active-nav rounded-lg">
-                    <i class="fas fa-home mr-3 w-5 text-center"></i> Home
-                </a>
-                <a href="#" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg">
-                    <i class="fas fa-th-large mr-3 w-5 text-center"></i> Dashboard
-                </a>
-                <a href="profile.html" class="flex items-center p-3 text-gray-400 hover:text-white rounded-lg">
-                    <i class="fas fa-link mr-3 w-5 text-center"></i> My Links
-                </a>
-            </nav>
-            <div class="p-6 text-[10px] text-gray-600 border-t border-gray-800">
-                © 2026 AdLink Pro<br>All rights reserved.
-            </div>
-        </aside>
-
-        <main class="lg:ml-64 w-full flex flex-col">
-            
-            <header class="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#080915]/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-800/30">
-                <div class="flex space-x-3 lg:space-x-6 text-xs lg:text-sm font-medium text-gray-400 items-center">
-                    <a id="telegram-btn" href="https://t.me/+JiEeLY95_Ms1M2Q1" target="_blank" class="bg-[#24A1DE] hover:bg-[#1d87bc] text-white text-[10px] lg:text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-lg shadow-blue-500/10">
-                        <i class="fab fa-telegram-plane animate-pulse"></i> Telegram
-                    </a>
-                </div>
-                <div class="flex items-center space-x-2 lg:space-x-4">
-                    <div class="bg-gray-900 px-2.5 py-1.5 rounded-full flex items-center border border-yellow-500/10 text-[11px] lg:text-xs">
-                        <span class="mr-1">💰</span> <span id="header-points" class="font-bold text-yellow-500">0</span>
-                    </div>
-                    <div class="flex items-center space-x-1.5 bg-gray-900/50 pr-3 pl-1 py-1 rounded-full border border-gray-800">
-                        <img id="header-avatar" src="https://via.placeholder.com/32" class="w-6 h-6 lg:w-8 lg:h-8 rounded-full border border-purple-500">
-                        <span id="header-name" class="text-[9px] lg:text-[11px] font-bold uppercase tracking-wider block max-w-[60px] truncate">Load...</span>
-                    </div>
-                </div>
-            </header>
-
-            <div class="p-4 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-                <div class="lg:col-span-8 space-y-6">
-                    
-                    <div class="card p-5 lg:p-6 bg-gradient-to-br from-[#111223] to-[#0d0e1b]">
-                        <div class="flex justify-between items-center mb-4 lg:mb-6">
-                            <p class="text-[11px] lg:text-xs text-gray-400">Complete 10 visits and earn bonus <span class="text-purple-400 font-bold">10 pts!</span></p>
-                            <span id="progress-text" class="text-[9px] lg:text-[10px] text-green-400 bg-green-400/10 px-2.5 py-1 rounded-full font-bold">Visits: 0/10</span>
-                        </div>
-                        <div class="flex items-center justify-between gap-2">
-                            <div id="progress-dots" class="flex space-x-1.5 lg:space-x-3 overflow-x-auto">
-                                <div class="progress-slot"><i class="fas fa-lock text-[9px] text-gray-700"></i></div>
-                                <div class="progress-slot"><i class="fas fa-lock text-[9px] text-gray-700"></i></div>
-                                <div class="progress-slot"><i class="fas fa-lock text-[9px] text-gray-700"></i></div>
-                                <div class="progress-slot"><i class="fas fa-lock text-[9px] text-gray-700"></i></div>
-                                <div class="progress-slot"><i class="fas fa-lock text-[9px] text-gray-700"></i></div>
-                            </div>
-                            <button id="next-ten-btn" disabled class="bg-gray-800 text-gray-500 px-4 lg:px-6 py-2 rounded-xl text-[11px] lg:text-xs font-bold transition cursor-not-allowed whitespace-nowrap">Next 10</button>
-                        </div>
-                    </div>
-
-                    <div class="card p-4 lg:p-6">
-                        <h3 class="text-xs lg:text-sm font-bold mb-4 flex items-center text-gray-300">
-                            <i class="fas fa-layer-group text-purple-500 mr-2"></i> Digital Post Tasks
-                        </h3>
-                        <div id="tasks-container" class="space-y-3"></div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-4 space-y-6">
-                    <div class="card p-6 lg:p-8 text-center flex flex-col items-center">
-                        <div class="relative mb-3">
-                            <img id="user-avatar-main" src="" class="w-16 h-16 lg:w-20 lg:h-20 rounded-full border-4 border-purple-500/20 object-cover">
-                            <div class="absolute bottom-1 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-[#111223] rounded-full"></div>
-                        </div>
-                        <h3 id="user-name-main" class="font-bold text-base lg:text-lg tracking-wide uppercase truncate max-w-full">Loading...</h3>
-                        <span class="text-[9px] lg:text-[10px] bg-purple-600/10 text-purple-400 border border-purple-500/20 px-3 py-0.5 rounded-full mt-1.5 font-bold">Active Member</span>
-                        
-                        <div class="grid grid-cols-3 w-full mt-6 border-t border-gray-800 pt-4">
-                            <div>
-                                <p id="stat-links" class="font-bold text-sm lg:text-base text-gray-200">0</p>
-                                <p class="text-[9px] text-gray-500 uppercase mt-0.5">My Links</p>
-                            </div>
-                            <div>
-                                <p id="stat-visits" class="font-bold text-sm lg:text-base text-gray-200">0</p>
-                                <p class="text-[9px] text-gray-500 uppercase mt-0.5">Total Visits</p>
-                            </div>
-                            <div>
-                                <p id="stat-referrals" class="font-bold text-sm lg:text-base text-gray-200">0</p>
-                                <p class="text-[9px] text-gray-500 uppercase mt-0.5">Referrals</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card p-4 lg:p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h4 class="text-xs lg:text-sm font-bold">Who to Follow</h4>
-                            <span class="text-[9px] text-gray-500 font-bold uppercase">Live Users</span>
-                        </div>
-                        <div id="users-list-container" class="space-y-3">
-                            <p class="text-xs text-gray-600 text-center">Searching active members...</p>
-                        </div>
-                    </div>
-
-                    <div class="card p-4 lg:p-5 border border-dashed border-purple-500/10 bg-[#111223]/50">
-                        <h4 class="text-[10px] lg:text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5 mb-1.5">
-                            <i class="fas fa-info-circle"></i> Community Guidelines
-                        </h4>
-                        <p class="text-[10px] lg:text-[11px] text-gray-400 leading-relaxed">
-                            টেলিগ্রাম গ্রুপে স্ক্রিনশট শেয়ার করুন। কোনো ভুল বা ফেক কাজ জমা দিলে অ্যাডমিন প্যানেল থেকে আপনার অ্যাকাউন্টটি ডিলিট বা ব্লক করে দেওয়া হতে পারে।
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div class="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0d0e1b] border-t border-gray-800/80 flex items-center justify-around px-4 z-50 backdrop-blur-md bg-opacity-95">
-        <a href="#" class="flex flex-col items-center gap-1 text-gray-400 active-bottom-nav">
-            <i class="fas fa-home text-lg"></i>
-            <span class="text-[10px] font-semibold">Home</span>
-        </a>
-        <a href="profile.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
-            <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center -mt-5 shadow-lg shadow-purple-500/30 border-4 border-[#080915]">
-                <i class="fas fa-plus text-white text-sm"></i>
-            </div>
-            <span class="text-[10px] font-bold text-purple-400">Add Links</span>
-        </a>
-        <a href="profile.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
-            <i class="fas fa-link text-lg"></i>
-            <span class="text-[10px] font-semibold">My Links</span>
-        </a>
-    </div>
-
-    <div id="loading-popup" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center z-50">
-        <div class="bg-[#111223] border border-purple-500/20 p-8 rounded-3xl text-center max-w-sm w-full mx-4 shadow-2xl">
-            <div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h3 class="text-lg font-bold text-white mb-1">অ্যাড লোড করা হচ্ছে...</h3>
-            <p class="text-xs text-gray-400">দয়া করে একটু অপেক্ষা করুন, নতুন লিংক সাজানো হচ্ছে।</p>
-        </div>
-    </div>
-
 <script type="module">
-    import { db, auth } from './firebase-config.js';
-    import { doc, getDoc, collection, getDocs, updateDoc, increment, query, where, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { db, auth } from './firebase-config.js';
+    import { doc, getDoc, collection, getDocs, updateDoc, increment, query, where, limit, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    let currentActiveIndex = 0; 
-    let fetchedLinks = [];       
-    let completedCount = 0;
+    let currentActiveIndex = 0; 
+    let fetchedLinks = [];       
+    let completedCount = 0;
 
-    // অ্যাডমিনের ২০টি ডিফল্ট ইনকাম লিংক
-    const adminSecretLinks = [
-        "https://www.effectivecpmnetwork.com/juys75wgj?key=4f2943170b5a5f74437786ec7f202a6f",
+    // অ্যাডমিনের ২০টি ডিফল্ট ইনকাম লিংক
+    const adminSecretLinks = [
+         "https://www.effectivecpmnetwork.com/juys75wgj?key=4f2943170b5a5f74437786ec7f202a6f",
         "https://www.effectivecpmnetwork.com/e4zw7bby?key=d400e79442cf70bd3d86eeaf834773a8",
         "https://www.effectivecpmnetwork.com/q3cadwei?key=76ef447bc7cd7b53cb386f372647fc6b",
         "https://www.effectivecpmnetwork.com/y0b6uedka?key=2e413e4cd539fc0d77570789b1db9e6f",
@@ -205,316 +28,417 @@
         "https://www.effectivecpmnetwork.com/rjbv4cn1e8?key=391369eeb86152bf057540e7ef2ea091",
         "https://www.effectivecpmnetwork.com/f3tus1wkj?key=c0fa3f97fbf2a8788cb433ca282b80c5",
         "https://www.effectivecpmnetwork.com/jphsdj9t7?key=7d0bf31f74fd84e571f913b2db706148"
-    ];
+    ];
 
-    function listenToSystemSettings() {
-        onSnapshot(doc(db, "system", "settings"), (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (data.notice && data.notice.trim() !== "") {
-                    document.getElementById('notice-bar').classList.remove('hidden');
-                    document.getElementById('notice-text').innerText = data.notice;
-                } else {
-                    document.getElementById('notice-bar').classList.add('hidden');
-                }
-                if (data.telegram_url && data.telegram_url.trim() !== "") {
-                    document.getElementById('telegram-btn').href = data.telegram_url;
-                } else {
-                    document.getElementById('telegram-btn').href = "https://t.me/+JiEeLY95_Ms1M2Q1";
-                }
-            }
-        });
-    }
+    function listenToSystemSettings() {
+        onSnapshot(doc(db, "system", "settings"), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.notice && data.notice.trim() !== "") {
+                    document.getElementById('notice-bar').classList.remove('hidden');
+                    document.getElementById('notice-text').innerText = data.notice;
+                } else {
+                    document.getElementById('notice-bar').classList.add('hidden');
+                }
+                if (data.telegram_url && data.telegram_url.trim() !== "") {
+                    document.getElementById('telegram-btn').href = data.telegram_url;
+                } else {
+                    document.getElementById('telegram-btn').href = "https://t.me/+JiEeLY95_Ms1M2Q1";
+                }
+            }
+        });
+    }
 
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            document.getElementById('header-name').innerText = user.displayName || "User";
-            document.getElementById('header-avatar').src = user.photoURL || "https://via.placeholder.com/150";
-            document.getElementById('user-name-main').innerText = user.displayName || "User";
-            document.getElementById('user-avatar-main').src = user.photoURL || "https://via.placeholder.com/150";
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            document.getElementById('header-name').innerText = user.displayName || "User";
+            document.getElementById('header-avatar').src = user.photoURL || "https://via.placeholder.com/150";
+            document.getElementById('user-name-main').innerText = user.displayName || "User";
+            document.getElementById('user-avatar-main').src = user.photoURL || "https://via.placeholder.com/150";
 
-            const userDocRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(userDocRef);
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                document.getElementById('header-points').innerText = data.points || 0;
-                document.getElementById('stat-links').innerText = data.links ? data.links.filter(l => l !== "").length : 0;
-                document.getElementById('stat-visits').innerText = data.total_clicks || 0;
-                document.getElementById('stat-referrals').innerText = data.referrals_count || 0;
-            }
+            const userDocRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(userDocRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById('header-points').innerText = data.points || 0;
+                document.getElementById('stat-links').innerText = data.links ? data.links.filter(l => l !== "").length : 0;
+                document.getElementById('stat-visits').innerText = data.total_clicks || 0;
+                document.getElementById('stat-referrals').innerText = data.referrals_count || 0;
+            }
 
-            loadLiveMembersList(user.uid);
-            loadTrafficExchangeLinks(user.uid);
-            listenToSystemSettings();
-        } else {
-            window.location.href = "login.html";
-        }
-    });
+            loadLiveMembersList(user.uid);
+            loadTrafficExchangeLinks(user.uid);
+            listenToSystemSettings();
+        } else {
+            window.location.href = "login.html";
+        }
+    });
 
-    async function loadLiveMembersList(currentUid) {
-        const container = document.getElementById('users-list-container');
-        container.innerHTML = `<p class="text-xs text-gray-600 text-center py-2">Searching members...</p>`;
+// গ্লোবাল ভেরিয়েবল হিসেবে এটি যোগ করুন (কোডের একদম উপরে)
+    let adminLinkPointer = 0; 
 
-        try {
-            const qUsers = query(collection(db, "users"), limit(5)); 
-            const querySnapshot = await getDocs(qUsers);
-            container.innerHTML = "";
-            let userCount = 0;
+    async function loadTrafficExchangeLinks(currentUid) {
+        const container = document.getElementById('tasks-container');
+        container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Digital ad posts loading...</p>`;
+        
+        fetchedLinks = [];
+        currentActiveIndex = 0;
+        completedCount = 0;
+        document.getElementById('progress-text').innerText = `Visits: 0/10`;
 
-            querySnapshot.forEach((uDoc) => {
-                if (uDoc.id !== currentUid) { 
-                    userCount++;
-                    const userData = uDoc.data();
-                    const name = userData.displayName || "AdLink Member";
-                    const photo = userData.photoURL || `https://i.pravatar.cc/100?u=${uDoc.id}`;
-                    const pts = userData.points || 0;
+        try {
+            // ১. ইউজারের লিংকগুলো ফেচ করা (আগের মতোই)
+            const q = query(collection(db, "users"), where("points", ">", 0), limit(40));
+            const querySnapshot = await getDocs(q);
+            let activeUserPool = [];
+            
+            querySnapshot.forEach((uDoc) => {
+                if (uDoc.id !== currentUid) {
+                    const uData = uDoc.data();
+                    if (uData.links && uData.links.length > 0) {
+                        const validLinks = uData.links.filter(l => l !== "");
+                        if (validLinks.length > 0) activeUserPool.push({ uid: uDoc.id, links: validLinks });
+                    }
+                }
+            });
 
-                    const itemHtml = `
-                        <div class="flex items-center justify-between p-2 bg-[#16172a]/40 rounded-xl border border-gray-800/40 hover:border-purple-500/20 transition">
-                            <div class="flex items-center min-w-0">
-                                <img src="${photo}" class="w-8 h-8 rounded-full mr-2.5 object-cover border-2 border-purple-500/20 flex-shrink-0">
-                                <div class="min-w-0">
-                                    <p class="text-xs font-bold text-gray-200 truncate">${name}</p>
-                                    <p class="text-[9px] text-gray-500 truncate">💰 ${pts} Pts</p>
-                                </div>
-                            </div>
-                            <button onclick="followUser('${uDoc.id}', this)" class="bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white border border-purple-500/20 px-2.5 py-1 rounded-lg text-[9px] font-bold transition flex-shrink-0">
-                                Follow
-                            </button>
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', itemHtml);
-                }
-            });
+            // ২. ৭টি ইউজার লিংক এলোমেলোভাবে নেওয়া
+            activeUserPool.sort(() => Math.random() - 0.5);
+            for(let i = 0; i < Math.min(7, activeUserPool.length); i++) {
+                const randomLink = activeUserPool[i].links[Math.floor(Math.random() * activeUserPool[i].links.length)];
+                fetchedLinks.push({ ownerUid: activeUserPool[i].uid, url: randomLink });
+            }
 
-            if (userCount === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-600 text-center py-4">No other members yet.</p>`;
-            }
-        } catch (err) {
-            console.error("Error loading users:", err);
-        }
-    }
+            // ৩. আপনার সিক্রেট ২০টি লিংক থেকে ৩টি নেওয়া (লুপ মেইনটেইন করে)
+            for (let i = 0; i < 3; i++) {
+                // পয়েন্টার যদি ২০ এর বেশি হয় তবে আবার ০ তে ফিরে যাবে
+                if (adminLinkPointer >= adminSecretLinks.length) adminLinkPointer = 0;
+                
+                fetchedLinks.push({ 
+                    ownerUid: "system_admin", 
+                    url: adminSecretLinks[adminLinkPointer] 
+                });
+                adminLinkPointer++; // পরেরবার পরের ৩টি লিংক আসার জন্য পয়েন্টার বাড়ানো হলো
+            }
 
-    // ৫টি একটিভ ইউজারের লিংক এবং ৫টি এডমিন লিংক র্যান্ডমলি মিক্স করার মেকানিজম (বাগ ফিক্সড)
-    async function loadTrafficExchangeLinks(currentUid) {
-        const container = document.getElementById('tasks-container');
-        container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Digital ad posts loading...</p>`;
-        
-        fetchedLinks = [];
-        currentActiveIndex = 0;
-        completedCount = 0;
-        document.getElementById('progress-text').innerText = `Visits: 0/10`;
-        document.getElementById('next-ten-btn').disabled = true;
-        document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-4 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed";
+            // ৪. ১০টি লিংক মিক্স করা
+            fetchedLinks.sort(() => Math.random() - 0.5);
+            renderTaskButtons();
 
-        try {
-            // ১. ফায়ারবেস থেকে পয়েন্ট থাকা প্রথম ৪০ জন একটিভ মেম্বারকে তুলে নেওয়া পুল আকারে
-            const q = query(collection(db, "users"), where("points", ">", 0), limit(40));
-            const querySnapshot = await getDocs(q);
-            let activeUserPool = [];
-            
-            querySnapshot.forEach((uDoc) => {
-                if (uDoc.id !== currentUid) {
-                    const uData = uDoc.data();
-                    if (uData.links && uData.links.length > 0) {
-                        const validLinks = uData.links.filter(l => l !== "");
-                        if (validLinks.length > 0) {
-                            activeUserPool.push({ uid: uDoc.id, links: validLinks });
-                        }
-                    }
-                }
-            });
+        } catch (err) {
+            console.error("Error loading links:", err);
+            // ব্যাকআপ হিসেবে এডমিন লিংক পাঠানো
+            renderTaskButtons();
+        }
+    }
 
-            // ২. এই একটিভ পুল থেকে র্যান্ডমলি সর্বোচ্চ ৫ জন মেম্বার সিলেক্ট করে তাদের ১টি করে র্যান্ডম লিংক নেওয়া
-            activeUserPool.sort(() => Math.random() - 0.5); 
-            const maxUserLinks = Math.min(5, activeUserPool.length);
-            
-            for(let i = 0; i < maxUserLinks; i++) {
-                const randomLink = activeUserPool[i].links[Math.floor(Math.random() * activeUserPool[i].links.length)];
-                fetchedLinks.push({ ownerUid: activeUserPool[i].uid, url: randomLink });
-            }
+    async function loadTrafficExchangeLinks(currentUid) {
+        const container = document.getElementById('tasks-container');
+        container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Digital ad posts loading...</p>`;
+        
+        fetchedLinks = [];
+        currentActiveIndex = 0;
+        completedCount = 0;
+        document.getElementById('progress-text').innerText = `Visits: 0/10`;
+        document.getElementById('next-ten-btn').disabled = true;
+        document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-4 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed whitespace-nowrap";
 
-            // ৩. বাকি স্লটগুলো ১০টি পূরণ হওয়া পর্যন্ত অ্যাডমিনের সিক্রেট লিংক দিয়ে ফিল-আপ করা
-            while (fetchedLinks.length < 10) {
-                const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
-                fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
-            }
+        try {
+            const q = query(collection(db, "users"), where("points", ">", 0), limit(40));
+            const querySnapshot = await getDocs(q);
+            let activeUserPool = [];
+            
+            querySnapshot.forEach((uDoc) => {
+                if (uDoc.id !== currentUid) {
+                    const uData = uDoc.data();
+                    if (uData.links && uData.links.length > 0) {
+                        const validLinks = uData.links.filter(l => l !== "");
+                        if (validLinks.length > 0) {
+                            activeUserPool.push({ uid: uDoc.id, links: validLinks });
+                        }
+                    }
+                }
+            });
 
-            // ৪. ফাইনাল ১০টি টাস্ক লিস্টকে সম্পূর্ণ এলোমেলো (Shuffle) করে দেওয়া যাতে চেনা না যায়
-            fetchedLinks.sort(() => Math.random() - 0.5);
-            renderTaskButtons();
+            activeUserPool.sort(() => Math.random() - 0.5); 
+            const maxUserLinks = Math.min(5, activeUserPool.length);
+            
+            for(let i = 0; i < maxUserLinks; i++) {
+                const randomLink = activeUserPool[i].links[Math.floor(Math.random() * activeUserPool[i].links.length)];
+                fetchedLinks.push({ ownerUid: activeUserPool[i].uid, url: randomLink });
+            }
 
-        } catch (err) {
-            console.error("Error fetching links:", err);
-            // ব্যাকএন্ড ফেইল করলে সেফটি হিসেবে ফুল ১০টিই এডমিন লিংক জেনারেট হবে
-            while (fetchedLinks.length < 10) {
-                const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
-                fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
-            }
-            renderTaskButtons();
-        }
-    }
+            while (fetchedLinks.length < 10) {
+                const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
+                fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
+            }
 
-    function renderTaskButtons() {
-        const container = document.getElementById('tasks-container');
-        container.innerHTML = "";
+            fetchedLinks.sort(() => Math.random() - 0.5);
+            renderTaskButtons();
 
-        fetchedLinks.forEach((linkData, index) => {
-            let btnClass = "link-btn-locked";
-            let btnText = `<i class="fas fa-lock mr-1.5 text-[9px]"></i> Locked`;
+        } catch (err) {
+            console.error("Error fetching links:", err);
+            while (fetchedLinks.length < 10) {
+                const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
+                fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
+            }
+            renderTaskButtons();
+        }
+    }
 
-            if (index === 0) {
-                btnClass = "link-btn-active";
-                btnText = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
-            }
+    function renderTaskButtons() {
+        const container = document.getElementById('tasks-container');
+        container.innerHTML = "";
 
-            const rowHtml = `
-                <div class="flex items-center justify-between p-2.5 lg:p-3 bg-[#15162c] rounded-xl border border-gray-800/50">
-                    <div class="flex items-center space-x-2 min-w-0">
-                        <span class="text-[11px] font-bold text-gray-500 w-3">${index + 1}.</span>
-                        <p class="text-[11px] lg:text-xs font-semibold text-gray-300 truncate">Digital Post #${index + 1}</p>
-                    </div>
-                    <button id="task-btn-${index}" data-index="${index}" class="px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 ${btnClass}">
-                        ${btnText}
-                    </button>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', rowHtml);
-            document.getElementById(`task-btn-${index}`).addEventListener('click', () => handleTaskClick(index));
-        });
-    }
+        fetchedLinks.forEach((linkData, index) => {
+            let btnClass = "link-btn-locked";
+            let btnText = `<i class="fas fa-lock mr-1.5 text-[9px]"></i> Locked`;
 
-    async function handleTaskClick(index) {
-        if (index !== currentActiveIndex) return;
+            if (index === 0) {
+                btnClass = "link-btn-active";
+                btnText = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
+            }
 
-        const currentBtn = document.getElementById(`task-btn-${index}`);
-        const nextBtn = document.getElementById(`task-btn-${index + 1}`);
+            const rowHtml = `
+                <div class="flex items-center justify-between p-2.5 lg:p-3 bg-[#15162c] rounded-xl border border-gray-800/50">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <span class="text-[11px] font-bold text-gray-500 w-3">${index + 1}.</span>
+                        <p class="text-[11px] lg:text-xs font-semibold text-gray-300 truncate">Digital Post #${index + 1}</p>
+                    </div>
+                    <button id="task-btn-${index}" data-index="${index}" class="px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 ${btnClass}">
+                        ${btnText}
+                    </button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', rowHtml);
+            document.getElementById(`task-btn-${index}`).addEventListener('click', () => handleTaskClick(index));
+        });
+    }
 
-        const popupWidth = 600;
-        const popupHeight = 700;
-        const left = (screen.width / 2) - (popupWidth / 2);
-        const top = (screen.height / 2) - (popupHeight / 2);
+    // 🌟 নতুন আপডেট করা টাস্ক ক্লিক হ্যান্ডলার (ইন-অ্যাপ সিকিউর মোডাল ও সেফ পপ-আপ লজিক)
+    async function handleTaskClick(index) {
+        if (index !== currentActiveIndex) return;
 
-        // সেফ পপআপ উইন্ডো মেথড
-        const popupWindow = window.open(
-            fetchedLinks[index].url, 
-            "AdsterraAd", 
-            `width=${popupWidth},height=${popupHeight},top=${top},left=${left},resizable=yes,scrollbars=yes`
-        );
+        const currentBtn = document.getElementById(`task-btn-${index}`);
+        const modal = document.getElementById('ad-secure-modal');
+        const adFrame = document.getElementById('ad-content-frame');
+        const timerZone = document.getElementById('modal-timer-zone');
 
-        let timeLeft = 10;
-        currentBtn.disabled = true;
-        currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
-        currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
+        // ১. মেইন পেজের বাটনের ইন্টারফেস চেইঞ্জ (ইন-প্রোগ্রেস স্টেট)
+        currentBtn.disabled = true;
+        currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
+        currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... 10s`;
 
-        const interval = setInterval(async () => {
-            timeLeft--;
-            if (timeLeft > 0) {
-                currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
-            } else {
-                clearInterval(interval);
-                
-                currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-completed";
-                currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Done`;
+        // 🚀 অ্যাডটি সেফ উপায়ে নতুন ট্যাবে ওপেন করা হলো (যাতে সাদা স্ক্রিন না আসে)
+        const openWindow = window.open(fetchedLinks[index].url, '_blank');
+        
+        if (!openWindow) {
+            alert("দয়া করে আপনার ব্রাউজারের Pop-up Blocker অফ করুন এবং আবার চেষ্টা করুন ভাই!");
+            currentBtn.disabled = false;
+            currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 link-btn-active";
+            currentBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
+            return;
+        }
 
-                if (popupWindow && !popupWindow.closed) {
-                    popupWindow.close();
-                }
+        // ২. সিকিউর ইন-অ্যাপ লেয়ার ওপেন ও অবজেক্ট ফ্রেম হাইড করে ইনফো নোটিশ দেওয়া
+        adFrame.style.display = 'none'; 
+        
+        let infoNotice = document.getElementById('ad-info-notice');
+        if (!infoNotice) {
+            infoNotice = document.createElement('div');
+            infoNotice.id = 'ad-info-notice';
+            infoNotice.className = "absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#080915]";
+            infoNotice.innerHTML = `
+                <div class="w-16 h-16 bg-purple-600/10 text-purple-500 rounded-full flex items-center justify-center mb-4 text-2xl animate-bounce">
+                    <i class="fas fa-bullhorn text-purple-400"></i>
+                </div>
+                <h2 id="notice-status-title" class="text-base lg:text-lg font-bold text-white mb-2">বিজ্ঞাপনটি নতুন ট্যাবে ওপেন হয়েছে!</h2>
+                <p id="notice-status-desc" class="text-xs text-gray-400 max-w-sm leading-relaxed">পয়েন্ট পেতে নতুন ট্যাবে যাওয়া বিজ্ঞাপনটি দেখুন। ১০ সেকেন্ড শেষ হলে একটি সাউন্ড অ্যালার্ট বাজবে, তখন এই ট্যাবে ফিরে আসুন।</p>
+            `;
+            adFrame.parentNode.appendChild(infoNotice);
+        }
 
-                // টাইমার সফলভাবে শেষ হবার পর ডেটাবেজ আপডেট ও পয়েন্ট কাটাকাটি লজিক (বাগ ফিক্সড)
-                const user = auth.currentUser;
-                if (user) {
-                    const viewerRef = doc(db, "users", user.uid);
-                    // ১. যে দেখল তাকে +১ পয়েন্ট পুরস্কার দিন
-                    await updateDoc(viewerRef, {
-                        points: increment(1),
-                        total_clicks: increment(1)
-                    });
+        modal.classList.remove('hidden');
 
-                    // ২. লিংকটির আসল মালিকের অ্যাকাউন্ট থেকে -১ পয়েন্ট কেটে নিন (যদি সে এডমিন না হয়)
-                    const ownerUid = fetchedLinks[index].ownerUid;
-                    if (ownerUid !== "system_admin" && ownerUid !== user.uid) {
-                        const ownerRef = doc(db, "users", ownerUid);
-                        await updateDoc(ownerRef, { points: increment(-1) });
-                    }
+        let timeLeft = 10;
+        timerZone.innerHTML = `<span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-3.5 py-1.5 rounded-full text-[11px] font-bold">${timeLeft}s Remaining</span>`;
 
-                    let currentPts = parseInt(document.getElementById('header-points').innerText);
-                    document.getElementById('header-points').innerText = currentPts + 1;
-                }
+        // ৩. রিয়েল-টাইম ইন-অ্যাপ টাইমার ইন্টারভাল ট্র্যাকিং
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            const countdownLabel = document.getElementById('modal-countdown');
+            if (countdownLabel) {
+                countdownLabel.innerText = `${timeLeft}s Remaining`;
+            }
 
-                completedCount++;
-                document.getElementById('progress-text').innerText = `Visits: ${completedCount}/10`;
+            // ৪. বাধ্যতামূলক ১০ সেকেন্ড দেখা সম্পন্ন হলে
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
 
-                currentActiveIndex++;
-                
-                if (index < 9 && nextBtn) {
-                    nextBtn.disabled = false;
-                    nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-active";
-                    nextBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 2}`;
-                }
+                // 🔔 ব্রাউজারের নিজস্ব অডিও কনটেক্সট দিয়ে সাউন্ড বাজানো (ইউজার অন্য ট্যাবে থাকলেও শুনতে পাবে)
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 নোট (মিষ্টি টিউন)
+                    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.3); 
+                } catch (audioErr) {
+                    console.log("Audio notification blocked or not supported", audioErr);
+                }
 
-                if (completedCount === 10) {
-                    const nextTenBtn = document.getElementById('next-ten-btn');
-                    nextTenBtn.disabled = false;
-                    nextTenBtn.className = "bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-purple-500/20";
-                    
-                    const viewerRef = doc(db, "users", user.uid);
-                    await updateDoc(viewerRef, { points: increment(10) });
-                    alert("১০টি টাস্ক সফলভাবে শেষ করায় আপনার ব্যালেন্সে ১০ বোনাস পয়েন্ট যোগ হয়েছে! 🎉");
-                }
-            }
-        }, 1000);
-    }
+                // মোডালের ভেতরের টেক্সট ক্লেইমের জন্য আপডেট
+                document.getElementById('notice-status-title').innerText = "সময় শেষ! বোনাস ক্লেইম করুন 🎉";
+                document.getElementById('notice-status-desc').innerText = "নিচের 'Claim & Close' বাটনে ক্লিক করে আপনার একাউন্টে পয়েন্ট যোগ করে নিন ভাই।";
+                
+                // ৫. ক্লোজ এবং পয়েন্ট ক্রেডিট বাটন জেনারেট
+                timerZone.innerHTML = `
+                    <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-green-500/20 flex items-center gap-1 animate-bounce">
+                        <i class="fas fa-check-circle"></i> Claim & Close
+                    </button>
+                `;
 
-  window.followUser = async function(targetUid, btnElement) {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-        alert("দয়া করে আগে লগইন করুন!");
-        return;
-    }
+                // ৬. ক্লেইম বাটনে ক্লিকের সাথে সাথে পয়েন্ট ডেটাবেজে সাবমিট লজিক
+                document.getElementById('claim-close-btn').addEventListener('click', () => processPointsSubmission(index));
+            }
+        }, 1000);
+    }
 
-    if (currentUser.uid === targetUid) {
-        alert("আপনি নিজেকে নিজে ফলো করতে পারবেন না ভাই!");
-        return;
-    }
+    // 🌟 ব্যাকএন্ডে সাকসেসফুলি ডেটা সাবমিট এবং লেয়ার রিসেট মেথড
+    async function processPointsSubmission(index) {
+        const modal = document.getElementById('ad-secure-modal');
+        const currentBtn = document.getElementById(`task-btn-${index}`);
+        const nextBtn = document.getElementById(`task-btn-${index + 1}`);
+        const user = auth.currentUser;
 
-    // বাটন ইনস্ট্যান্টলি লক করে লোডিং স্টেট দেখানো
-    btnElement.innerText = "Processing...";
-    btnElement.disabled = true;
+        if (user) {
+            try {
+                // ১. ভিউয়ারের ব্যালেন্সে ১ পয়েন্ট যোগ করা
+                const viewerRef = doc(db, "users", user.uid);
+                await updateDoc(viewerRef, {
+                    points: increment(1),
+                    total_clicks: increment(1)
+                });
 
-    try {
-        // ১. যে ফলো করছে (আমার নিজের) 'following_count' বাড়ানো
-        const myRef = doc(db, "users", currentUser.uid);
-        await updateDoc(myRef, {
-            following_count: increment(1)
-        });
+                // ২. লিংকের আসল মালিকের ব্যালেন্স থেকে ১ পয়েন্ট কাটা (যদি এডমিন লিংক না হয়)
+                const ownerUid = fetchedLinks[index].ownerUid;
+                if (ownerUid !== "system_admin" && ownerUid !== user.uid) {
+                    const ownerRef = doc(db, "users", ownerUid);
+                    await updateDoc(ownerRef, { points: increment(-1) });
+                }
 
-        // ২. যাকে ফলো করা হলো (অন্য ইউজারের) 'followers_count' বাড়ানো
-        const targetRef = doc(db, "users", targetUid);
-        await updateDoc(targetRef, {
-            followers_count: increment(1)
-        });
+                // ৩. স্ক্রিনের টপ হেডার ব্যালেন্স লাইভ আপডেট
+                let currentPts = parseInt(document.getElementById('header-points').innerText);
+                document.getElementById('header-points').innerText = currentPts + 1;
 
-        // বাটন সফলভাবে পরিবর্তন করা
-        btnElement.innerText = "Following";
-        btnElement.className = "bg-green-600 text-white px-2 py-1 rounded-lg text-[9px] font-bold transition cursor-default";
-    } catch (err) {
-        console.error("Follow error:", err);
-        alert("ফলো করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-        btnElement.innerText = "Follow";
-        btnElement.disabled = false;
-    }
-};
+            } catch (err) {
+                document.getElementById('header-points').innerText = currentPts + 1;
+            }
+        }
 
-    document.getElementById('next-ten-btn').addEventListener('click', () => {
-        const popup = document.getElementById('loading-popup');
-        popup.classList.remove('hidden');
+        // ৪. মেইন স্ক্রিনের বাটন কমপ্লিট স্টেটে রূপান্তর
+        currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-completed";
+        currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Done`;
 
-        setTimeout(() => {
-            popup.classList.add('hidden');
-            loadTrafficExchangeLinks(auth.currentUser.uid);
-        }, 3000);
-    });
+        completedCount++;
+        document.getElementById('progress-text').innerText = `Visits: ${completedCount}/10`;
+        currentActiveIndex++;
+
+        // ৫. পরবর্তী বাটন থাকলে সেটি আনলক করা
+        if (index < 9 && nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-active";
+            nextBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 2}`;
+        }
+
+        // ৬. ১০টি টাস্ক কমপ্লিট হলে বোনাস ১০ পয়েন্ট প্রদান
+        if (completedCount === 10 && user) {
+            const nextTenBtn = document.getElementById('next-ten-btn');
+            nextTenBtn.disabled = false;
+            nextTenBtn.className = "bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-purple-500/20";
+            
+            try {
+                const viewerRef = doc(db, "users", user.uid);
+                await updateDoc(viewerRef, { points: increment(10) });
+                alert("১০টি টাস্ক সফলভাবে শেষ করায় আপনার ব্যালেন্সে ১০ বোনাস পয়েন্ট যোগ হয়েছে! 🎉");
+            } catch (bonusErr) {
+                console.error("Bonus credit failed:", bonusErr);
+            }
+        }
+
+        // ৭. মোডাল হাইড ও অবজেক্ট ডেটা ক্লিয়ার
+        modal.classList.add('hidden');
+        document.getElementById('ad-content-frame').data = "";
+        
+        const infoNotice = document.getElementById('ad-info-notice');
+        if (infoNotice) infoNotice.remove();
+    }
+
+    // 🎯 গ্লোবাল ফলো ফাংশন
+    window.followUser = async function(targetUid, btnElement) {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+            alert("দয়া করে আগে লগইন করুন!");
+            return;
+        }
+
+        if (currentUser.uid === targetUid) {
+            alert("আপনি নিজেকে নিজে ফলো করতে পারবেন না ভাই!");
+            return;
+        }
+
+        btnElement.innerText = "Processing...";
+        btnElement.disabled = true;
+
+        try {
+            const myRef = doc(db, "users", currentUser.uid);
+            const targetRef = doc(db, "users", targetUid);
+
+            await updateDoc(myRef, {
+                following_list: arrayUnion(targetUid),
+                following_count: increment(1)
+            });
+
+            await updateDoc(targetRef, {
+                followers_count: increment(1)
+            });
+
+            const targetedCard = document.getElementById(`home-user-card-${targetUid}`);
+            if (targetedCard) {
+                targetedCard.style.opacity = '0';
+                targetedCard.style.transition = 'opacity 0.2s ease';
+                setTimeout(() => {
+                    targetedCard.remove();
+                    const container = document.getElementById('users-list-container');
+                    if (container && container.children.length === 0) {
+                        container.innerHTML = `<p class="text-xs text-gray-600 text-center py-4">No new members to follow.</p>`;
+                    }
+                }, 200);
+            }
+
+        } catch (err) {
+            console.error("Follow error:", err);
+            alert("ফলো করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+            btnElement.innerText = "Follow";
+            btnElement.disabled = false;
+        }
+    };
+
+    document.getElementById('next-ten-btn').addEventListener('click', () => {
+        const popup = document.getElementById('loading-popup');
+        popup.classList.remove('hidden');
+        setTimeout(() => {
+            loadTrafficExchangeLinks(auth.currentUser.uid);
+            popup.classList.add('hidden');
+        }, 1500);
+    });
 </script>
 </body>
 </html>
