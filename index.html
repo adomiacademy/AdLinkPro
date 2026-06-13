@@ -175,18 +175,17 @@
         </div>
     </div>
 
-
 <script type="module">
-    import { db, auth } from './firebase-config.js';
-    import { doc, getDoc, collection, getDocs, updateDoc, increment, query, where, limit, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { db, auth } from './firebase-config.js';
+    import { doc, getDoc, collection, getDocs, updateDoc, increment, query, where, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    let currentActiveIndex = 0; 
-    let fetchedLinks = [];       
-    let completedCount = 0;
+    let currentActiveIndex = 0; 
+    let fetchedLinks = [];       
+    let completedCount = 0;
 
-    // অ্যাডমিনের ২০টি ডিফল্ট ইনকাম লিংক
-    const adminSecretLinks = [
-         "https://www.effectivecpmnetwork.com/juys75wgj?key=4f2943170b5a5f74437786ec7f202a6f",
+    // অ্যাডমিনের ২০টি ডিফল্ট ইনকাম লিংক
+    const adminSecretLinks = [
+        "https://www.effectivecpmnetwork.com/juys75wgj?key=4f2943170b5a5f74437786ec7f202a6f",
         "https://www.effectivecpmnetwork.com/e4zw7bby?key=d400e79442cf70bd3d86eeaf834773a8",
         "https://www.effectivecpmnetwork.com/q3cadwei?key=76ef447bc7cd7b53cb386f372647fc6b",
         "https://www.effectivecpmnetwork.com/y0b6uedka?key=2e413e4cd539fc0d77570789b1db9e6f",
@@ -206,417 +205,316 @@
         "https://www.effectivecpmnetwork.com/rjbv4cn1e8?key=391369eeb86152bf057540e7ef2ea091",
         "https://www.effectivecpmnetwork.com/f3tus1wkj?key=c0fa3f97fbf2a8788cb433ca282b80c5",
         "https://www.effectivecpmnetwork.com/jphsdj9t7?key=7d0bf31f74fd84e571f913b2db706148"
-    ];
+    ];
 
-    function listenToSystemSettings() {
-        onSnapshot(doc(db, "system", "settings"), (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (data.notice && data.notice.trim() !== "") {
-                    document.getElementById('notice-bar').classList.remove('hidden');
-                    document.getElementById('notice-text').innerText = data.notice;
-                } else {
-                    document.getElementById('notice-bar').classList.add('hidden');
-                }
-                if (data.telegram_url && data.telegram_url.trim() !== "") {
-                    document.getElementById('telegram-btn').href = data.telegram_url;
-                } else {
-                    document.getElementById('telegram-btn').href = "https://t.me/+JiEeLY95_Ms1M2Q1";
-                }
-            }
-        });
-    }
+    function listenToSystemSettings() {
+        onSnapshot(doc(db, "system", "settings"), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.notice && data.notice.trim() !== "") {
+                    document.getElementById('notice-bar').classList.remove('hidden');
+                    document.getElementById('notice-text').innerText = data.notice;
+                } else {
+                    document.getElementById('notice-bar').classList.add('hidden');
+                }
+                if (data.telegram_url && data.telegram_url.trim() !== "") {
+                    document.getElementById('telegram-btn').href = data.telegram_url;
+                } else {
+                    document.getElementById('telegram-btn').href = "https://t.me/+JiEeLY95_Ms1M2Q1";
+                }
+            }
+        });
+    }
 
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            document.getElementById('header-name').innerText = user.displayName || "User";
-            document.getElementById('header-avatar').src = user.photoURL || "https://via.placeholder.com/150";
-            document.getElementById('user-name-main').innerText = user.displayName || "User";
-            document.getElementById('user-avatar-main').src = user.photoURL || "https://via.placeholder.com/150";
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            document.getElementById('header-name').innerText = user.displayName || "User";
+            document.getElementById('header-avatar').src = user.photoURL || "https://via.placeholder.com/150";
+            document.getElementById('user-name-main').innerText = user.displayName || "User";
+            document.getElementById('user-avatar-main').src = user.photoURL || "https://via.placeholder.com/150";
 
-            const userDocRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(userDocRef);
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                document.getElementById('header-points').innerText = data.points || 0;
-                document.getElementById('stat-links').innerText = data.links ? data.links.filter(l => l !== "").length : 0;
-                document.getElementById('stat-visits').innerText = data.total_clicks || 0;
-                document.getElementById('stat-referrals').innerText = data.referrals_count || 0;
-            }
+            const userDocRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(userDocRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById('header-points').innerText = data.points || 0;
+                document.getElementById('stat-links').innerText = data.links ? data.links.filter(l => l !== "").length : 0;
+                document.getElementById('stat-visits').innerText = data.total_clicks || 0;
+                document.getElementById('stat-referrals').innerText = data.referrals_count || 0;
+            }
 
-            loadLiveMembersList(user.uid);
-            loadTrafficExchangeLinks(user.uid);
-            listenToSystemSettings();
-        } else {
-            window.location.href = "login.html";
-        }
-    });
+            loadLiveMembersList(user.uid);
+            loadTrafficExchangeLinks(user.uid);
+            listenToSystemSettings();
+        } else {
+            window.location.href = "login.html";
+        }
+    });
 
-// গ্লোবাল ভেরিয়েবল হিসেবে এটি যোগ করুন (কোডের একদম উপরে)
-    let adminLinkPointer = 0; 
+    async function loadLiveMembersList(currentUid) {
+        const container = document.getElementById('users-list-container');
+        container.innerHTML = `<p class="text-xs text-gray-600 text-center py-2">Searching members...</p>`;
 
-    async function loadTrafficExchangeLinks(currentUid) {
-        const container = document.getElementById('tasks-container');
-        container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Digital ad posts loading...</p>`;
-        
-        fetchedLinks = [];
-        currentActiveIndex = 0;
-        completedCount = 0;
-        document.getElementById('progress-text').innerText = `Visits: 0/10`;
+        try {
+            const qUsers = query(collection(db, "users"), limit(5)); 
+            const querySnapshot = await getDocs(qUsers);
+            container.innerHTML = "";
+            let userCount = 0;
 
-        try {
-            // ১. ইউজারের লিংকগুলো ফেচ করা (আগের মতোই)
-            const q = query(collection(db, "users"), where("points", ">", 0), limit(40));
-            const querySnapshot = await getDocs(q);
-            let activeUserPool = [];
-            
-            querySnapshot.forEach((uDoc) => {
-                if (uDoc.id !== currentUid) {
-                    const uData = uDoc.data();
-                    if (uData.links && uData.links.length > 0) {
-                        const validLinks = uData.links.filter(l => l !== "");
-                        if (validLinks.length > 0) activeUserPool.push({ uid: uDoc.id, links: validLinks });
-                    }
-                }
-            });
+            querySnapshot.forEach((uDoc) => {
+                if (uDoc.id !== currentUid) { 
+                    userCount++;
+                    const userData = uDoc.data();
+                    const name = userData.displayName || "AdLink Member";
+                    const photo = userData.photoURL || `https://i.pravatar.cc/100?u=${uDoc.id}`;
+                    const pts = userData.points || 0;
 
-            // ২. ৭টি ইউজার লিংক এলোমেলোভাবে নেওয়া
-            activeUserPool.sort(() => Math.random() - 0.5);
-            for(let i = 0; i < Math.min(7, activeUserPool.length); i++) {
-                const randomLink = activeUserPool[i].links[Math.floor(Math.random() * activeUserPool[i].links.length)];
-                fetchedLinks.push({ ownerUid: activeUserPool[i].uid, url: randomLink });
-            }
+                    const itemHtml = `
+                        <div class="flex items-center justify-between p-2 bg-[#16172a]/40 rounded-xl border border-gray-800/40 hover:border-purple-500/20 transition">
+                            <div class="flex items-center min-w-0">
+                                <img src="${photo}" class="w-8 h-8 rounded-full mr-2.5 object-cover border-2 border-purple-500/20 flex-shrink-0">
+                                <div class="min-w-0">
+                                    <p class="text-xs font-bold text-gray-200 truncate">${name}</p>
+                                    <p class="text-[9px] text-gray-500 truncate">💰 ${pts} Pts</p>
+                                </div>
+                            </div>
+                            <button onclick="followUser('${uDoc.id}', this)" class="bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white border border-purple-500/20 px-2.5 py-1 rounded-lg text-[9px] font-bold transition flex-shrink-0">
+                                Follow
+                            </button>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', itemHtml);
+                }
+            });
 
-            // ৩. আপনার সিক্রেট ২০টি লিংক থেকে ৩টি নেওয়া (লুপ মেইনটেইন করে)
-            for (let i = 0; i < 3; i++) {
-                // পয়েন্টার যদি ২০ এর বেশি হয় তবে আবার ০ তে ফিরে যাবে
-                if (adminLinkPointer >= adminSecretLinks.length) adminLinkPointer = 0;
-                
-                fetchedLinks.push({ 
-                    ownerUid: "system_admin", 
-                    url: adminSecretLinks[adminLinkPointer] 
-                });
-                adminLinkPointer++; // পরেরবার পরের ৩টি লিংক আসার জন্য পয়েন্টার বাড়ানো হলো
-            }
+            if (userCount === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-600 text-center py-4">No other members yet.</p>`;
+            }
+        } catch (err) {
+            console.error("Error loading users:", err);
+        }
+    }
 
-            // ৪. ১০টি লিংক মিক্স করা
-            fetchedLinks.sort(() => Math.random() - 0.5);
-            renderTaskButtons();
+    // ৫টি একটিভ ইউজারের লিংক এবং ৫টি এডমিন লিংক র্যান্ডমলি মিক্স করার মেকানিজম (বাগ ফিক্সড)
+    async function loadTrafficExchangeLinks(currentUid) {
+        const container = document.getElementById('tasks-container');
+        container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Digital ad posts loading...</p>`;
+        
+        fetchedLinks = [];
+        currentActiveIndex = 0;
+        completedCount = 0;
+        document.getElementById('progress-text').innerText = `Visits: 0/10`;
+        document.getElementById('next-ten-btn').disabled = true;
+        document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-4 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed";
 
-        } catch (err) {
-            console.error("Error loading links:", err);
-            // ব্যাকআপ হিসেবে এডমিন লিংক পাঠানো
-            renderTaskButtons();
-        }
-    }
+        try {
+            // ১. ফায়ারবেস থেকে পয়েন্ট থাকা প্রথম ৪০ জন একটিভ মেম্বারকে তুলে নেওয়া পুল আকারে
+            const q = query(collection(db, "users"), where("points", ">", 0), limit(40));
+            const querySnapshot = await getDocs(q);
+            let activeUserPool = [];
+            
+            querySnapshot.forEach((uDoc) => {
+                if (uDoc.id !== currentUid) {
+                    const uData = uDoc.data();
+                    if (uData.links && uData.links.length > 0) {
+                        const validLinks = uData.links.filter(l => l !== "");
+                        if (validLinks.length > 0) {
+                            activeUserPool.push({ uid: uDoc.id, links: validLinks });
+                        }
+                    }
+                }
+            });
 
-    async function loadTrafficExchangeLinks(currentUid) {
-        const container = document.getElementById('tasks-container');
-        container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Digital ad posts loading...</p>`;
-        
-        fetchedLinks = [];
-        currentActiveIndex = 0;
-        completedCount = 0;
-        document.getElementById('progress-text').innerText = `Visits: 0/10`;
-        document.getElementById('next-ten-btn').disabled = true;
-        document.getElementById('next-ten-btn').className = "bg-gray-800 text-gray-500 px-4 py-2 rounded-xl text-xs font-bold transition cursor-not-allowed whitespace-nowrap";
+            // ২. এই একটিভ পুল থেকে র্যান্ডমলি সর্বোচ্চ ৫ জন মেম্বার সিলেক্ট করে তাদের ১টি করে র্যান্ডম লিংক নেওয়া
+            activeUserPool.sort(() => Math.random() - 0.5); 
+            const maxUserLinks = Math.min(5, activeUserPool.length);
+            
+            for(let i = 0; i < maxUserLinks; i++) {
+                const randomLink = activeUserPool[i].links[Math.floor(Math.random() * activeUserPool[i].links.length)];
+                fetchedLinks.push({ ownerUid: activeUserPool[i].uid, url: randomLink });
+            }
 
-        try {
-            const q = query(collection(db, "users"), where("points", ">", 0), limit(40));
-            const querySnapshot = await getDocs(q);
-            let activeUserPool = [];
-            
-            querySnapshot.forEach((uDoc) => {
-                if (uDoc.id !== currentUid) {
-                    const uData = uDoc.data();
-                    if (uData.links && uData.links.length > 0) {
-                        const validLinks = uData.links.filter(l => l !== "");
-                        if (validLinks.length > 0) {
-                            activeUserPool.push({ uid: uDoc.id, links: validLinks });
-                        }
-                    }
-                }
-            });
+            // ৩. বাকি স্লটগুলো ১০টি পূরণ হওয়া পর্যন্ত অ্যাডমিনের সিক্রেট লিংক দিয়ে ফিল-আপ করা
+            while (fetchedLinks.length < 10) {
+                const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
+                fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
+            }
 
-            activeUserPool.sort(() => Math.random() - 0.5); 
-            const maxUserLinks = Math.min(5, activeUserPool.length);
-            
-            for(let i = 0; i < maxUserLinks; i++) {
-                const randomLink = activeUserPool[i].links[Math.floor(Math.random() * activeUserPool[i].links.length)];
-                fetchedLinks.push({ ownerUid: activeUserPool[i].uid, url: randomLink });
-            }
+            // ৪. ফাইনাল ১০টি টাস্ক লিস্টকে সম্পূর্ণ এলোমেলো (Shuffle) করে দেওয়া যাতে চেনা না যায়
+            fetchedLinks.sort(() => Math.random() - 0.5);
+            renderTaskButtons();
 
-            while (fetchedLinks.length < 10) {
-                const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
-                fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
-            }
+        } catch (err) {
+            console.error("Error fetching links:", err);
+            // ব্যাকএন্ড ফেইল করলে সেফটি হিসেবে ফুল ১০টিই এডমিন লিংক জেনারেট হবে
+            while (fetchedLinks.length < 10) {
+                const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
+                fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
+            }
+            renderTaskButtons();
+        }
+    }
 
-            fetchedLinks.sort(() => Math.random() - 0.5);
-            renderTaskButtons();
+    function renderTaskButtons() {
+        const container = document.getElementById('tasks-container');
+        container.innerHTML = "";
 
-        } catch (err) {
-            console.error("Error fetching links:", err);
-            while (fetchedLinks.length < 10) {
-                const randomAdminLink = adminSecretLinks[Math.floor(Math.random() * adminSecretLinks.length)];
-                fetchedLinks.push({ ownerUid: "system_admin", url: randomAdminLink });
-            }
-            renderTaskButtons();
-        }
-    }
+        fetchedLinks.forEach((linkData, index) => {
+            let btnClass = "link-btn-locked";
+            let btnText = `<i class="fas fa-lock mr-1.5 text-[9px]"></i> Locked`;
 
-    function renderTaskButtons() {
-        const container = document.getElementById('tasks-container');
-        container.innerHTML = "";
+            if (index === 0) {
+                btnClass = "link-btn-active";
+                btnText = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
+            }
 
-        fetchedLinks.forEach((linkData, index) => {
-            let btnClass = "link-btn-locked";
-            let btnText = `<i class="fas fa-lock mr-1.5 text-[9px]"></i> Locked`;
+            const rowHtml = `
+                <div class="flex items-center justify-between p-2.5 lg:p-3 bg-[#15162c] rounded-xl border border-gray-800/50">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <span class="text-[11px] font-bold text-gray-500 w-3">${index + 1}.</span>
+                        <p class="text-[11px] lg:text-xs font-semibold text-gray-300 truncate">Digital Post #${index + 1}</p>
+                    </div>
+                    <button id="task-btn-${index}" data-index="${index}" class="px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 ${btnClass}">
+                        ${btnText}
+                    </button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', rowHtml);
+            document.getElementById(`task-btn-${index}`).addEventListener('click', () => handleTaskClick(index));
+        });
+    }
 
-            if (index === 0) {
-                btnClass = "link-btn-active";
-                btnText = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
-            }
+    async function handleTaskClick(index) {
+        if (index !== currentActiveIndex) return;
 
-            const rowHtml = `
-                <div class="flex items-center justify-between p-2.5 lg:p-3 bg-[#15162c] rounded-xl border border-gray-800/50">
-                    <div class="flex items-center space-x-2 min-w-0">
-                        <span class="text-[11px] font-bold text-gray-500 w-3">${index + 1}.</span>
-                        <p class="text-[11px] lg:text-xs font-semibold text-gray-300 truncate">Digital Post #${index + 1}</p>
-                    </div>
-                    <button id="task-btn-${index}" data-index="${index}" class="px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 ${btnClass}">
-                        ${btnText}
-                    </button>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', rowHtml);
-            document.getElementById(`task-btn-${index}`).addEventListener('click', () => handleTaskClick(index));
-        });
-    }
+        const currentBtn = document.getElementById(`task-btn-${index}`);
+        const nextBtn = document.getElementById(`task-btn-${index + 1}`);
 
-    // 🌟 নতুন আপডেট করা টাস্ক ক্লিক হ্যান্ডলার (ইন-অ্যাপ সিকিউর মোডাল ও সেফ পপ-আপ লজিক)
-    async function handleTaskClick(index) {
-        if (index !== currentActiveIndex) return;
+        const popupWidth = 600;
+        const popupHeight = 700;
+        const left = (screen.width / 2) - (popupWidth / 2);
+        const top = (screen.height / 2) - (popupHeight / 2);
 
-        const currentBtn = document.getElementById(`task-btn-${index}`);
-        const modal = document.getElementById('ad-secure-modal');
-        const adFrame = document.getElementById('ad-content-frame');
-        const timerZone = document.getElementById('modal-timer-zone');
+        // সেফ পপআপ উইন্ডো মেথড
+        const popupWindow = window.open(
+            fetchedLinks[index].url, 
+            "AdsterraAd", 
+            `width=${popupWidth},height=${popupHeight},top=${top},left=${left},resizable=yes,scrollbars=yes`
+        );
 
-        // ১. মেইন পেজের বাটনের ইন্টারফেস চেইঞ্জ (ইন-প্রোগ্রেস স্টেট)
-        currentBtn.disabled = true;
-        currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
-        currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... 10s`;
+        let timeLeft = 10;
+        currentBtn.disabled = true;
+        currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold bg-yellow-600/20 text-yellow-500 border border-yellow-500/20 cursor-not-allowed";
+        currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
 
-        // 🚀 অ্যাডটি সেফ উপায়ে নতুন ট্যাবে ওপেন করা হলো (যাতে সাদা স্ক্রিন না আসে)
-        const openWindow = window.open(fetchedLinks[index].url, '_blank');
-        
-        if (!openWindow) {
-            alert("দয়া করে আপনার ব্রাউজারের Pop-up Blocker অফ করুন এবং আবার চেষ্টা করুন ভাই!");
-            currentBtn.disabled = false;
-            currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold transition-all flex-shrink-0 link-btn-active";
-            currentBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 1}`;
-            return;
-        }
+        const interval = setInterval(async () => {
+            timeLeft--;
+            if (timeLeft > 0) {
+                currentBtn.innerHTML = `<i class="fas fa-clock animate-spin mr-1"></i> Checking... ${timeLeft}s`;
+            } else {
+                clearInterval(interval);
+                
+                currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-completed";
+                currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Done`;
 
-        // ২. সিকিউর ইন-অ্যাপ লেয়ার ওপেন ও অবজেক্ট ফ্রেম হাইড করে ইনফো নোটিশ দেওয়া
-        adFrame.style.display = 'none'; 
-        
-        let infoNotice = document.getElementById('ad-info-notice');
-        if (!infoNotice) {
-            infoNotice = document.createElement('div');
-            infoNotice.id = 'ad-info-notice';
-            infoNotice.className = "absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#080915]";
-            infoNotice.innerHTML = `
-                <div class="w-16 h-16 bg-purple-600/10 text-purple-500 rounded-full flex items-center justify-center mb-4 text-2xl animate-bounce">
-                    <i class="fas fa-bullhorn text-purple-400"></i>
-                </div>
-                <h2 id="notice-status-title" class="text-base lg:text-lg font-bold text-white mb-2">বিজ্ঞাপনটি নতুন ট্যাবে ওপেন হয়েছে!</h2>
-                <p id="notice-status-desc" class="text-xs text-gray-400 max-w-sm leading-relaxed">পয়েন্ট পেতে নতুন ট্যাবে যাওয়া বিজ্ঞাপনটি দেখুন। ১০ সেকেন্ড শেষ হলে একটি সাউন্ড অ্যালার্ট বাজবে, তখন এই ট্যাবে ফিরে আসুন।</p>
-            `;
-            adFrame.parentNode.appendChild(infoNotice);
-        }
+                if (popupWindow && !popupWindow.closed) {
+                    popupWindow.close();
+                }
 
-        modal.classList.remove('hidden');
+                // টাইমার সফলভাবে শেষ হবার পর ডেটাবেজ আপডেট ও পয়েন্ট কাটাকাটি লজিক (বাগ ফিক্সড)
+                const user = auth.currentUser;
+                if (user) {
+                    const viewerRef = doc(db, "users", user.uid);
+                    // ১. যে দেখল তাকে +১ পয়েন্ট পুরস্কার দিন
+                    await updateDoc(viewerRef, {
+                        points: increment(1),
+                        total_clicks: increment(1)
+                    });
 
-        let timeLeft = 10;
-        timerZone.innerHTML = `<span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-3.5 py-1.5 rounded-full text-[11px] font-bold">${timeLeft}s Remaining</span>`;
+                    // ২. লিংকটির আসল মালিকের অ্যাকাউন্ট থেকে -১ পয়েন্ট কেটে নিন (যদি সে এডমিন না হয়)
+                    const ownerUid = fetchedLinks[index].ownerUid;
+                    if (ownerUid !== "system_admin" && ownerUid !== user.uid) {
+                        const ownerRef = doc(db, "users", ownerUid);
+                        await updateDoc(ownerRef, { points: increment(-1) });
+                    }
 
-        // ৩. রিয়েল-টাইম ইন-অ্যাপ টাইমার ইন্টারভাল ট্র্যাকিং
-        const countdownInterval = setInterval(() => {
-            timeLeft--;
-            const countdownLabel = document.getElementById('modal-countdown');
-            if (countdownLabel) {
-                countdownLabel.innerText = `${timeLeft}s Remaining`;
-            }
+                    let currentPts = parseInt(document.getElementById('header-points').innerText);
+                    document.getElementById('header-points').innerText = currentPts + 1;
+                }
 
-            // ৪. বাধ্যতামূলক ১০ সেকেন্ড দেখা সম্পন্ন হলে
-            if (timeLeft <= 0) {
-                clearInterval(countdownInterval);
+                completedCount++;
+                document.getElementById('progress-text').innerText = `Visits: ${completedCount}/10`;
 
-                // 🔔 ব্রাউজারের নিজস্ব অডিও কনটেক্সট দিয়ে সাউন্ড বাজানো (ইউজার অন্য ট্যাবে থাকলেও শুনতে পাবে)
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 নোট (মিষ্টি টিউন)
-                    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                    
-                    oscillator.start();
-                    oscillator.stop(audioCtx.currentTime + 0.3); 
-                } catch (audioErr) {
-                    console.log("Audio notification blocked or not supported", audioErr);
-                }
+                currentActiveIndex++;
+                
+                if (index < 9 && nextBtn) {
+                    nextBtn.disabled = false;
+                    nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-active";
+                    nextBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 2}`;
+                }
 
-                // মোডালের ভেতরের টেক্সট ক্লেইমের জন্য আপডেট
-                document.getElementById('notice-status-title').innerText = "সময় শেষ! বোনাস ক্লেইম করুন 🎉";
-                document.getElementById('notice-status-desc').innerText = "নিচের 'Claim & Close' বাটনে ক্লিক করে আপনার একাউন্টে পয়েন্ট যোগ করে নিন ভাই।";
-                
-                // ৫. ক্লোজ এবং পয়েন্ট ক্রেডিট বাটন জেনারেট
-                timerZone.innerHTML = `
-                    <button id="claim-close-btn" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-green-500/20 flex items-center gap-1 animate-bounce">
-                        <i class="fas fa-check-circle"></i> Claim & Close
-                    </button>
-                `;
+                if (completedCount === 10) {
+                    const nextTenBtn = document.getElementById('next-ten-btn');
+                    nextTenBtn.disabled = false;
+                    nextTenBtn.className = "bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-purple-500/20";
+                    
+                    const viewerRef = doc(db, "users", user.uid);
+                    await updateDoc(viewerRef, { points: increment(10) });
+                    alert("১০টি টাস্ক সফলভাবে শেষ করায় আপনার ব্যালেন্সে ১০ বোনাস পয়েন্ট যোগ হয়েছে! 🎉");
+                }
+            }
+        }, 1000);
+    }
 
-                // ৬. ক্লেইম বাটনে ক্লিকের সাথে সাথে পয়েন্ট ডেটাবেজে সাবমিট লজিক
-                document.getElementById('claim-close-btn').addEventListener('click', () => processPointsSubmission(index));
-            }
-        }, 1000);
-    }
+  window.followUser = async function(targetUid, btnElement) {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+        alert("দয়া করে আগে লগইন করুন!");
+        return;
+    }
 
-    // 🌟 ব্যাকএন্ডে সাকসেসফুলি ডেটা সাবমিট এবং লেয়ার রিসেট মেথড
-    async function processPointsSubmission(index) {
-        const modal = document.getElementById('ad-secure-modal');
-        const currentBtn = document.getElementById(`task-btn-${index}`);
-        const nextBtn = document.getElementById(`task-btn-${index + 1}`);
-        const user = auth.currentUser;
+    if (currentUser.uid === targetUid) {
+        alert("আপনি নিজেকে নিজে ফলো করতে পারবেন না ভাই!");
+        return;
+    }
 
-        if (user) {
-            try {
-                // ১. ভিউয়ারের ব্যালেন্সে ১ পয়েন্ট যোগ করা
-                const viewerRef = doc(db, "users", user.uid);
-                await updateDoc(viewerRef, {
-                    points: increment(1),
-                    total_clicks: increment(1)
-                });
+    // বাটন ইনস্ট্যান্টলি লক করে লোডিং স্টেট দেখানো
+    btnElement.innerText = "Processing...";
+    btnElement.disabled = true;
 
-                // ২. লিংকের আসল মালিকের ব্যালেন্স থেকে ১ পয়েন্ট কাটা (যদি এডমিন লিংক না হয়)
-                const ownerUid = fetchedLinks[index].ownerUid;
-                if (ownerUid !== "system_admin" && ownerUid !== user.uid) {
-                    const ownerRef = doc(db, "users", ownerUid);
-                    await updateDoc(ownerRef, { points: increment(-1) });
-                }
+    try {
+        // ১. যে ফলো করছে (আমার নিজের) 'following_count' বাড়ানো
+        const myRef = doc(db, "users", currentUser.uid);
+        await updateDoc(myRef, {
+            following_count: increment(1)
+        });
 
-                // ৩. স্ক্রিনের টপ হেডার ব্যালেন্স লাইভ আপডেট
-                let currentPts = parseInt(document.getElementById('header-points').innerText);
-                document.getElementById('header-points').innerText = currentPts + 1;
+        // ২. যাকে ফলো করা হলো (অন্য ইউজারের) 'followers_count' বাড়ানো
+        const targetRef = doc(db, "users", targetUid);
+        await updateDoc(targetRef, {
+            followers_count: increment(1)
+        });
 
-            } catch (err) {
-                document.getElementById('header-points').innerText = currentPts + 1;
-            }
-        }
+        // বাটন সফলভাবে পরিবর্তন করা
+        btnElement.innerText = "Following";
+        btnElement.className = "bg-green-600 text-white px-2 py-1 rounded-lg text-[9px] font-bold transition cursor-default";
+    } catch (err) {
+        console.error("Follow error:", err);
+        alert("ফলো করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+        btnElement.innerText = "Follow";
+        btnElement.disabled = false;
+    }
+};
 
-        // ৪. মেইন স্ক্রিনের বাটন কমপ্লিট স্টেটে রূপান্তর
-        currentBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-completed";
-        currentBtn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Done`;
+    document.getElementById('next-ten-btn').addEventListener('click', () => {
+        const popup = document.getElementById('loading-popup');
+        popup.classList.remove('hidden');
 
-        completedCount++;
-        document.getElementById('progress-text').innerText = `Visits: ${completedCount}/10`;
-        currentActiveIndex++;
-
-        // ৫. পরবর্তী বাটন থাকলে সেটি আনলক করা
-        if (index < 9 && nextBtn) {
-            nextBtn.disabled = false;
-            nextBtn.className = "px-3.5 py-1.5 rounded-xl text-[10px] lg:text-[11px] font-bold link-btn-active";
-            nextBtn.innerHTML = `<i class="fas fa-play mr-1.5 text-[9px]"></i> Visit #${index + 2}`;
-        }
-
-        // ৬. ১০টি টাস্ক কমপ্লিট হলে বোনাস ১০ পয়েন্ট প্রদান
-        if (completedCount === 10 && user) {
-            const nextTenBtn = document.getElementById('next-ten-btn');
-            nextTenBtn.disabled = false;
-            nextTenBtn.className = "bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-purple-500/20";
-            
-            try {
-                const viewerRef = doc(db, "users", user.uid);
-                await updateDoc(viewerRef, { points: increment(10) });
-                alert("১০টি টাস্ক সফলভাবে শেষ করায় আপনার ব্যালেন্সে ১০ বোনাস পয়েন্ট যোগ হয়েছে! 🎉");
-            } catch (bonusErr) {
-                console.error("Bonus credit failed:", bonusErr);
-            }
-        }
-
-        // ৭. মোডাল হাইড ও অবজেক্ট ডেটা ক্লিয়ার
-        modal.classList.add('hidden');
-        document.getElementById('ad-content-frame').data = "";
-        
-        const infoNotice = document.getElementById('ad-info-notice');
-        if (infoNotice) infoNotice.remove();
-    }
-
-    // 🎯 গ্লোবাল ফলো ফাংশন
-    window.followUser = async function(targetUid, btnElement) {
-        const currentUser = auth.currentUser;
-        if (!currentUser) {
-            alert("দয়া করে আগে লগইন করুন!");
-            return;
-        }
-
-        if (currentUser.uid === targetUid) {
-            alert("আপনি নিজেকে নিজে ফলো করতে পারবেন না ভাই!");
-            return;
-        }
-
-        btnElement.innerText = "Processing...";
-        btnElement.disabled = true;
-
-        try {
-            const myRef = doc(db, "users", currentUser.uid);
-            const targetRef = doc(db, "users", targetUid);
-
-            await updateDoc(myRef, {
-                following_list: arrayUnion(targetUid),
-                following_count: increment(1)
-            });
-
-            await updateDoc(targetRef, {
-                followers_count: increment(1)
-            });
-
-            const targetedCard = document.getElementById(`home-user-card-${targetUid}`);
-            if (targetedCard) {
-                targetedCard.style.opacity = '0';
-                targetedCard.style.transition = 'opacity 0.2s ease';
-                setTimeout(() => {
-                    targetedCard.remove();
-                    const container = document.getElementById('users-list-container');
-                    if (container && container.children.length === 0) {
-                        container.innerHTML = `<p class="text-xs text-gray-600 text-center py-4">No new members to follow.</p>`;
-                    }
-                }, 200);
-            }
-
-        } catch (err) {
-            console.error("Follow error:", err);
-            alert("ফলো করতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-            btnElement.innerText = "Follow";
-            btnElement.disabled = false;
-        }
-    };
-
-    document.getElementById('next-ten-btn').addEventListener('click', () => {
-        const popup = document.getElementById('loading-popup');
-        popup.classList.remove('hidden');
-        setTimeout(() => {
-            loadTrafficExchangeLinks(auth.currentUser.uid);
-            popup.classList.add('hidden');
-        }, 1500);
-    });
+        setTimeout(() => {
+            popup.classList.add('hidden');
+            loadTrafficExchangeLinks(auth.currentUser.uid);
+        }, 3000);
+    });
 </script>
 </body>
 </html>
