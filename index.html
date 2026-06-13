@@ -417,7 +417,7 @@
         }
     }
 
- // 🛠️ টাইমার ১ সেকেন্ডে আটকে থাকা এবং বাটন না আসার ফিক্সড লজিক
+ // 📱 মোবাইল ওয়েব অ্যাপ (WebView/PWA) স্পেশাল ফিক্সড ফাংশন
     async function handleTaskClick(index) {
         if (index !== currentActiveIndex) return;
 
@@ -435,6 +435,7 @@
             Notification.requestPermission();
         }
 
+        // অ্যাড ওপেন করা হলো
         const adWindow = window.open(fetchedLinks[index].url, '_blank');
 
         currentBtn.disabled = true;
@@ -449,13 +450,18 @@
         const targetTime = startTime + (duration * 1000);
         let isFinished = false; 
 
+        // ক্লেইম বাটন দেখানোর মেইন লজিক
         const showClaimButton = () => {
             if (isFinished) return;
             isFinished = true;
 
             clearInterval(countdownInterval);
-            window.removeEventListener('focus', handleWindowFocus);
-            window.removeEventListener('visibilitychange', handleWindowFocus);
+            
+            // সব ইভেন্ট লিসেনার রিমুভ করা
+            window.removeEventListener('focus', forceCheckTime);
+            window.removeEventListener('visibilitychange', forceCheckTime);
+            document.removeEventListener('touchend', forceCheckTime);
+            document.removeEventListener('click', forceCheckTime);
             window.removeEventListener('popstate', handlePhysicalBack);
 
             if (audioCtx) {
@@ -482,7 +488,6 @@
                 document.getElementById(`task-btn-${index}`).innerHTML = `<i class="fas fa-check-circle mr-1"></i> Ready`;
             }
 
-            // এখানে বাটন রেন্ডার নিশ্চিত করা হয়েছে
             timerZone.innerHTML = `
                 <div class="text-center py-2">
                     <p class="text-green-400 text-xs font-bold mb-2 animate-pulse">🎉 টাস্ক সফলভাবে সম্পন্ন হয়েছে!</p>
@@ -504,22 +509,18 @@
             });
         };
 
-        const updateTimer = () => {
-            if (isFinished) return;
-            
+        // সময় চেক করার আলটিমেট লজিক (যা অ্যাপ ব্যাকগ্রাউন্ড থেকে ফিরলে কাজ করবেই)
+        const forceCheckTime = () => {
             const now = Date.now();
-            
-            // 🚨 মেইন ফিক্স: সময় পার হয়ে গেলে বা ১ সেকেন্ডের কম বাকি থাকলে সরাসরি বাটন দেখাবে
             if (now >= targetTime) {
                 showClaimButton();
-                return;
+                return true;
             }
-
+            
             let timeLeft = Math.ceil((targetTime - now) / 1000);
-
             if (timeLeft <= 0) {
                 showClaimButton();
-                return;
+                return true;
             }
 
             if (document.getElementById(`task-btn-${index}`)) {
@@ -532,28 +533,28 @@
                     <span id="modal-countdown" class="bg-purple-950/80 text-purple-400 border border-purple-500/30 px-4 py-1.5 rounded-full text-xs font-bold">${timeLeft}s Remaining</span>
                 </div>
             `;
+            return false;
         };
 
-        updateTimer();
-        const countdownInterval = setInterval(updateTimer, 500); // আরও দ্রুত চেকিংয়ের জন্য ১ সেকেন্ডের বদলে ৫০০ms করা হলো
+        // প্রথম রান
+        forceCheckTime();
+        
+        // ব্যাকগ্রাউন্ড সেফ ইন্টারভাল (৫০০ms পর পর চেক)
+        const countdownInterval = setInterval(forceCheckTime, 500);
 
-        const handleWindowFocus = () => {
-            const now = Date.now();
-            if (now >= targetTime) {
-                showClaimButton(); 
-            } else {
-                updateTimer();
-            }
-        };
-
-        window.addEventListener('focus', handleWindowFocus);
-        window.addEventListener('visibilitychange', handleWindowFocus);
+        // 🚨 মোবাইল অ্যাপ লাইফলাইন: ইউজার অ্যাপে ফিরে স্ক্রিনে যেকোনো জায়গায় টাচ বা ক্লিক করলেই সাথে সাথে চেক হবে
+        window.addEventListener('focus', forceCheckTime);
+        window.addEventListener('visibilitychange', forceCheckTime);
+        document.addEventListener('touchend', forceCheckTime); // মোবাইলের জন্য টাচ এ্যান্ড ইভেন্ট
+        document.addEventListener('click', forceCheckTime);    // ক্লিক ইভেন্ট
 
         const handlePhysicalBack = (e) => {
             if (isFinished) return;
             clearInterval(countdownInterval);
-            window.removeEventListener('focus', handleWindowFocus);
-            window.removeEventListener('visibilitychange', handleWindowFocus);
+            window.removeEventListener('focus', forceCheckTime);
+            window.removeEventListener('visibilitychange', forceCheckTime);
+            document.removeEventListener('touchend', forceCheckTime);
+            document.removeEventListener('click', forceCheckTime);
             modal.classList.add('hidden');
             document.title = originalTitle;
             setupActiveButtonListener(); 
